@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Configura la base de datos
 def get_db_connection():
@@ -9,7 +10,7 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Crea la tabla de citas (solo una vez)
+# Crea la tabla de citas
 def create_table():
     conn = get_db_connection()
     conn.execute('''
@@ -25,10 +26,10 @@ def create_table():
     conn.commit()
     conn.close()
 
-create_table()  # Ejecuta al iniciar
+create_table()
 
 @app.route("/")
-def index():
+def home():
     return render_template("index.html")
 
 @app.route("/agendar", methods=["POST"])
@@ -48,7 +49,8 @@ def agendar():
         conn.commit()
         conn.close()
 
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
