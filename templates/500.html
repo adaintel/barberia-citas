@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Error del Servidor{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h2 class="h4 mb-0"><i class="bi bi-exclamation-octagon"></i> Error 500 - Error Interno del Servidor</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">¡Algo salió mal!</h4>
+                <p>El servidor encontró un error interno y no pudo completar tu solicitud.</p>
+                <hr>
+                <p class="mb-0">
+                    Por favor intenta nuevamente más tarde o contacta al administrador del sistema.
+                </p>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
