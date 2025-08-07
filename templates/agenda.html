@@ -3,43 +3,48 @@
 {% block title %}Agenda de Citas{% endblock %}
 
 {% block content %}
-<h2>Próximas Citas</h2>
+<div class="container">
+    <h2 class="my-4">Próximas Citas</h2>
 
-{% if citas %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Cliente</th>
-            <th>Servicio</th>
-            <th>Teléfono</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cita in citas %}
-        <tr>
-            <td>{{ cita[1].strftime('%d/%m/%Y') }}</td>
-            <td>{{ cita[2].strftime('%H:%M') }}</td>
-            <td>{{ cita[3] }}</td>
-            <td>{{ cita[4] }}</td>
-            <td>{{ cita[5] if cita[5] else 'N/A' }}</td>
-        </tr>
+    {% if citas %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Servicio</th>
+                    <th>Teléfono</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td>{{ cita[0].strftime('%d/%m/%Y') }}</td>
+                    <td>{{ cita[1].strftime('%H:%M') }}</td>
+                    <td>{{ cita[2] }}</td>
+                    <td>{{ cita[3] }}</td>
+                    <td>{{ cita[4] if cita[4] else '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Actualmente no hay citas programadas.
+    </div>
+    {% endif %}
+
+    <h2 class="my-4">Servicios Disponibles</h2>
+    <ul class="list-group">
+        {% for servicio, precio in servicios %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ servicio }}
+            <span class="badge badge-primary badge-pill">${{ "%.2f"|format(precio) }}</span>
+        </li>
         {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<div class="alert alert-info">
-    No hay citas programadas
+    </ul>
 </div>
-{% endif %}
-
-<h2>Servicios Disponibles</h2>
-<ul class="list-group">
-    {% for servicio, precio in servicios %}
-    <li class="list-group-item">
-        {{ servicio }} - ${{ "%.2f"|format(precio) }}
-    </li>
-    {% endfor %}
-</ul>
 {% endblock %}
