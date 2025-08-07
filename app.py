@@ -5,7 +5,6 @@ from psycopg2 import sql
 
 app = Flask(__name__)
 
-# Conexión a TU base de datos específica
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
@@ -31,15 +30,32 @@ def create_table():
 
 create_table()
 
-# [Mantén tus rutas @app.route existentes...]
-
-# ... (el resto de tu código existente)
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/agendar', methods=['POST'])
 def agendar():
-    # ... (tu código existente de agendar)
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        telefono = request.form['telefono']
+        servicio = request.form['servicio']
+        fecha = request.form['fecha']
+        hora = request.form['hora']
 
-# ▼▼▼ AÑADE ESTA NUEVA RUTA AQUÍ ▼▼▼
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            '''INSERT INTO citas (nombre, telefono, servicio, fecha, hora) 
+               VALUES (%s, %s, %s, %s, %s)''',
+            (nombre, telefono, servicio, fecha, hora)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect(url_for('home'))
+
 @app.route('/test-db')
 def test_db():
     try:
@@ -50,12 +66,10 @@ def test_db():
         return "¡Conexión a PostgreSQL exitosa!"
     except Exception as e:
         return f"Error: {str(e)}"
-# ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
-
 
 
 
