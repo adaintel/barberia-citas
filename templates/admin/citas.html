@@ -1,0 +1,15 @@
+{% extends 'admin/model/list.html' %}
+
+{% block brand %}
+    <h2 id="brand">Gestión de Citas - Barbería</h2>
+{{ super() }}
+{% endblock %}
+
+{% block model_menu_bar %}
+<div class="btn-group">
+    <a href="{{ url_for('exportar_csv') }}" class="btn btn-success">
+        <i class="glyphicon glyphicon-download"></i> Exportar CSV
+    </a>
+    {{ super() }}
+</div>
+{% endblock %}
