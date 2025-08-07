@@ -2,6 +2,8 @@ import os
 from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
 from psycopg2 import sql
+# Añade esto al inicio, después de los imports
+print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
 
 app = Flask(__name__)
 
@@ -70,6 +72,7 @@ def test_db():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
