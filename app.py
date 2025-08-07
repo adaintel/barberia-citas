@@ -4,7 +4,12 @@ import psycopg2
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta_flask'
+app.secret_key = os.getenv('SECRET_KEY', 'una-clave-secreta-por-defecto')
+
+# Configuración para la base de datos
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+app.config['ADMIN_USER'] = os.getenv('ADMIN_USER')
+app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS')
 
 # Configuración de la base de datos desde variables de entorno
 app.config['DATABASE_URL'] = 'postgresql://user:pass@host:port/db'
@@ -57,4 +62,5 @@ def login():
     return render_template('login.html')
 
 if __name__ == '__main__':
+
     app.run(debug=True)
