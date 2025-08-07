@@ -4,7 +4,6 @@ from datetime import datetime
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
-from urllib.parse import urlparse
 
 # Cargar variables de entorno
 load_dotenv()
@@ -14,26 +13,11 @@ def create_app():
     app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
     # Configuración
-    app.config['ADMIN_USER'] = os.getenv('ADMIN_USER')
-    app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS')
+    app.config['ADMIN_USER'] = os.getenv('ADMIN_USER', 'admin_pro')
+    app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS', 'Cl4v3-S3gur4!')
     
     # Pool de conexiones
     connection_pool = None
-
-    def parse_db_url(db_url):
-        """Parsear la URL de la base de datos para componentes individuales"""
-        try:
-            parsed = urlparse(db_url)
-            return {
-                'dbname': parsed.path[1:],
-                'user': parsed.username,
-                'password': parsed.password,
-                'host': parsed.hostname,
-                'port': parsed.port or 5432  # Puerto por defecto de PostgreSQL
-            }
-        except Exception as e:
-            print(f"Error al parsear DATABASE_URL: {e}")
-            raise
 
     def init_db():
         nonlocal connection_pool
@@ -41,35 +25,33 @@ def create_app():
             db_url = os.getenv('DATABASE_URL')
             if not db_url:
                 raise ValueError("DATABASE_URL no está configurada")
-                
-            # Parsear la URL de la base de datos
-            db_params = parse_db_url(db_url)
             
-            # Crear pool de conexiones con parámetros individuales
+            # Conexión directa con la URL
             connection_pool = psycopg2.pool.SimpleConnectionPool(
                 minconn=1,
                 maxconn=10,
-                **db_params
+                dsn=db_url
             )
             print("✅ Conexión a la base de datos establecida correctamente")
+            return True
         except Exception as e:
             print(f"❌ Error al conectar a la base de datos: {e}")
-            raise
+            return False
 
     def get_db_connection():
         if not connection_pool:
-            init_db()
+            if not init_db():
+                return None
         return connection_pool.getconn()
 
     def close_db_connection(conn):
         if connection_pool and conn:
             connection_pool.putconn(conn)
 
-    # Verificar conexión a la base de datos al iniciar
-    try:
-        init_db()
-    except Exception as e:
-        print(f"Error inicializando la base de datos: {e}")
+    # Context processor para añadir 'now' a todas las plantillas
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.now()}
 
     # Rutas
     @app.route('/')
@@ -78,9 +60,12 @@ def create_app():
 
     @app.route('/agenda')
     def agenda():
-        conn = None
+        conn = get_db_connection()
+        if not conn:
+            flash("Error de conexión con la base de datos", "danger")
+            return render_template('agenda.html')
+        
         try:
-            conn = get_db_connection()
             cur = conn.cursor()
             
             cur.execute("""
@@ -134,3 +119,4 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
