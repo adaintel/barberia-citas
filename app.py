@@ -2,7 +2,6 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime, time
 import psycopg2
-from psycopg2 import pool
 from dotenv import load_dotenv
 import time
 
@@ -13,13 +12,15 @@ def create_app():
     app.secret_key = os.getenv('SECRET_KEY', 'la sabana de caripito')
     app.config['ADMIN_USER'] = os.getenv('ADMIN_USER', 'admin_pro')
     app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS', 'Cl4v3-S3gur4!')
-    
-    # Context processor para inyectar 'now' en todas las plantillas
+
+    # --------------------------------------------
+    # CONTEXT PROCESSOR PARA INYECTAR 'now' (SOLUCIÓN AL ERROR)
+    # --------------------------------------------
     @app.context_processor
     def inject_now():
         return {'now': datetime.now()}
+    # --------------------------------------------
 
-    # Configuración mejorada de conexión a DB
     def get_db_connection(retries=3, delay=2):
         for i in range(retries):
             try:
@@ -38,7 +39,6 @@ def create_app():
                     time.sleep(delay)
         return None
 
-    # Verificar e inicializar tablas
     def init_db():
         conn = get_db_connection()
         if not conn:
@@ -46,8 +46,6 @@ def create_app():
         
         try:
             cur = conn.cursor()
-            
-            # Tabla simplificada de citas
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS citas (
                     id SERIAL PRIMARY KEY,
@@ -60,7 +58,6 @@ def create_app():
                     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
             conn.commit()
             return True
         except Exception as e:
@@ -70,7 +67,6 @@ def create_app():
             if conn:
                 conn.close()
 
-    # Inicializar DB al iniciar
     init_db()
 
     @app.route('/')
@@ -82,17 +78,19 @@ def create_app():
         conn = get_db_connection()
         if not conn:
             flash("Error de conexión con la base de datos", "danger")
-            return render_template('agenda.html', citas=[])
+            return render_template('agenda.html', citas=[], servicios=[])
         
         try:
             cur = conn.cursor()
+            print("Ejecutando consulta a la base de datos...")  # Debug
             cur.execute("""
-                SELECT fecha, hora, cliente, servicio 
+                SELECT id, fecha, hora, cliente, servicio, telefono
                 FROM citas 
                 WHERE estado = 'pendiente'
                 ORDER BY fecha, hora
             """)
             citas = cur.fetchall()
+            print(f"Citas encontradas: {citas}")  # Debug
             
             servicios = [
                 ('Corte de caballero', 150.00),
@@ -101,11 +99,19 @@ def create_app():
                 ('Tinte de barba', 200.00)
             ]
             
-            return render_template('agenda.html', citas=citas, servicios=servicios)
+            if not citas:
+                flash("No hay citas pendientes", "info")
+                
+            return render_template('agenda.html', 
+                                citas=citas, 
+                                servicios=servicios)
+            
         except Exception as e:
-            print(f"Error en agenda: {str(e)}")
+            print(f"Error en agenda: {str(e)}")  # Debug detallado
             flash("Error al cargar la agenda", "danger")
-            return render_template('agenda.html', citas=[], servicios=[])
+            return render_template('agenda.html', 
+                                citas=[], 
+                                servicios=[])
         finally:
             if conn:
                 conn.close()
@@ -127,7 +133,6 @@ def create_app():
                 return redirect(url_for('crear_cita'))
             
             try:
-                # Validar hora
                 hora_obj = datetime.strptime(hora, '%H:%M').time()
                 if hora_obj < time(9, 0) or hora_obj > time(18, 0):
                     flash("El horario de atención es de 9:00 AM a 6:00 PM", "danger")
@@ -140,8 +145,6 @@ def create_app():
                 
                 try:
                     cur = conn.cursor()
-                    
-                    # Verificar disponibilidad
                     cur.execute("""
                         SELECT id FROM citas 
                         WHERE fecha = %s AND hora = %s AND estado = 'pendiente'
@@ -150,7 +153,6 @@ def create_app():
                         flash("Ya existe una cita programada para esa fecha y hora", "danger")
                         return redirect(url_for('crear_cita'))
                     
-                    # Insertar cita
                     cur.execute("""
                         INSERT INTO citas (fecha, hora, cliente, servicio, telefono)
                         VALUES (%s, %s, %s, %s, %s)
@@ -170,7 +172,6 @@ def create_app():
                 flash("Formato de hora incorrecto (use HH:MM)", "danger")
                 return redirect(url_for('crear_cita'))
         
-        # GET request - mostrar formulario
         servicios = [
             ('Corte de caballero', 150.00),
             ('Corte de niño', 100.00),
@@ -178,6 +179,23 @@ def create_app():
             ('Tinte de barba', 200.00)
         ]
         return render_template('crear_cita.html', servicios=servicios, min_date=datetime.now().strftime('%Y-%m-%d'))
+
+    @app.route('/test_db')  # Ruta para testing
+    def test_db():
+        conn = get_db_connection()
+        if not conn:
+            return "Error de conexión a la BD", 500
+        
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT 1")
+            result = cur.fetchone()
+            return f"Conexión exitosa a la BD. Resultado test: {result}", 200
+        except Exception as e:
+            return f"Error en consulta test: {str(e)}", 500
+        finally:
+            if conn:
+                conn.close()
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -206,4 +224,5 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
 
