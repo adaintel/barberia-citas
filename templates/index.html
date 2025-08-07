@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Barbería{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Bienvenido al Sistema de Citas de la Barbería</h2>
+    
+    <div class="row">
+        <div class="col">
+            <p>Gestiona tus citas de forma fácil y rápida.</p>
+            <a href="{{ url_for('agenda') }}" class="btn btn-primary">Ver Agenda de Citas</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
