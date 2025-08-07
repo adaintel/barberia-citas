@@ -1,40 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}Crear Nueva Cita{% endblock %}
+{% block title %}Nueva Cita{% endblock %}
 
 {% block content %}
-<h2>Crear Nueva Cita</h2>
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h2 class="h4 mb-0"><i class="bi bi-plus-circle"></i> Programar Nueva Cita</h2>
+    </div>
+    
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('crear_cita') }}" class="needs-validation" novalidate>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <input type="date" class="form-control" id="fecha" name="fecha" 
+                           min="{{ min_date }}" required>
+                    <div class="invalid-feedback">
+                        Por favor seleccione una fecha válida.
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="hora" class="form-label">Hora</label>
+                    <input type="time" class="form-control" id="hora" name="hora" 
+                           min="09:00" max="18:00" required>
+                    <div class="invalid-feedback">
+                        Horario de atención: 09:00 - 18:00
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <label for="nombre_cliente" class="form-label">Nombre del Cliente</label>
+                    <input type="text" class="form-control" id="nombre_cliente" 
+                           name="nombre_cliente" required minlength="3">
+                    <div class="invalid-feedback">
+                        Mínimo 3 caracteres requeridos.
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="servicio" class="form-label">Servicio</label>
+                    <select class="form-select" id="servicio" name="servicio" required>
+                        <option value="" selected disabled>Seleccione un servicio...</option>
+                        {% for servicio, precio in servicios %}
+                        <option value="{{ servicio }}">{{ servicio }} - ${{ "%.2f"|format(precio) }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">
+                        Por favor seleccione un servicio.
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="telefono" class="form-label">Teléfono (Opcional)</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono">
+                </div>
+                
+                <div class="col-12">
+                    <label for="observaciones" class="form-label">Observaciones</label>
+                    <textarea class="form-control" id="observaciones" name="observaciones" 
+                              rows="2"></textarea>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Cita
+                    </button>
+                    <a href="{{ url_for('agenda') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-<form method="POST" action="{{ url_for('crear_cita') }}">
-    <div class="form-group">
-        <label for="fecha">Fecha:</label>
-        <input type="date" id="fecha" name="fecha" min="{{ min_date }}" required>
-    </div>
+<script>
+// Validación del formulario
+(() => {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
     
-    <div class="form-group">
-        <label for="hora">Hora:</label>
-        <input type="time" id="hora" name="hora" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="nombre_cliente">Nombre del Cliente:</label>
-        <input type="text" id="nombre_cliente" name="nombre_cliente" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="servicio">Servicio:</label>
-        <select id="servicio" name="servicio" required>
-            {% for servicio, precio in servicios %}
-            <option value="{{ servicio }}">{{ servicio }} - ${{ "%.2f"|format(precio) }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="telefono">Teléfono (opcional):</label>
-        <input type="tel" id="telefono" name="telefono">
-    </div>
-    
-    <button type="submit" class="btn btn-primary">Guardar Cita</button>
-</form>
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
 {% endblock %}
