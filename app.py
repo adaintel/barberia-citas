@@ -13,13 +13,9 @@ def create_app():
     app.config['ADMIN_USER'] = os.getenv('ADMIN_USER', 'admin_pro')
     app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS', 'Cl4v3-S3gur4!')
 
-    # --------------------------------------------
-    # CONTEXT PROCESSOR PARA INYECTAR 'now' (SOLUCIÓN AL ERROR)
-    # --------------------------------------------
     @app.context_processor
     def inject_now():
         return {'now': datetime.now()}
-    # --------------------------------------------
 
     def get_db_connection(retries=3, delay=2):
         for i in range(retries):
@@ -46,18 +42,32 @@ def create_app():
         
         try:
             cur = conn.cursor()
+            
+            # Verificar estructura actual de la tabla
             cur.execute("""
-                CREATE TABLE IF NOT EXISTS citas (
-                    id SERIAL PRIMARY KEY,
-                    fecha DATE NOT NULL,
-                    hora TIME NOT NULL,
-                    cliente VARCHAR(100) NOT NULL,
-                    servicio VARCHAR(100) NOT NULL,
-                    telefono VARCHAR(20),
-                    estado VARCHAR(20) DEFAULT 'pendiente',
-                    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                SELECT column_name FROM information_schema.columns 
+                WHERE table_name = 'citas'
             """)
+            existing_columns = [row[0] for row in cur.fetchall()]
+            
+            # Crear tabla si no existe o actualizar estructura
+            if not existing_columns:
+                cur.execute("""
+                    CREATE TABLE citas (
+                        id SERIAL PRIMARY KEY,
+                        fecha DATE NOT NULL,
+                        hora TIME NOT NULL,
+                        nombre_cliente VARCHAR(100) NOT NULL,
+                        servicio VARCHAR(100) NOT NULL,
+                        telefono VARCHAR(20),
+                        estado VARCHAR(20) DEFAULT 'pendiente',
+                        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+            elif 'cliente' in existing_columns:
+                # Si existe la columna cliente (antigua), la renombramos
+                cur.execute("ALTER TABLE citas RENAME COLUMN cliente TO nombre_cliente")
+            
             conn.commit()
             return True
         except Exception as e:
@@ -82,15 +92,13 @@ def create_app():
         
         try:
             cur = conn.cursor()
-            print("Ejecutando consulta a la base de datos...")  # Debug
             cur.execute("""
-                SELECT id, fecha, hora, cliente, servicio, telefono
+                SELECT id, fecha, hora, nombre_cliente, servicio, telefono
                 FROM citas 
                 WHERE estado = 'pendiente'
                 ORDER BY fecha, hora
             """)
             citas = cur.fetchall()
-            print(f"Citas encontradas: {citas}")  # Debug
             
             servicios = [
                 ('Corte de caballero', 150.00),
@@ -102,16 +110,12 @@ def create_app():
             if not citas:
                 flash("No hay citas pendientes", "info")
                 
-            return render_template('agenda.html', 
-                                citas=citas, 
-                                servicios=servicios)
+            return render_template('agenda.html', citas=citas, servicios=servicios)
             
         except Exception as e:
-            print(f"Error en agenda: {str(e)}")  # Debug detallado
+            print(f"Error en agenda: {str(e)}")
             flash("Error al cargar la agenda", "danger")
-            return render_template('agenda.html', 
-                                citas=[], 
-                                servicios=[])
+            return render_template('agenda.html', citas=[], servicios=[])
         finally:
             if conn:
                 conn.close()
@@ -124,11 +128,11 @@ def create_app():
         if request.method == 'POST':
             fecha = request.form.get('fecha')
             hora = request.form.get('hora')
-            cliente = request.form.get('cliente')
+            nombre_cliente = request.form.get('nombre_cliente')
             servicio = request.form.get('servicio')
             telefono = request.form.get('telefono')
             
-            if not all([fecha, hora, cliente, servicio]):
+            if not all([fecha, hora, nombre_cliente, servicio]):
                 flash("Todos los campos son requeridos", "danger")
                 return redirect(url_for('crear_cita'))
             
@@ -154,9 +158,9 @@ def create_app():
                         return redirect(url_for('crear_cita'))
                     
                     cur.execute("""
-                        INSERT INTO citas (fecha, hora, cliente, servicio, telefono)
+                        INSERT INTO citas (fecha, hora, nombre_cliente, servicio, telefono)
                         VALUES (%s, %s, %s, %s, %s)
-                    """, (fecha, hora, cliente, servicio, telefono))
+                    """, (fecha, hora, nombre_cliente, servicio, telefono))
                     conn.commit()
                     
                     flash("Cita creada exitosamente!", "success")
@@ -179,23 +183,6 @@ def create_app():
             ('Tinte de barba', 200.00)
         ]
         return render_template('crear_cita.html', servicios=servicios, min_date=datetime.now().strftime('%Y-%m-%d'))
-
-    @app.route('/test_db')  # Ruta para testing
-    def test_db():
-        conn = get_db_connection()
-        if not conn:
-            return "Error de conexión a la BD", 500
-        
-        try:
-            cur = conn.cursor()
-            cur.execute("SELECT 1")
-            result = cur.fetchone()
-            return f"Conexión exitosa a la BD. Resultado test: {result}", 200
-        except Exception as e:
-            return f"Error en consulta test: {str(e)}", 500
-        finally:
-            if conn:
-                conn.close()
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -224,5 +211,3 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-
-
