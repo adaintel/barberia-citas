@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva tu Cita - Barbería XYZ</title>
+    <title>Agendar Cita</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>¡Agenda tu Cita!</h1>
+        <h1>Agendar Cita</h1>
         <form action="/agendar" method="POST">
             <input type="text" name="nombre" placeholder="Nombre" required>
             <input type="tel" name="telefono" placeholder="Teléfono" required>
             <select name="servicio" required>
-                <option value="" disabled selected>Selecciona un servicio</option>
-                <option value="Corte de pelo">Corte de pelo</option>
+                <option value="">Seleccione servicio</option>
+                <option value="Corte">Corte</option>
                 <option value="Barba">Barba</option>
-                <option value="Corte + Barba">Corte + Barba</option>
             </select>
             <input type="date" name="fecha" required>
             <input type="time" name="hora" required>
-            <button type="submit">Reservar</button>
+            <button type="submit">Agendar</button>
         </form>
+        <a href="/admin/cita/" class="admin-link">Panel de Administración</a>
     </div>
 </body>
 </html>
