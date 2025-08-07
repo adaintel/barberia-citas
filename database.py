@@ -1,26 +1,6 @@
 import psycopg2
 from psycopg2 import pool
 from flask import current_app
-import os
-
-connection_pool = None
-
-def init_db(app):
-    global connection_pool
-    connection_pool = psycopg2.pool.SimpleConnectionPool(
-        minconn=1,
-        maxconn=10,
-        dsn=app.config['DATABASE_URL']
-    )
-
-def get_db_connection():
-    if not connection_pool:
-        raise Exception("Connection pool not initialized")
-    return connection_pool.getconn()
-
-def close_db_connection(conn):
-    if connection_pool and conn:
-        connection_pool.putconn(conn)
 
 def create_tables():
     conn = None
@@ -28,6 +8,7 @@ def create_tables():
         conn = get_db_connection()
         cur = conn.cursor()
         
+        # Tabla de servicios
         cur.execute("""
             CREATE TABLE IF NOT EXISTS servicios (
                 id SERIAL PRIMARY KEY,
@@ -37,6 +18,7 @@ def create_tables():
             )
         """)
         
+        # Tabla de usuarios
         cur.execute("""
             CREATE TABLE IF NOT EXISTS usuarios (
                 id SERIAL PRIMARY KEY,
@@ -46,6 +28,7 @@ def create_tables():
             )
         """)
         
+        # Tabla de citas
         cur.execute("""
             CREATE TABLE IF NOT EXISTS citas (
                 id SERIAL PRIMARY KEY,
@@ -58,9 +41,10 @@ def create_tables():
         """)
         
         conn.commit()
-        cur.close()
+        print("Tablas creadas exitosamente")
+        
     except Exception as e:
-        print(f"Error creating tables: {e}")
+        print(f"Error al crear tablas: {e}")
     finally:
         if conn:
             close_db_connection(conn)
