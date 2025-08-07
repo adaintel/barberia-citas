@@ -1,29 +1,8 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environment
-.venv/
-venv/
-
-# Environment variables
+*.pyc
+*.pyo
+*.pyd
 .env
-.env.*
-
-# Database
-*.db
-*.sqlite3
-
-# Flask stuff
+.venv
+venv/
 instance/
-
-# IDE
-.vscode/
-.idea/
-
-# Static files
-staticfiles/
-
-# Logs
-*.log
