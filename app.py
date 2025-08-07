@@ -2,15 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 import os
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+app = Flask(__name__)
 
-# Configura la base de datos
+# Ruta absoluta para la base de datos
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database.db')
+
 def get_db_connection():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
-# Crea la tabla de citas
 def create_table():
     conn = get_db_connection()
     conn.execute('''
@@ -26,31 +27,20 @@ def create_table():
     conn.commit()
     conn.close()
 
+# Llamamos create_table() al inicio
 create_table()
 
-@app.route("/")
+@app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/agendar", methods=["POST"])
+@app.route('/agendar', methods=['POST'])
 def agendar():
-    if request.method == "POST":
-        nombre = request.form["nombre"]
-        telefono = request.form["telefono"]
-        servicio = request.form["servicio"]
-        fecha = request.form["fecha"]
-        hora = request.form["hora"]
+    if request.method == 'POST':
+        # (Mantén tu código existente aquí)
+        return redirect(url_for('home'))
 
-        conn = get_db_connection()
-        conn.execute(
-            "INSERT INTO citas (nombre, telefono, servicio, fecha, hora) VALUES (?, ?, ?, ?, ?)",
-            (nombre, telefono, servicio, fecha, hora)
-        )
-        conn.commit()
-        conn.close()
-
-        return redirect(url_for("home"))
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
+
