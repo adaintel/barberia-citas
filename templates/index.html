@@ -10,6 +10,10 @@
         <div class="col">
             <p>Gestiona tus citas de forma fácil y rápida.</p>
             <a href="{{ url_for('agenda') }}" class="btn btn-primary">Ver Agenda de Citas</a>
+            
+            {% if session.get('admin') %}
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Cerrar Sesión</a>
+            {% endif %}
         </div>
     </div>
 </div>
