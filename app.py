@@ -1,18 +1,47 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from database import get_db_connection, close_db_connection
-import psycopg2
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
+import psycopg2
+from psycopg2 import pool
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'una-clave-secreta-por-defecto')
+app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
-# Configuración para la base de datos
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
-app.config['ADMIN_USER'] = os.getenv('ADMIN_USER')
-app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS')
+# Configuración de la aplicación
+app.config.update({
+    'DATABASE_URL': os.getenv('DATABASE_URL'),
+    'ADMIN_USER': os.getenv('ADMIN_USER'),
+    'ADMIN_PASS': os.getenv('ADMIN_PASS'),
+    'TEMPLATES_AUTO_RELOAD': True
+})
 
-# Configuración de la base de datos desde variables de entorno
-app.config['DATABASE_URL'] = 'postgresql://user:pass@host:port/db'
+# Configuración del pool de conexiones
+connection_pool = None
+
+def init_db():
+    global connection_pool
+    connection_pool = psycopg2.pool.SimpleConnectionPool(
+        minconn=1,
+        maxconn=10,
+        dsn=app.config['DATABASE_URL']
+    )
+
+def get_db_connection():
+    if not connection_pool:
+        init_db()
+    return connection_pool.getconn()
+
+def close_db_connection(conn):
+    if connection_pool and conn:
+        connection_pool.putconn(conn)
+
+@app.before_first_request
+def initialize():
+    init_db()
 
 @app.route('/')
 def index():
@@ -36,7 +65,7 @@ def agenda():
         
         citas = cur.fetchall()
         
-        # Obtener servicios disponibles
+        # Obtener servicios
         cur.execute("SELECT id, nombre, duracion, precio FROM servicios")
         servicios = cur.fetchall()
         
@@ -45,22 +74,33 @@ def agenda():
         
     except Exception as e:
         print(f"Error: {e}")
-        return render_template('agenda.html', error="Error al cargar la agenda")
+        flash("Error al cargar la agenda", "danger")
+        return render_template('agenda.html')
     finally:
-        close_db_connection(conn)
+        if 'conn' in locals():
+            close_db_connection(conn)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
         
         if username == app.config['ADMIN_USER'] and password == app.config['ADMIN_PASS']:
             session['admin'] = True
-            return redirect(url_for('admin_dashboard'))
+            flash("Inicio de sesión exitoso", "success")
+            return redirect(url_for('index'))
         
+        flash("Credenciales incorrectas", "danger")
+    
     return render_template('login.html')
 
-if __name__ == '__main__':
+@app.route('/logout')
+def logout():
+    session.pop('admin', None)
+    flash("Has cerrado sesión", "info")
+    return redirect(url_for('index'))
 
+if __name__ == '__main__':
     app.run(debug=True)
+
