@@ -17,23 +17,20 @@ def create_app():
     def inject_now():
         return {'now': datetime.now()}
 
-    def get_db_connection(retries=3, delay=2):
-        for i in range(retries):
-            try:
-                conn = psycopg2.connect(
-                    host=os.getenv('DB_HOST'),
-                    database=os.getenv('DB_NAME'),
-                    user=os.getenv('DB_USER'),
-                    password=os.getenv('DB_PASSWORD'),
-                    port=os.getenv('DB_PORT', '5432'),
-                    connect_timeout=5
-                )
-                return conn
-            except Exception as e:
-                print(f"Intento {i+1} de {retries}: Error al conectar a DB - {str(e)}")
-                if i < retries - 1:
-                    time.sleep(delay)
-        return None
+    def get_db_connection():
+        try:
+            conn = psycopg2.connect(
+                host=os.getenv('DB_HOST'),
+                database=os.getenv('DB_NAME'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                port=os.getenv('DB_PORT', '5432'),
+                connect_timeout=5
+            )
+            return conn
+        except Exception as e:
+            print(f"Error de conexión a DB: {str(e)}")
+            return None
 
     def init_db():
         conn = get_db_connection()
@@ -43,15 +40,17 @@ def create_app():
         try:
             cur = conn.cursor()
             
-            # Verificar estructura actual de la tabla
+            # Verificar si la tabla existe
             cur.execute("""
-                SELECT column_name FROM information_schema.columns 
-                WHERE table_name = 'citas'
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_name = 'citas'
+                )
             """)
-            existing_columns = [row[0] for row in cur.fetchall()]
+            tabla_existe = cur.fetchone()[0]
             
-            # Crear tabla si no existe o actualizar estructura
-            if not existing_columns:
+            if not tabla_existe:
+                # Crear tabla con estructura actualizada
                 cur.execute("""
                     CREATE TABLE citas (
                         id SERIAL PRIMARY KEY,
@@ -64,11 +63,21 @@ def create_app():
                         creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
-            elif 'cliente' in existing_columns:
-                # Si existe la columna cliente (antigua), la renombramos
-                cur.execute("ALTER TABLE citas RENAME COLUMN cliente TO nombre_cliente")
-            
-            conn.commit()
+                conn.commit()
+                print("Tabla 'citas' creada exitosamente")
+            else:
+                # Verificar estructura de columnas
+                cur.execute("""
+                    SELECT column_name FROM information_schema.columns 
+                    WHERE table_name = 'citas'
+                """)
+                columnas = [row[0] for row in cur.fetchall()]
+                
+                if 'cliente' in columnas and 'nombre_cliente' not in columnas:
+                    cur.execute("ALTER TABLE citas RENAME COLUMN cliente TO nombre_cliente")
+                    conn.commit()
+                    print("Columna 'cliente' renombrada a 'nombre_cliente'")
+                
             return True
         except Exception as e:
             print(f"Error al inicializar DB: {str(e)}")
@@ -85,20 +94,27 @@ def create_app():
 
     @app.route('/agenda')
     def agenda():
-        conn = get_db_connection()
-        if not conn:
-            flash("Error de conexión con la base de datos", "danger")
-            return render_template('agenda.html', citas=[], servicios=[])
-        
         try:
+            conn = get_db_connection()
+            if not conn:
+                flash("Error temporal al conectar con la base de datos. Intente nuevamente.", "warning")
+                return render_template('agenda.html', citas=[], servicios=[])
+            
             cur = conn.cursor()
-            cur.execute("""
-                SELECT id, fecha, hora, nombre_cliente, servicio, telefono
-                FROM citas 
-                WHERE estado = 'pendiente'
-                ORDER BY fecha, hora
-            """)
-            citas = cur.fetchall()
+            
+            # Consulta mejorada con manejo de errores
+            try:
+                cur.execute("""
+                    SELECT fecha, hora, nombre_cliente, servicio, telefono
+                    FROM citas 
+                    WHERE estado = 'pendiente'
+                    ORDER BY fecha, hora
+                """)
+                citas = cur.fetchall()
+            except psycopg2.Error as e:
+                print(f"Error en consulta SQL: {str(e)}")
+                flash("Error al recuperar las citas. Verifique la estructura de la base de datos.", "danger")
+                citas = []
             
             servicios = [
                 ('Corte de caballero', 150.00),
@@ -108,13 +124,13 @@ def create_app():
             ]
             
             if not citas:
-                flash("No hay citas pendientes", "info")
-                
+                flash("No hay citas pendientes actualmente", "info")
+            
             return render_template('agenda.html', citas=citas, servicios=servicios)
             
         except Exception as e:
-            print(f"Error en agenda: {str(e)}")
-            flash("Error al cargar la agenda", "danger")
+            print(f"Error general en agenda: {str(e)}")
+            flash("Ocurrió un error al cargar la agenda", "danger")
             return render_template('agenda.html', citas=[], servicios=[])
         finally:
             if conn:
@@ -133,7 +149,7 @@ def create_app():
             telefono = request.form.get('telefono')
             
             if not all([fecha, hora, nombre_cliente, servicio]):
-                flash("Todos los campos son requeridos", "danger")
+                flash("Todos los campos excepto teléfono son requeridos", "danger")
                 return redirect(url_for('crear_cita'))
             
             try:
@@ -149,6 +165,8 @@ def create_app():
                 
                 try:
                     cur = conn.cursor()
+                    
+                    # Verificar disponibilidad
                     cur.execute("""
                         SELECT id FROM citas 
                         WHERE fecha = %s AND hora = %s AND estado = 'pendiente'
@@ -157,6 +175,7 @@ def create_app():
                         flash("Ya existe una cita programada para esa fecha y hora", "danger")
                         return redirect(url_for('crear_cita'))
                     
+                    # Insertar nueva cita
                     cur.execute("""
                         INSERT INTO citas (fecha, hora, nombre_cliente, servicio, telefono)
                         VALUES (%s, %s, %s, %s, %s)
@@ -166,12 +185,12 @@ def create_app():
                     flash("Cita creada exitosamente!", "success")
                     return redirect(url_for('agenda'))
                 except Exception as e:
+                    conn.rollback()
                     print(f"Error al crear cita: {str(e)}")
-                    flash("Error al guardar la cita", "danger")
+                    flash("Error técnico al guardar la cita", "danger")
                     return redirect(url_for('crear_cita'))
                 finally:
-                    if conn:
-                        conn.close()
+                    conn.close()
             except ValueError:
                 flash("Formato de hora incorrecto (use HH:MM)", "danger")
                 return redirect(url_for('crear_cita'))
