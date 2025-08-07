@@ -39,9 +39,11 @@ def close_db_connection(conn):
     if connection_pool and conn:
         connection_pool.putconn(conn)
 
-@app.before_first_request
-def initialize():
+# Nueva forma de inicialización en Flask 2.3+
+with app.app_context():
     init_db()
+    # También puedes crear tablas aquí si es necesario
+    # create_tables()
 
 @app.route('/')
 def index():
