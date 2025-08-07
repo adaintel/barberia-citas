@@ -1,7 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Funcionalidad básica para el frontend
     console.log('Sistema de Barbería cargado');
     
-    // Puedes agregar más funcionalidad JS aquí
-    // Por ejemplo, validación de formularios, interacciones, etc.
+    // Código para manejar interacciones del usuario
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Botón clickeado:', this.textContent);
+        });
+    });
+    
+    // Puedes agregar más funcionalidades aquí
 });
