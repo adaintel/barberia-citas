@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="bi bi-calendar-plus"></i> Crear Nueva Cita</h2>
+    
+    <form method="POST" action="{{ url_for('crear_cita') }}" class="needs-validation" novalidate>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" 
+                       min="{{ min_date }}" required>
+                <div class="invalid-feedback">
+                    Por favor selecciona una fecha válida
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="hora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="hora" name="hora" 
+                       min="09:00" max="18:00" required>
+                <div class="invalid-feedback">
+                    Horario: 9:00 AM - 6:00 PM
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="cliente_id" class="form-label">Cliente</label>
+                <select class="form-select" id="cliente_id" name="cliente_id" required>
+                    <option value="">Seleccionar cliente...</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente[0] }}">{{ cliente[1] }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                    Selecciona un cliente
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <label for="servicio_id" class="form-label">Servicio</label>
+                <select class="form-select" id="servicio_id" name="servicio_id" required>
+                    <option value="">Seleccionar servicio...</option>
+                    {% for servicio in servicios %}
+                    <option value="{{ servicio[0] }}">{{ servicio[1] }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                    Selecciona un servicio
+                </div>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar Cita
+                </button>
+                <a href="{{ url_for('agenda') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Validación del formulario
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}
