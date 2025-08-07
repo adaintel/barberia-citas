@@ -4,34 +4,56 @@ from datetime import datetime
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Cargar variables de entorno
 load_dotenv()
 
-# Crear aplicación Flask
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
     # Configuración
-    app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
     app.config['ADMIN_USER'] = os.getenv('ADMIN_USER')
     app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS')
-
-    # Inicializar pool de conexiones
+    
+    # Pool de conexiones
     connection_pool = None
+
+    def parse_db_url(db_url):
+        """Parsear la URL de la base de datos para componentes individuales"""
+        try:
+            parsed = urlparse(db_url)
+            return {
+                'dbname': parsed.path[1:],
+                'user': parsed.username,
+                'password': parsed.password,
+                'host': parsed.hostname,
+                'port': parsed.port or 5432  # Puerto por defecto de PostgreSQL
+            }
+        except Exception as e:
+            print(f"Error al parsear DATABASE_URL: {e}")
+            raise
 
     def init_db():
         nonlocal connection_pool
         try:
+            db_url = os.getenv('DATABASE_URL')
+            if not db_url:
+                raise ValueError("DATABASE_URL no está configurada")
+                
+            # Parsear la URL de la base de datos
+            db_params = parse_db_url(db_url)
+            
+            # Crear pool de conexiones con parámetros individuales
             connection_pool = psycopg2.pool.SimpleConnectionPool(
                 minconn=1,
                 maxconn=10,
-                dsn=app.config['DATABASE_URL']
+                **db_params
             )
-            print("Conexión a la base de datos establecida")
+            print("✅ Conexión a la base de datos establecida correctamente")
         except Exception as e:
-            print(f"Error al conectar a la base de datos: {e}")
+            print(f"❌ Error al conectar a la base de datos: {e}")
             raise
 
     def get_db_connection():
@@ -43,8 +65,11 @@ def create_app():
         if connection_pool and conn:
             connection_pool.putconn(conn)
 
-    # Inicializar la base de datos al iniciar
-    init_db()
+    # Verificar conexión a la base de datos al iniciar
+    try:
+        init_db()
+    except Exception as e:
+        print(f"Error inicializando la base de datos: {e}")
 
     # Rutas
     @app.route('/')
@@ -105,7 +130,6 @@ def create_app():
 
     return app
 
-# Crear y ejecutar la aplicación
 app = create_app()
 
 if __name__ == '__main__':
