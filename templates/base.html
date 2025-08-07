@@ -12,8 +12,7 @@
         <nav>
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="{{ url_for('agenda') }}">Agenda</a>
-            {% if 'admin' in session %}
-                <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+            {% if session.get('admin') %}
                 <a href="{{ url_for('logout') }}">Salir</a>
             {% else %}
                 <a href="{{ url_for('login') }}">Login</a>
@@ -22,6 +21,14 @@
     </header>
     
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
     </main>
     
