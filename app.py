@@ -4,6 +4,7 @@ from datetime import datetime, time
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -13,26 +14,35 @@ def create_app():
     app.config['ADMIN_USER'] = os.getenv('ADMIN_USER', 'admin_pro')
     app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS', 'Cl4v3-S3gur4!')
     
-    # Configuración de la base de datos
-    connection_pool = None
+    # Configuración mejorada de conexión a DB
+    def get_db_connection(retries=3, delay=2):
+        for i in range(retries):
+            try:
+                conn = psycopg2.connect(
+                    host=os.getenv('DB_HOST'),
+                    database=os.getenv('DB_NAME'),
+                    user=os.getenv('DB_USER'),
+                    password=os.getenv('DB_PASSWORD'),
+                    port=os.getenv('DB_PORT', '5432'),
+                    connect_timeout=5
+                )
+                return conn
+            except Exception as e:
+                print(f"Intento {i+1} de {retries}: Error al conectar a DB - {str(e)}")
+                if i < retries - 1:
+                    time.sleep(delay)
+        return None
 
+    # Verificar e inicializar tablas
     def init_db():
-        nonlocal connection_pool
+        conn = get_db_connection()
+        if not conn:
+            return False
+        
         try:
-            db_url = os.getenv('DATABASE_URL') or \
-                    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME')}"
-            
-            connection_pool = psycopg2.pool.SimpleConnectionPool(
-                minconn=1,
-                maxconn=10,
-                dsn=db_url
-            )
-            
-            # Crear tablas si no existen
-            conn = connection_pool.getconn()
             cur = conn.cursor()
             
-            # Tabla simplificada de citas (sin relaciones para simplificar)
+            # Tabla simplificada de citas
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS citas (
                     id SERIAL PRIMARY KEY,
@@ -46,42 +56,17 @@ def create_app():
                 )
             """)
             
-            # Insertar datos de ejemplo si no hay citas
-            cur.execute("SELECT COUNT(*) FROM citas")
-            if cur.fetchone()[0] == 0:
-                cur.execute("""
-                    INSERT INTO citas (fecha, hora, cliente, servicio, telefono)
-                    VALUES 
-                        (CURRENT_DATE + 1, '10:00', 'Juan Pérez', 'Corte de caballero', '5551234567'),
-                        (CURRENT_DATE + 1, '11:30', 'María Gómez', 'Afeitado clásico', '5557654321')
-                """)
-            
             conn.commit()
-            connection_pool.putconn(conn)
             return True
-            
         except Exception as e:
-            print(f"Error al inicializar DB: {e}")
+            print(f"Error al inicializar DB: {str(e)}")
             return False
+        finally:
+            if conn:
+                conn.close()
 
-    def get_db_connection():
-        if not connection_pool and not init_db():
-            return None
-        try:
-            return connection_pool.getconn()
-        except:
-            return None
-
-    def close_db_connection(conn):
-        if connection_pool and conn:
-            try:
-                connection_pool.putconn(conn)
-            except:
-                pass
-
-    @app.context_processor
-    def inject_now():
-        return {'now': datetime.now()}
+    # Inicializar DB al iniciar
+    init_db()
 
     @app.route('/')
     def index():
@@ -97,14 +82,13 @@ def create_app():
         try:
             cur = conn.cursor()
             cur.execute("""
-                SELECT id, fecha, hora, cliente, servicio 
+                SELECT fecha, hora, cliente, servicio 
                 FROM citas 
-                WHERE fecha >= CURRENT_DATE AND estado = 'pendiente'
+                WHERE estado = 'pendiente'
                 ORDER BY fecha, hora
             """)
             citas = cur.fetchall()
             
-            # Obtener servicios disponibles
             servicios = [
                 ('Corte de caballero', 150.00),
                 ('Corte de niño', 100.00),
@@ -113,38 +97,41 @@ def create_app():
             ]
             
             return render_template('agenda.html', citas=citas, servicios=servicios)
-            
         except Exception as e:
-            print(f"Error en agenda: {e}")
+            print(f"Error en agenda: {str(e)}")
             flash("Error al cargar la agenda", "danger")
-            return render_template('agenda.html', citas=[])
+            return render_template('agenda.html', citas=[], servicios=[])
         finally:
             if conn:
-                close_db_connection(conn)
+                conn.close()
 
     @app.route('/crear_cita', methods=['GET', 'POST'])
     def crear_cita():
+        if not session.get('admin'):
+            return redirect(url_for('login'))
+        
         if request.method == 'POST':
-            # Validar datos del formulario
-            fecha_str = request.form.get('fecha')
-            hora_str = request.form.get('hora')
+            fecha = request.form.get('fecha')
+            hora = request.form.get('hora')
             cliente = request.form.get('cliente')
             servicio = request.form.get('servicio')
             telefono = request.form.get('telefono')
             
+            if not all([fecha, hora, cliente, servicio]):
+                flash("Todos los campos son requeridos", "danger")
+                return redirect(url_for('crear_cita'))
+            
             try:
-                fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-                hora = datetime.strptime(hora_str, '%H:%M').time()
-                
-                # Validar horario de atención (9AM - 6PM)
-                if hora < time(9, 0) or hora > time(18, 0):
+                # Validar hora
+                hora_obj = datetime.strptime(hora, '%H:%M').time()
+                if hora_obj < time(9, 0) or hora_obj > time(18, 0):
                     flash("El horario de atención es de 9:00 AM a 6:00 PM", "danger")
                     return redirect(url_for('crear_cita'))
                 
                 conn = get_db_connection()
                 if not conn:
                     flash("Error de conexión con la base de datos", "danger")
-                    return redirect(url_for('agenda'))
+                    return redirect(url_for('crear_cita'))
                 
                 try:
                     cur = conn.cursor()
@@ -158,28 +145,26 @@ def create_app():
                         flash("Ya existe una cita programada para esa fecha y hora", "danger")
                         return redirect(url_for('crear_cita'))
                     
-                    # Insertar nueva cita
+                    # Insertar cita
                     cur.execute("""
                         INSERT INTO citas (fecha, hora, cliente, servicio, telefono)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (fecha, hora, cliente, servicio, telefono))
                     conn.commit()
                     
-                    flash("Cita creada exitosamente", "success")
+                    flash("Cita creada exitosamente!", "success")
                     return redirect(url_for('agenda'))
-                    
                 except Exception as e:
-                    print(f"Error al crear cita: {e}")
+                    print(f"Error al crear cita: {str(e)}")
                     flash("Error al guardar la cita", "danger")
                     return redirect(url_for('crear_cita'))
                 finally:
                     if conn:
-                        close_db_connection(conn)
-                        
+                        conn.close()
             except ValueError:
-                flash("Fecha u hora no válidas", "danger")
+                flash("Formato de hora incorrecto (use HH:MM)", "danger")
                 return redirect(url_for('crear_cita'))
-            
+        
         # GET request - mostrar formulario
         servicios = [
             ('Corte de caballero', 150.00),
@@ -187,7 +172,7 @@ def create_app():
             ('Afeitado clásico', 120.00),
             ('Tinte de barba', 200.00)
         ]
-        return render_template('crear_cita.html', servicios=servicios)
+        return render_template('crear_cita.html', servicios=servicios, min_date=datetime.now().strftime('%Y-%m-%d'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -215,4 +200,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
