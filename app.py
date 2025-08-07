@@ -1,11 +1,11 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
-import psycopg2  # Nuevo: para PostgreSQL
+import psycopg2
 from psycopg2 import sql
 
 app = Flask(__name__)
 
-# Configuración PostgreSQL (Render automáticamente inyecta DATABASE_URL)
+# Conexión a TU base de datos específica
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
@@ -31,33 +31,11 @@ def create_table():
 
 create_table()
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/agendar', methods=['POST'])
-def agendar():
-    if request.method == 'POST':
-        nombre = request.form['nombre']
-        telefono = request.form['telefono']
-        servicio = request.form['servicio']
-        fecha = request.form['fecha']
-        hora = request.form['hora']
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            '''INSERT INTO citas (nombre, telefono, servicio, fecha, hora) 
-               VALUES (%s, %s, %s, %s, %s)''',
-            (nombre, telefono, servicio, fecha, hora)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return redirect(url_for('home'))
+# [Mantén tus rutas @app.route existentes...]
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
+
+
 
