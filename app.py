@@ -14,6 +14,11 @@ def create_app():
     app.config['ADMIN_USER'] = os.getenv('ADMIN_USER', 'admin_pro')
     app.config['ADMIN_PASS'] = os.getenv('ADMIN_PASS', 'Cl4v3-S3gur4!')
     
+    # Context processor para inyectar 'now' en todas las plantillas
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.now()}
+
     # Configuración mejorada de conexión a DB
     def get_db_connection(retries=3, delay=2):
         for i in range(retries):
@@ -201,3 +206,4 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
