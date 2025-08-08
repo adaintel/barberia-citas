@@ -91,15 +91,32 @@
       padding: 12px 15px 12px 45px;
       border: none;
       border-radius: 8px;
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0, 0, 0, 0.7);
       color: white;
-      border: 1px solid rgba(212, 175, 55, 0.3);
+      border: 1px solid var(--gold);
+      font-size: 1rem;
+      appearance: none;
     }
     
     input:focus, select:focus {
       outline: none;
       border-color: var(--gold);
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
+    }
+    
+    select {
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23D4AF37"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 15px;
+      cursor: pointer;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
     }
     
     button[type="submit"] {
@@ -194,6 +211,16 @@
       transform: translate(-50%, -50%);
       z-index: -1;
     }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+    }
   </style>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
@@ -219,33 +246,38 @@
             <input type="tel" id="telefono" placeholder="Teléfono" required>
           </div>
           
-          <div class="input-group">
-            <i class="fas fa-calendar-day"></i>
-            <input type="date" id="fecha" required>
-          </div>
-          
-          <div class="input-group">
-            <i class="fas fa-clock"></i>
-            <input type="time" id="hora" min="08:00" max="21:00" required>
-          </div>
-          
-          <div class="input-group">
-            <i class="fas fa-cut"></i>
-            <select id="servicio" required>
-              <option value="" disabled selected>Seleccione un servicio</option>
-              <option value="Corte de cabello">Corte de cabello ($20)</option>
-              <option value="Arreglo de barba">Arreglo de barba ($15)</option>
-              <option value="Corte y barba">Corte + barba ($30)</option>
-              <option value="Tinte">Tinte ($25)</option>
-              <option value="Servicio VIP">Servicio VIP ($50)</option>
-            </select>
+          <div class="form-row">
+            <!-- Selector de Fecha -->
+            <div class="input-group">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="date" id="fecha" required>
+            </div>
+
+            <!-- Selector de Hora -->
+            <div class="input-group">
+              <i class="fas fa-clock"></i>
+              <input type="time" id="hora" min="08:00" max="21:00" required>
+            </div>
+
+            <!-- Selector de Servicio -->
+            <div class="input-group">
+              <i class="fas fa-cut"></i>
+              <select id="servicio" required>
+                <option value="" disabled selected>Servicio</option>
+                <option value="Corte de cabello">Corte ($20)</option>
+                <option value="Arreglo de barba">Barba ($15)</option>
+                <option value="Corte y barba">Combo ($30)</option>
+                <option value="Tinte">Tinte ($25)</option>
+                <option value="Servicio VIP">VIP ($50)</option>
+              </select>
+            </div>
           </div>
           
           <div class="input-group">
             <i class="fas fa-user-tie"></i>
             <select id="barbero" required>
               <option value="" disabled selected>Seleccione su barbero</option>
-              <option value="Juan">Juan (Especialista en cortes clásicos)</option>
+              <option value="Juan">Juan (Cortes clásicos)</option>
               <option value="Carlos">Carlos (Experto en barbas)</option>
               <option value="Pedro">Pedro (Estilista moderno)</option>
             </select>
