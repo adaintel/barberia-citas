@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import logging
+import psycopg
 
 # Configuración básica de logging
 logging.basicConfig(level=logging.INFO)
@@ -85,3 +86,4 @@ def initialize_database():
 if __name__ == '__main__':
     initialize_database()
     app.run(host='0.0.0.0', port=5000)
+
