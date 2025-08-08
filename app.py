@@ -1,27 +1,36 @@
 import os
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime, time
 import psycopg2
 from dotenv import load_dotenv
-import time
-import logging
-from logging.handlers import RotatingFileHandler
+import traceback
+from functools import wraps
 
-# Configuración básica de logging
+# Configuración inicial de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
-handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
+
+# Configurar el handler para archivos de log
+file_handler = RotatingFileHandler(
+    'app.log',
+    maxBytes=1024 * 1024,
+    backupCount=3
+)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+logger.addHandler(file_handler)
 
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.getenv('SECRET_KEY', 'secret-key-123456')
     
     # Configuración de la aplicación
     app.config.update(
+        SECRET_KEY=os.getenv('SECRET_KEY', 'dev-secret-key-123456789'),
         ADMIN_USER=os.getenv('ADMIN_USER', 'admin'),
         ADMIN_PASS=os.getenv('ADMIN_PASS', 'admin123'),
         DB_CONFIG={
@@ -39,32 +48,62 @@ def create_app():
         ]
     )
 
+    # Decorador para requerir autenticación
+    def login_required(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not session.get('admin'):
+                return redirect(url_for('login', next=request.url))
+            return f(*args, **kwargs)
+        return decorated_function
+
     # Context processor para variables comunes
     @app.context_processor
     def inject_common_data():
         return {
             'now': datetime.now(),
-            'servicios': app.config['SERVICIOS']
+            'servicios': app.config['SERVICIOS'],
+            'is_authenticated': session.get('admin', False)
         }
 
     # Manejo de errores
     @app.errorhandler(404)
     def page_not_found(error):
-        return render_template('404.html'), 404
+        logger.warning(f"Página no encontrada: {request.url}")
+        return render_template('errors/404.html'), 404
 
     @app.errorhandler(500)
     def internal_error(error):
-        logger.error(f"Error 500: {str(error)}")
-        return render_template('500.html'), 500
+        logger.error(f"Error 500: {str(error)}\n{traceback.format_exc()}")
+        return render_template('errors/500.html'), 500
 
-    # Conexión a la base de datos
+    @app.errorhandler(psycopg2.Error)
+    def handle_db_errors(error):
+        logger.error(f"Error de base de datos: {str(error)}\n{traceback.format_exc()}")
+        flash("Error de conexión con la base de datos. Por favor intente más tarde.", "danger")
+        return render_template('errors/500.html'), 500
+
+    # Conexión a la base de datos con manejo de errores
     def get_db_connection():
-        try:
-            conn = psycopg2.connect(**app.config['DB_CONFIG'])
-            return conn
-        except Exception as e:
-            logger.error(f"Error de conexión a DB: {str(e)}")
-            return None
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                conn = psycopg2.connect(**app.config['DB_CONFIG'])
+                logger.info("Conexión a DB establecida correctamente")
+                return conn
+            except psycopg2.OperationalError as e:
+                logger.warning(f"Intento {attempt + 1} de conexión fallido: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                continue
+            except Exception as e:
+                logger.error(f"Error inesperado en conexión a DB: {str(e)}\n{traceback.format_exc()}")
+                raise
+        
+        logger.error("No se pudo establecer conexión después de varios intentos")
+        return None
 
     # Inicialización de la base de datos
     def init_db():
@@ -74,28 +113,39 @@ def create_app():
         
         try:
             with conn.cursor() as cur:
+                # Verificar si la tabla existe
                 cur.execute("""
-                    CREATE TABLE IF NOT EXISTS citas (
-                        id SERIAL PRIMARY KEY,
-                        fecha DATE NOT NULL,
-                        hora TIME NOT NULL,
-                        nombre_cliente VARCHAR(100) NOT NULL,
-                        servicio VARCHAR(100) NOT NULL,
-                        telefono VARCHAR(20),
-                        estado VARCHAR(20) DEFAULT 'pendiente',
-                        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'citas'
                     )
                 """)
-                conn.commit()
-                return True
+                if not cur.fetchone()[0]:
+                    # Crear tabla si no existe
+                    cur.execute("""
+                        CREATE TABLE citas (
+                            id SERIAL PRIMARY KEY,
+                            fecha DATE NOT NULL,
+                            hora TIME NOT NULL,
+                            nombre_cliente VARCHAR(100) NOT NULL,
+                            servicio VARCHAR(100) NOT NULL,
+                            telefono VARCHAR(20),
+                            estado VARCHAR(20) DEFAULT 'pendiente',
+                            creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        )
+                    """)
+                    conn.commit()
+                    logger.info("Tabla 'citas' creada exitosamente")
+            
+            return True
         except Exception as e:
-            logger.error(f"Error al inicializar DB: {str(e)}")
+            logger.error(f"Error al inicializar DB: {str(e)}\n{traceback.format_exc()}")
             return False
         finally:
             if conn:
                 conn.close()
 
-    # Inicializar la base de datos
+    # Inicializar la base de datos al arrancar
     init_db()
 
     # Rutas de la aplicación
@@ -104,18 +154,18 @@ def create_app():
         try:
             return render_template('index.html')
         except Exception as e:
-            logger.error(f"Error en ruta /: {str(e)}")
+            logger.error(f"Error en ruta /: {str(e)}\n{traceback.format_exc()}")
             flash("Error al cargar la página principal", "danger")
             return render_template('index.html')
 
     @app.route('/agenda')
     def agenda():
-        conn = get_db_connection()
-        if not conn:
-            flash("Error de conexión con la base de datos", "danger")
-            return render_template('agenda.html', citas=[])
-        
         try:
+            conn = get_db_connection()
+            if not conn:
+                flash("Error de conexión con la base de datos", "danger")
+                return render_template('agenda.html', citas=[])
+            
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT id, fecha, hora, nombre_cliente, servicio, telefono
@@ -130,7 +180,7 @@ def create_app():
                 
                 return render_template('agenda.html', citas=citas)
         except Exception as e:
-            logger.error(f"Error en agenda: {str(e)}")
+            logger.error(f"Error en agenda: {str(e)}\n{traceback.format_exc()}")
             flash("Error al cargar la agenda", "danger")
             return render_template('agenda.html', citas=[])
         finally:
@@ -138,17 +188,64 @@ def create_app():
                 conn.close()
 
     @app.route('/crear_cita', methods=['GET', 'POST'])
+    @login_required
     def crear_cita():
-        if not session.get('admin'):
-            return redirect(url_for('login'))
-        
         if request.method == 'POST':
-            # ... (mantener el mismo código de creación de cita)
-            pass
+            fecha = request.form.get('fecha')
+            hora = request.form.get('hora')
+            nombre_cliente = request.form.get('nombre_cliente', '').strip()
+            servicio = request.form.get('servicio')
+            telefono = request.form.get('telefono', '').strip()
+            
+            # Validaciones
+            if not all([fecha, hora, nombre_cliente, servicio]):
+                flash("Todos los campos excepto teléfono son requeridos", "danger")
+                return redirect(url_for('crear_cita'))
+            
+            try:
+                hora_obj = datetime.strptime(hora, '%H:%M').time()
+                if hora_obj < time(9, 0) or hora_obj > time(18, 0):
+                    flash("El horario de atención es de 9:00 AM a 6:00 PM", "danger")
+                    return redirect(url_for('crear_cita'))
+                
+                conn = get_db_connection()
+                if not conn:
+                    flash("Error de conexión con la base de datos", "danger")
+                    return redirect(url_for('crear_cita'))
+                
+                try:
+                    with conn.cursor() as cur:
+                        # Verificar disponibilidad
+                        cur.execute("""
+                            SELECT id FROM citas 
+                            WHERE fecha = %s AND hora = %s AND estado = 'pendiente'
+                        """, (fecha, hora))
+                        if cur.fetchone():
+                            flash("Ya existe una cita programada para esa fecha y hora", "danger")
+                            return redirect(url_for('crear_cita'))
+                        
+                        # Insertar cita
+                        cur.execute("""
+                            INSERT INTO citas (fecha, hora, nombre_cliente, servicio, telefono)
+                            VALUES (%s, %s, %s, %s, %s)
+                        """, (fecha, hora, nombre_cliente, servicio, telefono))
+                        conn.commit()
+                        
+                        flash("Cita creada exitosamente!", "success")
+                        return redirect(url_for('agenda'))
+                except Exception as e:
+                    conn.rollback()
+                    logger.error(f"Error al crear cita: {str(e)}\n{traceback.format_exc()}")
+                    flash("Error técnico al guardar la cita", "danger")
+                    return redirect(url_for('crear_cita'))
+                finally:
+                    conn.close()
+            except ValueError:
+                flash("Formato de hora incorrecto (use HH:MM)", "danger")
+                return redirect(url_for('crear_cita'))
         
         return render_template('crear_cita.html', min_date=datetime.now().strftime('%Y-%m-%d'))
 
-    # Añadiendo la ruta login que faltaba
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -158,11 +255,12 @@ def create_app():
             if username == app.config['ADMIN_USER'] and password == app.config['ADMIN_PASS']:
                 session['admin'] = True
                 flash("Inicio de sesión exitoso", "success")
-                return redirect(url_for('index'))
+                next_page = request.args.get('next') or url_for('index')
+                return redirect(next_page)
             
             flash("Credenciales incorrectas", "danger")
         
-        return render_template('login.html')
+        return render_template('auth/login.html')
 
     @app.route('/logout')
     def logout():
