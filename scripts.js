@@ -1,15 +1,12 @@
-// Verificar conexión a internet
-function verificarConexion() {
-  const statusElement = document.getElementById('connection-status');
-  if (!statusElement) return;
-
-  if (navigator.onLine) {
-    statusElement.className = 'connected';
-    statusElement.innerHTML = '<i class="fas fa-circle"></i> En línea';
-  } else {
-    statusElement.className = 'disconnected';
-    statusElement.innerHTML = '<i class="fas fa-circle"></i> Sin conexión';
+// Configuración de Supabase (se ejecuta solo una vez)
+function initSupabase() {
+  if (!window.supabaseClient) {
+    window.supabaseClient = supabase.createClient(
+      'https://azjlrbmgpczuintqyosm.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
+    );
   }
+  return window.supabaseClient;
 }
 
 // Función para mostrar mensajes
@@ -41,7 +38,7 @@ function inicializarFormulario() {
   horaInput.addEventListener('change', function() {
     const hora = this.value.split(':')[0];
     if (hora < 8 || hora > 18) {
-      alert('Nuestro horario de atención es de 8:00 AM a 6:00 PM');
+      mostrarMensaje('Nuestro horario de atención es de 8:00 AM a 6:00 PM', 'error');
       this.value = '';
     }
   });
@@ -73,7 +70,8 @@ function inicializarFormulario() {
     };
 
     try {
-      const { error } = await window.supabaseClient.from('citas').insert([citaData]);
+      const supabase = initSupabase();
+      const { error } = await supabase.from('citas').insert([citaData]);
       
       if (error) throw error;
       
@@ -81,10 +79,24 @@ function inicializarFormulario() {
       citaForm.reset();
       
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al agendar cita:', error);
       mostrarMensaje('❌ Error al agendar: ' + error.message, 'error');
     }
   });
+}
+
+// Verificar conexión a internet
+function verificarConexion() {
+  const statusElement = document.getElementById('connection-status');
+  if (!statusElement) return;
+
+  if (navigator.onLine) {
+    statusElement.className = 'connected';
+    statusElement.innerHTML = '<i class="fas fa-circle"></i> En línea';
+  } else {
+    statusElement.className = 'disconnected';
+    statusElement.innerHTML = '<i class="fas fa-circle"></i> Sin conexión';
+  }
 }
 
 // Inicialización cuando el DOM esté listo
