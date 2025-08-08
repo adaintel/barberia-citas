@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import traceback
 from functools import wraps
 from urllib.parse import urlparse
+import time as time_module
 
 # Configuración inicial
 load_dotenv()
@@ -43,7 +44,9 @@ def create_app():
         ],
         HORARIO_APERTURA=time(9, 0),  # 9:00 AM
         HORARIO_CIERRE=time(18, 0),    # 6:00 PM
-        MAX_DIAS_CITA=30  # Máximo días para agendar citas
+        MAX_DIAS_CITA=30,  # Máximo días para agendar citas
+        DB_CONNECTION_RETRIES=3,
+        DB_CONNECTION_DELAY=1
     )
 
     # Parsear DATABASE_URL si existe
@@ -90,18 +93,15 @@ def create_app():
 
     # Conexión a la base de datos con reintentos
     def get_db_connection():
-        max_retries = 3
-        retry_delay = 1  # segundos
-        
-        for attempt in range(max_retries):
+        for attempt in range(app.config['DB_CONNECTION_RETRIES']):
             try:
                 conn = psycopg2.connect(**app.config['DB_CONFIG'])
                 logger.info("Conexión a DB establecida correctamente")
                 return conn
             except psycopg2.OperationalError as e:
                 logger.warning(f"Intento {attempt + 1} de conexión fallido: {str(e)}")
-                if attempt < max_retries - 1:
-                    time.sleep(retry_delay)
+                if attempt < app.config['DB_CONNECTION_RETRIES'] - 1:
+                    time_module.sleep(app.config['DB_CONNECTION_DELAY'])
                     continue
                 logger.error("No se pudo establecer conexión después de varios intentos")
                 return None
@@ -117,6 +117,7 @@ def create_app():
         
         try:
             with conn.cursor() as cur:
+                # Verificar si la tabla existe
                 cur.execute("""
                     CREATE TABLE IF NOT EXISTS citas (
                         id SERIAL PRIMARY KEY,
@@ -157,10 +158,14 @@ def create_app():
             <head><title>Barbería Master</title>
                 <link rel="stylesheet" href="/static/css/styles.css">
             </head>
-            <body>
-                <h1>Bienvenido a Barbería Master</h1>
-                <p>Sistema de gestión de citas</p>
-                <a href="/agenda">Ver Agenda</a>
+            <body class="bg-light">
+                <div class="container py-5">
+                    <h1 class="text-center">Bienvenido a Barbería Master</h1>
+                    <p class="text-center">Sistema de gestión de citas</p>
+                    <div class="text-center mt-4">
+                        <a href="/agenda" class="btn btn-primary">Ver Agenda</a>
+                    </div>
+                </div>
             </body>
             </html>
             """
@@ -175,22 +180,39 @@ def create_app():
                 return render_template('agenda.html', citas=[])
             
             with conn.cursor() as cur:
+                # Consulta mejorada con formateo de fechas y horas
                 cur.execute("""
-                    SELECT id, fecha, hora, nombre_cliente, servicio, telefono
-                    FROM citas 
+                    SELECT 
+                        id,
+                        to_char(fecha, 'DD/MM/YYYY') as fecha_formateada,
+                        to_char(hora, 'HH24:MI') as hora_formateada,
+                        nombre_cliente,
+                        servicio,
+                        CASE WHEN telefono IS NULL OR telefono = '' THEN '-' ELSE telefono END as telefono
+                    FROM citas
                     WHERE estado = 'pendiente'
                     ORDER BY fecha, hora
                 """)
-                citas = cur.fetchall()
+                
+                # Obtener resultados como lista de diccionarios
+                column_names = [desc[0] for desc in cur.description]
+                citas = [dict(zip(column_names, row)) for row in cur.fetchall()]
                 
                 if not citas:
                     flash("No hay citas pendientes", "info")
                 
                 return render_template('agenda.html', citas=citas)
-        except Exception as e:
-            logger.error(f"Error en agenda: {str(e)}")
-            flash("Error técnico al cargar la agenda", "danger")
+                
+        except psycopg2.Error as e:
+            logger.error(f"Error de base de datos en agenda: {str(e)}")
+            flash("Error técnico al cargar la agenda desde la base de datos", "danger")
             return render_template('agenda.html', citas=[])
+            
+        except Exception as e:
+            logger.error(f"Error inesperado en agenda: {str(e)}")
+            flash("Error inesperado al cargar la agenda", "danger")
+            return render_template('agenda.html', citas=[])
+            
         finally:
             if conn:
                 conn.close()
@@ -223,9 +245,13 @@ def create_app():
                     return redirect(url_for('crear_cita'))
 
                 # Validar fecha no pasada
-                fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
-                if fecha_obj < datetime.now().date():
-                    flash("No se pueden agendar citas en fechas pasadas", "danger")
+                try:
+                    fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
+                    if fecha_obj < datetime.now().date():
+                        flash("No se pueden agendar citas en fechas pasadas", "danger")
+                        return redirect(url_for('crear_cita'))
+                except ValueError:
+                    flash("Formato de fecha incorrecto", "danger")
                     return redirect(url_for('crear_cita'))
 
                 conn = get_db_connection()
@@ -326,10 +352,14 @@ def create_app():
             <head><title>Error 500</title>
                 <link rel="stylesheet" href="/static/css/styles.css">
             </head>
-            <body>
-                <h1>Error en el servidor</h1>
-                <p>Estamos experimentando problemas técnicos. Por favor intente más tarde.</p>
-                <a href="/">Volver al inicio</a>
+            <body class="bg-light">
+                <div class="container py-5">
+                    <h1 class="text-center text-danger">Error en el servidor</h1>
+                    <p class="text-center">Estamos experimentando problemas técnicos. Por favor intente más tarde.</p>
+                    <div class="text-center mt-4">
+                        <a href="/" class="btn btn-primary">Volver al inicio</a>
+                    </div>
+                </div>
             </body>
             </html>
             """, 500
@@ -340,4 +370,5 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
+
 
