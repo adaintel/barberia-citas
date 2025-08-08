@@ -712,6 +712,92 @@ textarea {
   width: 100%;
 }
 
+/* Estilos para combobox (select) */
+select {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  color: var(--gold) !important;
+  border: 1px solid var(--gold) !important;
+  border-radius: 8px !important;
+  padding: 12px 15px !important;
+  font-size: 1rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23D4AF37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 15px center !important;
+  background-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+}
+
+select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3) !important;
+}
+
+select option {
+  background-color: var(--darker) !important;
+  color: var(--light) !important;
+  padding: 10px !important;
+}
+
+/* Contenedor para select con icono */
+.select-container {
+  position: relative;
+  width: 100%;
+}
+
+.select-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  pointer-events: none;
+}
+
+.select-container select {
+  padding-left: 45px !important;
+  width: 100% !important;
+}
+
+/* Estilos para date/time inputs */
+input[type="date"],
+input[type="time"] {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  color: var(--gold) !important;
+  border: 1px solid var(--gold) !important;
+  border-radius: 8px !important;
+  padding: 12px 15px !important;
+  font-size: 1rem !important;
+}
+
+.input-icon-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  pointer-events: none;
+}
+
+.input-icon-container input[type="date"],
+.input-icon-container input[type="time"] {
+  padding-left: 45px !important;
+  width: 100% !important;
+}
+
+/* Placeholder color para inputs */
+::placeholder {
+  color: rgba(212, 175, 55, 0.5) !important;
+}
+
 .btn-cerrar-calendario:hover {
   background: var(--gold);
   color: var(--dark);
