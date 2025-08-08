@@ -1,13 +1,25 @@
+// Inicialización del cliente Supabase
+const initSupabase = () => {
+  if (!window.supabaseClient) {
+    window.supabaseClient = supabase.createClient(
+      'https://azjlrbmgpczuintqyosm.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
+    );
+  }
+  return window.supabaseClient;
+};
+
 // Variables globales para el panel
 let todasLasCitas = [];
 let canalCitas;
 
 // Función para cargar citas desde Supabase
-async function cargarCitas() {
+const cargarCitas = async () => {
   const contenedor = document.getElementById('citasContainer');
   if (!contenedor) return;
 
   try {
+    // Mostrar estado de carga
     contenedor.innerHTML = `
       <div class="loading">
         <i class="fas fa-spinner fa-spin"></i>
@@ -15,7 +27,8 @@ async function cargarCitas() {
       </div>
     `;
 
-    const { data: citas, error } = await window.supabaseClient
+    const supabase = initSupabase();
+    const { data: citas, error } = await supabase
       .from('citas')
       .select('*')
       .order('fecha', { ascending: true })
@@ -28,23 +41,25 @@ async function cargarCitas() {
     actualizarEstadisticas(todasLasCitas);
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error al cargar citas:', error);
     contenedor.innerHTML = `
       <div class="mensaje-error">
-        <p>Error al cargar citas</p>
-        <button onclick="location.reload()">Reintentar</button>
+        <p>Error al cargar citas. Por favor intente nuevamente.</p>
+        <button onclick="window.location.reload()" class="btn-reintentar">
+          <i class="fas fa-sync-alt"></i> Reintentar
+        </button>
       </div>
     `;
   }
-}
+};
 
 // Función para mostrar citas en la tabla
-function mostrarCitas(citas) {
+const mostrarCitas = (citas) => {
   const contenedor = document.getElementById('citasContainer');
   if (!contenedor) return;
 
   if (!citas || citas.length === 0) {
-    contenedor.innerHTML = '<p>No hay citas agendadas actualmente</p>';
+    contenedor.innerHTML = '<p class="no-citas">No hay citas agendadas actualmente</p>';
     return;
   }
 
@@ -83,10 +98,13 @@ function mostrarCitas(citas) {
         </td>
         <td class="acciones">
           <button class="btn-accion btn-completar" data-id="${cita.id}" title="Completar">
-            ✓
+            <i class="fas fa-check"></i>
           </button>
           <button class="btn-accion btn-cancelar" data-id="${cita.id}" title="Cancelar">
-            ✗
+            <i class="fas fa-times"></i>
+          </button>
+          <button class="btn-accion btn-detalles" data-id="${cita.id}" title="Detalles">
+            <i class="fas fa-eye"></i>
           </button>
         </td>
       </tr>
@@ -97,6 +115,11 @@ function mostrarCitas(citas) {
   contenedor.innerHTML = html;
 
   // Agregar eventos a los botones
+  agregarEventosBotones();
+};
+
+// Función para agregar eventos a los botones de acción
+const agregarEventosBotones = () => {
   document.querySelectorAll('.btn-completar').forEach(btn => {
     btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'completado'));
   });
@@ -104,29 +127,114 @@ function mostrarCitas(citas) {
   document.querySelectorAll('.btn-cancelar').forEach(btn => {
     btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'cancelado'));
   });
-}
+  
+  document.querySelectorAll('.btn-detalles').forEach(btn => {
+    btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
+  });
+};
 
 // Función para cambiar estado de una cita
-async function cambiarEstadoCita(id, nuevoEstado) {
+const cambiarEstadoCita = async (id, nuevoEstado) => {
   try {
-    const { error } = await window.supabaseClient
+    const supabase = initSupabase();
+    const { error } = await supabase
       .from('citas')
       .update({ estado: nuevoEstado })
       .eq('id', id);
     
     if (error) throw error;
     
+    // Mostrar notificación de éxito
+    mostrarNotificacion(`Cita marcada como ${nuevoEstado}`, 'success');
+    
     // Actualizar la lista de citas
-    cargarCitas();
+    await cargarCitas();
     
   } catch (error) {
     console.error('Error al actualizar cita:', error);
-    alert('Error al actualizar el estado de la cita');
+    mostrarNotificacion('Error al actualizar el estado de la cita', 'error');
   }
-}
+};
+
+// Función para mostrar detalles de una cita
+const mostrarDetallesCita = async (id) => {
+  const modal = document.getElementById('modal-detalles');
+  const modalBody = document.getElementById('modal-body');
+  
+  try {
+    const supabase = initSupabase();
+    const { data: cita, error } = await supabase
+      .from('citas')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    
+    const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    modalBody.innerHTML = `
+      <div class="detalle-item">
+        <h3>Cliente:</h3>
+        <p>${cita.nombre}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Teléfono:</h3>
+        <p>${cita.telefono}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Fecha:</h3>
+        <p>${fechaFormateada}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Hora:</h3>
+        <p>${cita.hora.substring(0, 5)}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Servicio:</h3>
+        <p>${cita.servicio}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Barbero:</h3>
+        <p>${cita.barbero}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Estado:</h3>
+        <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Notas:</h3>
+        <textarea id="notas-cita" placeholder="Agregar notas adicionales..."></textarea>
+      </div>
+    `;
+    
+    modal.style.display = 'block';
+    
+  } catch (error) {
+    console.error('Error al cargar detalles:', error);
+    modalBody.innerHTML = '<p class="mensaje-error">Error al cargar los detalles de la cita</p>';
+    modal.style.display = 'block';
+  }
+  
+  // Configurar cierre del modal
+  document.querySelector('.close-modal').addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+  
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+};
 
 // Función para filtrar citas
-function filtrarCitas() {
+const filtrarCitas = () => {
   const textoBusqueda = document.getElementById('buscador')?.value.toLowerCase() || '';
   const filtroEstado = document.getElementById('filtro-estado')?.value || 'todas';
   const filtroBarbero = document.getElementById('filtro-barbero')?.value || 'todos';
@@ -141,10 +249,10 @@ function filtrarCitas() {
   });
 
   mostrarCitas(citasFiltradas);
-}
+};
 
 // Función para actualizar estadísticas
-function actualizarEstadisticas(citas) {
+const actualizarEstadisticas = (citas) => {
   const totalCitas = document.getElementById('total-citas');
   const pendientesCitas = document.getElementById('pendientes-citas');
   const completadasCitas = document.getElementById('completadas-citas');
@@ -156,10 +264,53 @@ function actualizarEstadisticas(citas) {
   if (completadasCitas) {
     completadasCitas.textContent = citas.filter(c => c.estado === 'completado').length;
   }
-}
+};
+
+// Función para mostrar notificaciones
+const mostrarNotificacion = (mensaje, tipo) => {
+  const notificacion = document.createElement('div');
+  notificacion.className = `notificacion notificacion-${tipo}`;
+  notificacion.innerHTML = `
+    <p>${mensaje}</p>
+  `;
+  
+  document.body.appendChild(notificacion);
+  
+  setTimeout(() => {
+    notificacion.classList.add('fade-out');
+    setTimeout(() => {
+      notificacion.remove();
+    }, 500);
+  }, 3000);
+};
+
+// Función para exportar citas a CSV
+const exportarCitas = () => {
+  if (todasLasCitas.length === 0) {
+    mostrarNotificacion('No hay citas para exportar', 'warning');
+    return;
+  }
+  
+  let csv = 'Nombre,Telefono,Fecha,Hora,Servicio,Barbero,Estado\n';
+  
+  todasLasCitas.forEach(cita => {
+    csv += `"${cita.nombre}","${cita.telefono}","${cita.fecha}","${cita.hora}","${cita.servicio}","${cita.barbero}","${cita.estado}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `citas_barberia_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  mostrarNotificacion('Exportación completada con éxito', 'success');
+};
 
 // Inicialización del panel
-function inicializarPanel() {
+const inicializarPanel = () => {
   // Configurar buscador
   const buscador = document.getElementById('buscador');
   if (buscador) {
@@ -173,22 +324,66 @@ function inicializarPanel() {
   if (filtroEstado) filtroEstado.addEventListener('change', filtrarCitas);
   if (filtroBarbero) filtroBarbero.addEventListener('change', filtrarCitas);
   
+  // Configurar botón de exportar
+  const btnExportar = document.getElementById('btn-exportar');
+  if (btnExportar) {
+    btnExportar.addEventListener('click', exportarCitas);
+  }
+  
   // Cargar citas iniciales
   cargarCitas();
   
-  // Actualizar cada 30 segundos
+  // Configurar actualización automática cada 30 segundos
   setInterval(cargarCitas, 30000);
-}
+  
+  // Configurar conexión a websockets para cambios en tiempo real
+  const conectarWebsockets = () => {
+    const supabase = initSupabase();
+    canalCitas = supabase
+      .channel('cambios-citas')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'citas' 
+      }, () => {
+        mostrarNotificacion('La lista de citas se ha actualizado', 'info');
+        cargarCitas();
+      })
+      .subscribe();
+  };
+  
+  conectarWebsockets();
+};
 
 // Inicialización cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-  // Configurar Supabase una sola vez
-  if (!window.supabaseClient) {
-    window.supabaseClient = supabase.createClient(
-      'https://azjlrbmgpczuintqyosm.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
-    );
-  }
-  
+document.addEventListener('DOMContentLoaded', () => {
   inicializarPanel();
+  
+  // Configurar hora de actualización
+  const actualizarHora = () => {
+    const ahora = new Date();
+    document.getElementById('hora-actual').textContent = 
+      ahora.toLocaleTimeString('es-ES');
+  };
+  
+  actualizarHora();
+  setInterval(actualizarHora, 1000);
+  
+  // Verificar conexión a internet
+  const verificarConexion = () => {
+    const statusElement = document.getElementById('connection-status');
+    if (!statusElement) return;
+
+    if (navigator.onLine) {
+      statusElement.className = 'connected';
+      statusElement.innerHTML = '<i class="fas fa-circle"></i> En línea';
+    } else {
+      statusElement.className = 'disconnected';
+      statusElement.innerHTML = '<i class="fas fa-circle"></i> Sin conexión';
+    }
+  };
+  
+  verificarConexion();
+  window.addEventListener('online', verificarConexion);
+  window.addEventListener('offline', verificarConexion);
 });
