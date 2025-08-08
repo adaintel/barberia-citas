@@ -1,3 +1,9 @@
+// Inicialización de Supabase al inicio del archivo
+const supabase = supabase.createClient(
+  'https://azjlrbmgpczuintqyosm.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
+);
+
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
   const notificacion = document.createElement('div');
@@ -30,12 +36,6 @@ function verificarAccesoBarbero() {
   }
   return true;
 }
-
-// Inicialización de Supabase para el panel
-const supabase = supabase.createClient(
-  'https://azjlrbmgpczuintqyosm.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
-);
 
 // Cargar citas desde Supabase
 async function cargarCitas() {
@@ -174,10 +174,16 @@ async function cambiarEstadoCita(id, nuevoEstado) {
   }
 }
 
-// Mostrar detalles de cita en modal
+// Mostrar detalles de cita en modal (corregido para evitar pegado)
 async function mostrarDetallesCita(id) {
   const modal = document.getElementById('modal-detalles');
   const modalBody = document.getElementById('modal-body');
+  
+  // Limpiar eventos anteriores para evitar duplicados
+  const oldCloseBtn = document.querySelector('.close-modal');
+  if (oldCloseBtn) {
+    oldCloseBtn.removeEventListener('click', closeModal);
+  }
   
   try {
     const { data: cita, error } = await supabase
@@ -224,26 +230,106 @@ async function mostrarDetallesCita(id) {
         <h3>Estado:</h3>
         <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
       </div>
+      <div class="detalle-item">
+        <button id="btn-calendario" class="btn-accion" title="Agregar al calendario">
+          <i class="fas fa-calendar-plus"></i> Agregar a calendario
+        </button>
+      </div>
     `;
     
-    modal.style.display = 'block';
+    modal.style.display = 'flex'; // Cambiado a flex para mejor centrado
+    
+    // Configurar botón de calendario
+    document.getElementById('btn-calendario')?.addEventListener('click', () => {
+      agregarACalendario(cita);
+    });
+    
+    // Configurar cierre del modal
+    const closeModal = () => {
+      modal.style.display = 'none';
+      document.removeEventListener('click', outsideClick);
+    };
+    
+    const outsideClick = (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    };
+    
+    document.querySelector('.close-modal').addEventListener('click', closeModal);
+    document.addEventListener('click', outsideClick);
     
   } catch (error) {
     console.error('Error al cargar detalles:', error);
     modalBody.innerHTML = '<p class="mensaje-error">Error al cargar los detalles de la cita</p>';
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
   }
+}
+
+// Función para agregar evento al calendario
+function agregarACalendario(cita) {
+  const startDate = new Date(`${cita.fecha}T${cita.hora}`);
+  const endDate = new Date(startDate);
+  endDate.setHours(endDate.getHours() + 1); // Duración de 1 hora
   
-  // Cerrar modal
-  document.querySelector('.close-modal').addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
+  const event = {
+    title: `Cita con ${cita.nombre} - ${cita.servicio}`,
+    description: `Servicio: ${cita.servicio}\nBarbero: ${cita.barbero}\nTeléfono: ${cita.telefono}`,
+    start: startDate.toISOString(),
+    end: endDate.toISOString(),
+    location: 'Barbería Elite'
+  };
   
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.style.display = 'none';
-    }
+  // Para Google Calendar
+  const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDateForGoogle(startDate)}/${formatDateForGoogle(endDate)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
+  
+  // Para otros calendarios (ICS)
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
+    `SUMMARY:${event.title}`,
+    `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
+    `DTSTART:${formatDateForICS(startDate)}`,
+    `DTEND:${formatDateForICS(endDate)}`,
+    `LOCATION:${event.location}`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\n');
+  
+  const icsBlob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const icsUrl = URL.createObjectURL(icsBlob);
+  
+  // Crear menú de opciones
+  const options = `
+    <div class="modal-calendario">
+      <h3>Agregar a calendario</h3>
+      <a href="${googleUrl}" target="_blank" class="btn-calendario-option">
+        <i class="fab fa-google"></i> Google Calendar
+      </a>
+      <a href="${icsUrl}" download="cita-barberia.ics" class="btn-calendario-option">
+        <i class="fas fa-calendar-alt"></i> Descargar (.ics)
+      </a>
+      <button class="btn-cerrar-calendario">Cerrar</button>
+    </div>
+  `;
+  
+  const modalBody = document.getElementById('modal-body');
+  modalBody.insertAdjacentHTML('beforeend', options);
+  
+  // Configurar cierre del menú de calendario
+  document.querySelector('.btn-cerrar-calendario')?.addEventListener('click', () => {
+    document.querySelector('.modal-calendario')?.remove();
   });
+}
+
+// Funciones de ayuda para formatos de fecha
+function formatDateForGoogle(date) {
+  return date.toISOString().replace(/-|:|\.\d\d\d/g, '');
+}
+
+function formatDateForICS(date) {
+  return date.toISOString().replace(/-|:|\.\d\d\d/g, '');
 }
 
 // Filtrar citas
@@ -346,12 +432,4 @@ function inicializarPanel() {
 // Inicialización cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
   inicializarPanel();
-  
-  // Configurar hora de actualización
-  const actualizarHora = () => {
-    const ahora = new Date();
-    document.getElementById('hora-actual').textContent = ahora.toLocaleTimeString('es-ES');
-  };
-  actualizarHora();
-  setInterval(actualizarHora, 1000);
 });
