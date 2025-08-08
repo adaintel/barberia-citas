@@ -2,7 +2,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import psycopg2
 from dotenv import load_dotenv
 import traceback
@@ -40,7 +40,9 @@ def create_app():
             ('Corte de niño', 100.00),
             ('Afeitado clásico', 120.00),
             ('Tinte de barba', 200.00)
-        ]
+        ],
+        HORARIO_APERTURA=time(9, 0),  # 9:00 AM
+        HORARIO_CIERRE=time(18, 0)    # 6:00 PM
     )
 
     # Parsear DATABASE_URL si existe
@@ -83,20 +85,26 @@ def create_app():
             return f(*args, **kwargs)
         return decorated_function
 
-    # Conexión a la base de datos
+    # Conexión a la base de datos con reintentos
     def get_db_connection():
-        try:
-            conn = psycopg2.connect(**app.config['DB_CONFIG'])
-            logger.info("Conexión a DB establecida correctamente")
-            return conn
-        except psycopg2.OperationalError as e:
-            logger.error(f"Error de conexión a DB: {str(e)}")
-            flash("Error de conexión con la base de datos. Intente nuevamente.", "danger")
-            return None
-        except Exception as e:
-            logger.error(f"Error inesperado en conexión a DB: {str(e)}")
-            flash("Error técnico inesperado", "danger")
-            return None
+        max_retries = 3
+        retry_delay = 1  # segundos
+        
+        for attempt in range(max_retries):
+            try:
+                conn = psycopg2.connect(**app.config['DB_CONFIG'])
+                logger.info("Conexión a DB establecida correctamente")
+                return conn
+            except psycopg2.OperationalError as e:
+                logger.warning(f"Intento {attempt + 1} de conexión fallido: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                logger.error("No se pudo establecer conexión después de varios intentos")
+                return None
+            except Exception as e:
+                logger.error(f"Error inesperado en conexión a DB: {str(e)}")
+                return None
 
     # Inicialización de la base de datos
     def init_db():
@@ -115,7 +123,8 @@ def create_app():
                         servicio VARCHAR(100) NOT NULL,
                         telefono VARCHAR(20),
                         estado VARCHAR(20) DEFAULT 'pendiente',
-                        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        CONSTRAINT cita_unica UNIQUE (fecha, hora, estado)
                     )
                 """)
                 conn.commit()
@@ -129,7 +138,8 @@ def create_app():
                 conn.close()
 
     # Inicializar la base de datos al arrancar
-    init_db()
+    if not init_db():
+        logger.error("No se pudo inicializar la base de datos")
 
     # Rutas de la aplicación
     @app.route('/')
@@ -138,7 +148,6 @@ def create_app():
             return render_template('index.html')
         except Exception as e:
             logger.error(f"Error en ruta principal: {str(e)}")
-            # Versión de emergencia si falla el template
             return """
             <!DOCTYPE html>
             <html>
@@ -157,6 +166,7 @@ def create_app():
         try:
             conn = get_db_connection()
             if not conn:
+                flash("Error de conexión con la base de datos", "danger")
                 return render_template('agenda.html', citas=[])
             
             with conn.cursor() as cur:
@@ -184,58 +194,92 @@ def create_app():
     @login_required
     def crear_cita():
         if request.method == 'POST':
-            fecha = request.form.get('fecha')
-            hora = request.form.get('hora')
-            nombre_cliente = request.form.get('nombre_cliente', '').strip()
-            servicio = request.form.get('servicio')
-            telefono = request.form.get('telefono', '').strip()
-            
-            if not all([fecha, hora, nombre_cliente, servicio]):
-                flash("Todos los campos excepto teléfono son requeridos", "danger")
-                return redirect(url_for('crear_cita'))
-            
             try:
-                hora_obj = datetime.strptime(hora, '%H:%M').time()
-                if hora_obj < time(9, 0) or hora_obj > time(18, 0):
-                    flash("El horario de atención es de 9:00 AM a 6:00 PM", "danger")
+                # Obtener datos del formulario
+                fecha = request.form.get('fecha')
+                hora = request.form.get('hora')
+                nombre_cliente = request.form.get('nombre_cliente', '').strip()
+                servicio = request.form.get('servicio')
+                telefono = request.form.get('telefono', '').strip()
+
+                # Validaciones básicas
+                if not all([fecha, hora, nombre_cliente, servicio]):
+                    flash("Todos los campos excepto teléfono son requeridos", "danger")
                     return redirect(url_for('crear_cita'))
-                
+
+                # Validar formato de hora
+                try:
+                    hora_obj = datetime.strptime(hora, '%H:%M').time()
+                    if hora_obj < app.config['HORARIO_APERTURA'] or hora_obj > app.config['HORARIO_CIERRE']:
+                        flash(f"El horario de atención es de {app.config['HORARIO_APERTURA'].strftime('%H:%M')} a {app.config['HORARIO_CIERRE'].strftime('%H:%M')}", "danger")
+                        return redirect(url_for('crear_cita'))
+                except ValueError:
+                    flash("Formato de hora incorrecto (use HH:MM)", "danger")
+                    return redirect(url_for('crear_cita'))
+
+                # Validar fecha no pasada
+                fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
+                if fecha_obj < datetime.now().date():
+                    flash("No se pueden agendar citas en fechas pasadas", "danger")
+                    return redirect(url_for('crear_cita'))
+
                 conn = get_db_connection()
                 if not conn:
+                    flash("Error de conexión con la base de datos", "danger")
                     return redirect(url_for('crear_cita'))
-                
+
                 try:
                     with conn.cursor() as cur:
+                        # Verificar disponibilidad con bloqueo
                         cur.execute("""
                             SELECT id FROM citas 
                             WHERE fecha = %s AND hora = %s AND estado = 'pendiente'
+                            FOR UPDATE
                         """, (fecha, hora))
+                        
                         if cur.fetchone():
                             flash("Ya existe una cita programada para esa fecha y hora", "danger")
                             return redirect(url_for('crear_cita'))
-                        
+
+                        # Insertar cita
                         cur.execute("""
                             INSERT INTO citas (fecha, hora, nombre_cliente, servicio, telefono)
                             VALUES (%s, %s, %s, %s, %s)
                             RETURNING id
                         """, (fecha, hora, nombre_cliente, servicio, telefono))
+                        
                         cita_id = cur.fetchone()[0]
                         conn.commit()
                         
                         flash(f"Cita #{cita_id} creada exitosamente!", "success")
+                        logger.info(f"Cita #{cita_id} creada para {nombre_cliente} el {fecha} a las {hora}")
                         return redirect(url_for('agenda'))
+
+                except psycopg2.Error as e:
+                    conn.rollback()
+                    logger.error(f"Error de base de datos al crear cita: {str(e)}")
+                    flash("Error técnico al guardar la cita en la base de datos", "danger")
+                    return redirect(url_for('crear_cita'))
+                    
                 except Exception as e:
                     conn.rollback()
-                    logger.error(f"Error al crear cita: {str(e)}")
-                    flash("Error técnico al guardar la cita", "danger")
+                    logger.error(f"Error inesperado al crear cita: {str(e)}")
+                    flash("Error inesperado al procesar la cita", "danger")
                     return redirect(url_for('crear_cita'))
+                    
                 finally:
-                    conn.close()
-            except ValueError:
-                flash("Formato de hora incorrecto (use HH:MM)", "danger")
+                    if conn:
+                        conn.close()
+                        
+            except Exception as e:
+                logger.error(f"Error general en crear_cita: {str(e)}")
+                flash("Ocurrió un error al procesar su solicitud", "danger")
                 return redirect(url_for('crear_cita'))
-        
-        return render_template('crear_cita.html', min_date=datetime.now().strftime('%Y-%m-%d'))
+
+        # GET request - mostrar formulario
+        return render_template('crear_cita.html', 
+                            min_date=datetime.now().strftime('%Y-%m-%d'),
+                            max_date=(datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -251,7 +295,7 @@ def create_app():
             
             flash("Credenciales incorrectas", "danger")
         
-        return render_template('login.html')
+        return render_template('auth/login.html')
 
     @app.route('/logout')
     def logout():
@@ -268,6 +312,8 @@ def create_app():
     def internal_error(error):
         logger.error(f"Error 500: {str(error)}")
         try:
+            return render_template('errors/500.html'), 500
+        except:
             return """
             <!DOCTYPE html>
             <html>
@@ -279,8 +325,6 @@ def create_app():
             </body>
             </html>
             """, 500
-        except:
-            return "<h1>Error interno del servidor</h1>", 500
 
     return app
 
@@ -288,5 +332,4 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-
 
