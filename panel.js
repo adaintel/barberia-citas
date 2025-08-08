@@ -1,9 +1,11 @@
 // Verificación de acceso solo para barberos
-function verificarAcceso() {
-  const esBarbero = confirm("¿Eres un barbero autorizado?");
-  if (!esBarbero) {
-    window.location.href = "index.html";
-    return false;
+// En panel.js, reemplaza el confirm por:
+const password = prompt("Ingrese la contraseña de barbero:");
+if (password !== "TuContraseñaSegura123") {
+  alert("Acceso no autorizado");
+  window.location.href = "index.html";
+  return false;
+}
   }
   return true;
 }
