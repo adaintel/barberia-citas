@@ -1,116 +1,217 @@
-// Esperamos a que todo el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Configuración de Supabase
-  const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+/* Estilos generales */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+}
 
-  // 2. Función para mostrar citas (actualizada)
-  async function mostrarCitas() {
-    const contenedor = document.getElementById('citasContainer');
-    if (!contenedor) return;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    try {
-      contenedor.innerHTML = '<p class="cargando">Cargando citas...</p>';
-      
-      const { data: citas, error } = await supabase
-        .from('citas')
-        .select('*')
-        .order('fecha_completa', { ascending: true });
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
 
-      if (error) throw error;
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-      if (!citas || citas.length === 0) {
-        contenedor.innerHTML = '<p class="no-citas">No hay citas agendadas aún</p>';
-        return;
-      }
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
+  border-bottom: 2px solid var(--primary-color);
+}
 
-      let html = `
-        <table class="tabla-citas">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Servicio</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
+header h1 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
 
-      citas.forEach(cita => {
-        const fecha = new Date(cita.fecha_completa);
-        html += `
-          <tr>
-            <td>${cita.nombre}</td>
-            <td>${cita.telefono}</td>
-            <td>${fecha.toLocaleDateString('es-ES')}</td>
-            <td>${fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</td>
-            <td>${cita.servicio}</td>
-            <td class="estado-${cita.estado}">${cita.estado}</td>
-          </tr>
-        `;
-      });
+/* Formulario */
+form {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
 
-      contenedor.innerHTML = html + '</tbody></table>';
-    } catch (error) {
-      console.error('Error al cargar citas:', error);
-      contenedor.innerHTML = `
-        <p class="error">Error al cargar citas</p>
-        <button onclick="location.reload()">Reintentar</button>
-      `;
-    }
+input, select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+button {
+  background: var(--primary-color);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: var(--secondary-color);
+}
+
+/* Tabla de citas */
+.tabla-citas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-citas th, .tabla-citas td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.tabla-citas th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tabla-citas tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.tabla-citas tr:hover {
+  background-color: #e9e9e9;
+}
+
+.estado-cita {
+  font-weight: bold;
+}
+
+.estado-cita[data-estado="pendiente"] {
+  color: #e67e22;
+}
+
+.estado-cita[data-estado="completado"] {
+  color: #27ae60;
+}
+
+.estado-cita[data-estado="cancelado"] {
+  color: #e74c3c;
+}
+
+/* Botones */
+.btn {
+  display: inline-block;
+  background: var(--primary-color);
+  color: white;
+  padding: 12px 25px;
+  margin: 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: var(--secondary-color);
+  text-decoration: none;
+}
+
+.btn-volver {
+  display: inline-block;
+  background: #7f8c8d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.btn-volver:hover {
+  background: #95a5a6;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* Mensajes */
+#mensaje {
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 4px;
+  display: none;
+}
+
+.mensaje-exito {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Actualización */
+.actualizacion {
+  text-align: center;
+  margin-top: 20px;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
   }
-
-  // 3. Suscripción a cambios en tiempo real
-  function iniciarSuscripcion() {
-    supabase
-      .channel('citas_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'citas'
-      }, () => {
-        mostrarCitas();
-      })
-      .subscribe();
+  
+  form {
+    padding: 15px;
   }
-
-  // 4. Inicialización para barbero.html
-  if (window.location.pathname.includes('barbero.html')) {
-    mostrarCitas();
-    iniciarSuscripcion();
-    setInterval(mostrarCitas, 30000); // Refresco cada 30s
+  
+  .tabla-citas {
+    font-size: 14px;
   }
-
-  // 5. Manejador de formulario para cliente.html
-  document.getElementById('citaForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const citaData = {
-      nombre: document.getElementById('nombre').value,
-      telefono: document.getElementById('telefono').value,
-      fecha: document.getElementById('fecha').value,
-      hora: document.getElementById('hora').value,
-      fecha_completa: new Date(
-        `${document.getElementById('fecha').value}T${document.getElementById('hora').value}:00`
-      ).toISOString(),
-      servicio: document.getElementById('servicio').value,
-      barbero: 'Juan',
-      estado: 'pendiente'
-    };
-
-    try {
-      const { error } = await supabase.from('citas').insert([citaData]);
-      if (error) throw error;
-      
-      alert('✅ Cita agendada correctamente');
-      document.getElementById('citaForm').reset();
-    } catch (error) {
-      console.error('Error al agendar:', error);
-      alert('❌ Error: ' + error.message);
-    }
-  });
-});
+  
+  .buttons-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn {
+    width: 80%;
+    text-align: center;
+  }
+}
