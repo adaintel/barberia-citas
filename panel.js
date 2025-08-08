@@ -1,3 +1,20 @@
+// Verificación de acceso solo para barberos
+function verificarAcceso() {
+  const esBarbero = confirm("¿Eres un barbero autorizado?");
+  if (!esBarbero) {
+    window.location.href = "index.html";
+    return false;
+  }
+  return true;
+}
+
+// Modificar la inicialización del panel
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarAcceso()) return;
+  
+  // Resto del código de inicialización...
+});
+
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
   const notificacion = document.createElement('div');
