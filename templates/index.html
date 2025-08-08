@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio - Barbería{% endblock %}
-
 {% block content %}
-<div class="container">
-    <h2>Bienvenido al Sistema de Citas de la Barbería</h2>
-    
-    <div class="row">
-        <div class="col">
-            <p>Gestiona tus citas de forma fácil y rápida.</p>
-            <a href="{{ url_for('agenda') }}" class="btn btn-primary">Ver Agenda de Citas</a>
-            
-            {% if session.get('admin') %}
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Cerrar Sesión</a>
-            {% endif %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Bienvenido a Barbería Master</h1>
+        <p class="lead">Sistema de gestión de citas profesionales</p>
+        
+        <div class="mt-5">
+            <a href="/agenda" class="btn btn-primary btn-lg me-3">
+                <i class="bi bi-calendar-check"></i> Ver Agenda
+            </a>
+            <a href="/crear_cita" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Nueva Cita
+            </a>
         </div>
     </div>
 </div>
