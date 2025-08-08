@@ -28,7 +28,7 @@ file_handler.setFormatter(logging.Formatter(
 logger.addHandler(file_handler)
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static')
     
     # Configuración desde variables de entorno
     app.config.update(
@@ -42,7 +42,8 @@ def create_app():
             ('Tinte de barba', 200.00)
         ],
         HORARIO_APERTURA=time(9, 0),  # 9:00 AM
-        HORARIO_CIERRE=time(18, 0)    # 6:00 PM
+        HORARIO_CIERRE=time(18, 0),    # 6:00 PM
+        MAX_DIAS_CITA=30  # Máximo días para agendar citas
     )
 
     # Parsear DATABASE_URL si existe
@@ -72,7 +73,9 @@ def create_app():
             'now': datetime.now(),
             'current_year': datetime.now().year,
             'servicios': app.config['SERVICIOS'],
-            'is_authenticated': session.get('admin', False)
+            'is_authenticated': session.get('admin', False),
+            'horario_apertura': app.config['HORARIO_APERTURA'].strftime('%H:%M'),
+            'horario_cierre': app.config['HORARIO_CIERRE'].strftime('%H:%M')
         }
 
     # Decorador para requerir autenticación
@@ -151,7 +154,9 @@ def create_app():
             return """
             <!DOCTYPE html>
             <html>
-            <head><title>Barbería Master</title></head>
+            <head><title>Barbería Master</title>
+                <link rel="stylesheet" href="/static/css/styles.css">
+            </head>
             <body>
                 <h1>Bienvenido a Barbería Master</h1>
                 <p>Sistema de gestión de citas</p>
@@ -277,9 +282,10 @@ def create_app():
                 return redirect(url_for('crear_cita'))
 
         # GET request - mostrar formulario
+        max_date = (datetime.now() + timedelta(days=app.config['MAX_DIAS_CITA'])).strftime('%Y-%m-%d')
         return render_template('crear_cita.html', 
                             min_date=datetime.now().strftime('%Y-%m-%d'),
-                            max_date=(datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d'))
+                            max_date=max_date)
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -317,7 +323,9 @@ def create_app():
             return """
             <!DOCTYPE html>
             <html>
-            <head><title>Error 500</title></head>
+            <head><title>Error 500</title>
+                <link rel="stylesheet" href="/static/css/styles.css">
+            </head>
             <body>
                 <h1>Error en el servidor</h1>
                 <p>Estamos experimentando problemas técnicos. Por favor intente más tarde.</p>
