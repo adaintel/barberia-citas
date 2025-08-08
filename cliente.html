@@ -1,12 +1,30 @@
-<form id="citaForm">
-  <input type="text" id="nombre" placeholder="Nombre" required>
-  <input type="tel" id="telefono" placeholder="Teléfono" required>
-  <input type="date" id="fecha" required>
-  <input type="time" id="hora" required>
-  <select id="servicio" required>
-    <option value="Corte">Corte</option>
-    <option value="Barba">Barba</option>
-  </select>
-  <button type="submit">Agendar</button>
-</form>
-<script src="scripts.js"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendar Cita</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="scripts.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 Agendar Cita</h1>
+    <form id="citaForm">
+      <input type="text" id="nombre" placeholder="Nombre" required>
+      <input type="tel" id="telefono" placeholder="Teléfono" required>
+      <input type="date" id="fecha" required min="${new Date().toISOString().split('T')[0]}">
+      <input type="time" id="hora" required>
+      <select id="servicio" required>
+        <option value="">Seleccione un servicio</option>
+        <option value="Corte de cabello">Corte de cabello</option>
+        <option value="Arreglo de barba">Arreglo de barba</option>
+        <option value="Corte + Barba">Corte + Barba</option>
+      </select>
+      <button type="submit">Agendar Cita</button>
+    </form>
+    <a href="index.html" class="btn-volver">← Volver al inicio</a>
+  </div>
+</body>
+</html>
