@@ -17,7 +17,7 @@ function mostrarMensaje(texto, tipo) {
   }, 5000);
 }
 
-// Inicialización del formulario de cita con mejor selector de fecha/hora
+// Inicialización del formulario de cita
 function inicializarFormulario() {
   const citaForm = document.getElementById('citaForm');
   if (!citaForm) return;
@@ -27,55 +27,22 @@ function inicializarFormulario() {
   const hoy = new Date();
   const manana = new Date(hoy);
   manana.setDate(hoy.getDate() + 1);
-  fechaInput.min = manana.toISOString().split('T')[0];
+  const fechaMinima = manana.toISOString().split('T')[0];
+  fechaInput.min = fechaMinima;
+  fechaInput.value = fechaMinima; // Establecer valor por defecto
   
-  // Configurar horario laboral (8am-9pm)
+  // Configurar hora por defecto (8:00 AM)
   const horaInput = document.getElementById('hora');
   horaInput.min = "08:00";
   horaInput.max = "21:00";
+  horaInput.value = "08:00"; // Valor por defecto
   
-  // Mejor selector de hora con icono
-  const horaContainer = document.createElement('div');
-  horaContainer.className = 'input-icon-container';
-  horaInput.parentNode.insertBefore(horaContainer, horaInput);
-  horaContainer.appendChild(horaInput);
-  
-  const horaIcon = document.createElement('i');
-  horaIcon.className = 'fas fa-clock';
-  horaContainer.appendChild(horaIcon);
-  
-  horaInput.addEventListener('click', function() {
-    this.showPicker(); // Mostrar el selector nativo de hora
-  });
-  
-  horaIcon.addEventListener('click', function() {
-    horaInput.showPicker(); // Mostrar selector al hacer clic en el icono
-  });
-
-  // Mejor selector de fecha con icono
-  const fechaContainer = document.createElement('div');
-  fechaContainer.className = 'input-icon-container';
-  fechaInput.parentNode.insertBefore(fechaContainer, fechaInput);
-  fechaContainer.appendChild(fechaInput);
-  
-  const fechaIcon = document.createElement('i');
-  fechaIcon.className = 'fas fa-calendar-alt';
-  fechaContainer.appendChild(fechaIcon);
-  
-  fechaInput.addEventListener('click', function() {
-    this.showPicker(); // Mostrar el selector nativo de fecha
-  });
-  
-  fechaIcon.addEventListener('click', function() {
-    fechaInput.showPicker(); // Mostrar selector al hacer clic en el icono
-  });
-
   // Validación de hora
   horaInput.addEventListener('change', function() {
     const hora = parseInt(this.value.split(':')[0]);
     if (hora < 8 || hora > 21) {
       mostrarMensaje('Nuestro horario de atención es de 8:00 AM a 9:00 PM', 'error');
-      this.value = '';
+      this.value = "08:00";
     }
   });
 
@@ -85,18 +52,18 @@ function inicializarFormulario() {
     const mensajeDiv = document.getElementById('mensaje');
     mensajeDiv.style.display = 'none';
     
-    // Validación de fecha
-    const fechaSeleccionada = new Date(fechaInput.value);
-    fechaSeleccionada.setHours(0, 0, 0, 0);
+    // Validación de campos
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
     
-    if (fechaSeleccionada < manana) {
-      mostrarMensaje('Debes agendar con al menos un día de anticipación', 'error');
+    if (!nombre || !telefono) {
+      mostrarMensaje('Por favor complete todos los campos', 'error');
       return;
     }
 
     const citaData = {
-      nombre: document.getElementById('nombre').value.trim(),
-      telefono: document.getElementById('telefono').value.trim(),
+      nombre: nombre,
+      telefono: telefono,
       fecha: fechaInput.value,
       hora: horaInput.value,
       servicio: document.getElementById('servicio').value,
@@ -105,12 +72,17 @@ function inicializarFormulario() {
     };
 
     try {
-      const { error } = await supabase.from('citas').insert([citaData]);
+      const { data, error } = await supabase
+        .from('citas')
+        .insert([citaData])
+        .select();
       
       if (error) throw error;
       
       mostrarMensaje('✅ Cita agendada correctamente', 'exito');
       citaForm.reset();
+      fechaInput.value = fechaMinima; // Restablecer fecha
+      horaInput.value = "08:00"; // Restablecer hora
       
     } catch (error) {
       console.error('Error al agendar cita:', error);
