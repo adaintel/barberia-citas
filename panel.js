@@ -1,7 +1,11 @@
-// 1. Primero definimos Supabase al inicio del archivo
+// 1. Primero inicializamos Supabase
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Variables globales
+let todasLasCitas = [];
+let modalAbierto = false;
 
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -15,10 +19,6 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
     setTimeout(() => notificacion.remove(), 500);
   }, 3000);
 }
-
-// Variables globales
-let todasLasCitas = [];
-let canalCitas;
 
 // Verificación de seguridad para barberos
 function verificarAccesoBarbero() {
@@ -74,6 +74,83 @@ async function cargarCitas() {
       </div>
     `;
   }
+}
+
+// Mostrar detalles de cita en modal (corregido para evitar pegado)
+async function mostrarDetallesCita(id) {
+  if (modalAbierto) return;
+  modalAbierto = true;
+  
+  const modal = document.getElementById('modal-detalles');
+  const modalBody = document.getElementById('modal-body');
+  
+  try {
+    const { data: cita, error } = await supabase
+      .from('citas')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    
+    const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    modalBody.innerHTML = `
+      <div class="detalle-item">
+        <h3>Cliente:</h3>
+        <p>${cita.nombre}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Teléfono:</h3>
+        <p>${cita.telefono}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Fecha:</h3>
+        <p>${fechaFormateada}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Hora:</h3>
+        <p>${cita.hora.substring(0, 5)}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Servicio:</h3>
+        <p>${cita.servicio}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Barbero:</h3>
+        <p>${cita.barbero}</p>
+      </div>
+      <div class="detalle-item">
+        <h3>Estado:</h3>
+        <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
+      </div>
+      <button class="btn-cerrar-detalles" style="margin-top: 20px; padding: 10px; background: var(--gold); color: var(--dark); border: none; border-radius: 5px; cursor: pointer;">
+        Cerrar detalles
+      </button>
+    `;
+    
+    modal.style.display = 'flex';
+    
+    // Configurar cierre del modal
+    document.querySelector('.btn-cerrar-detalles').addEventListener('click', cerrarModal);
+    document.querySelector('.close-modal').addEventListener('click', cerrarModal);
+    
+  } catch (error) {
+    console.error('Error al cargar detalles:', error);
+    modalBody.innerHTML = '<p class="mensaje-error">Error al cargar los detalles de la cita</p>';
+    modal.style.display = 'flex';
+  }
+}
+
+function cerrarModal() {
+  const modal = document.getElementById('modal-detalles');
+  modal.style.display = 'none';
+  modalAbierto = false;
 }
 
 // [Resto del código de panel.js permanece igual...]
