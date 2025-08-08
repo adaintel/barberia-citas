@@ -497,3 +497,100 @@ footer {
   align-items: center;
   gap: 10px;
 }
+
+/* Estilos para notificaciones */
+.notificacion {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notificacion-success {
+  background-color: #27ae60;
+}
+
+.notificacion-error {
+  background-color: #e74c3c;
+}
+
+.notificacion-warning {
+  background-color: #f39c12;
+}
+
+.notificacion-info {
+  background-color: #3498db;
+}
+
+.notificacion i {
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(20px); }
+}
+
+/* Estilos para el botón de reintentar */
+.btn-reintentar {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-reintentar:hover {
+  background-color: #2980b9;
+}
+
+/* Estilos para el modal */
+.modal-content {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.detalle-item {
+  margin-bottom: 15px;
+}
+
+.detalle-item h3 {
+  color: var(--primary);
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.detalle-item p {
+  font-size: 1.1rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  min-height: 100px;
+  resize: vertical;
+}
