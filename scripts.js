@@ -24,21 +24,30 @@ function mostrarMensaje(texto, tipo) {
 }
 
 // Inicialización del formulario de cita
+
+// En la función inicializarFormulario():
 function inicializarFormulario() {
   const citaForm = document.getElementById('citaForm');
   if (!citaForm) return;
 
   // Configurar fecha mínima (hoy)
   const fechaInput = document.getElementById('fecha');
-  const hoy = new Date().toISOString().split('T')[0];
-  fechaInput.min = hoy;
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const manana = new Date(hoy);
+  manana.setDate(hoy.getDate() + 1);
   
-  // Configurar horario laboral
+  fechaInput.min = manana.toISOString().split('T')[0];
+  
+  // Configurar horario laboral (8am-9pm)
   const horaInput = document.getElementById('hora');
+  horaInput.min = "08:00";
+  horaInput.max = "21:00";
+  
   horaInput.addEventListener('change', function() {
     const hora = this.value.split(':')[0];
-    if (hora < 8 || hora > 18) {
-      mostrarMensaje('Nuestro horario de atención es de 8:00 AM a 6:00 PM', 'error');
+    if (hora < 8 || hora > 21) {
+      mostrarMensaje('Nuestro horario de atención es de 8:00 AM a 9:00 PM', 'error');
       this.value = '';
     }
   });
@@ -49,15 +58,18 @@ function inicializarFormulario() {
     const mensajeDiv = document.getElementById('mensaje');
     mensajeDiv.style.display = 'none';
     
-    // Validación de fecha
+    // Validación de fecha (no puede ser hoy ni días pasados)
     const fechaSeleccionada = new Date(fechaInput.value);
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    fechaSeleccionada.setHours(0, 0, 0, 0);
     
-    if (fechaSeleccionada < hoy) {
-      mostrarMensaje('No puedes agendar citas en fechas pasadas', 'error');
+    if (fechaSeleccionada < manana) {
+      mostrarMensaje('Debes agendar con al menos un día de anticipación', 'error');
       return;
     }
+
+    // Resto del código del formulario...
+  });
+}
 
     const citaData = {
       nombre: document.getElementById('nombre').value.trim(),
