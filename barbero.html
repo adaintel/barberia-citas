@@ -3,18 +3,178 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Barbero - Barbería Elite</title>
+  <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f8f8f8;
+      --glass: rgba(255, 255, 255, 0.05);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    body {
+      background-color: var(--darker);
+      color: var(--light);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>');
+      background-size: 200px;
+      background-repeat: repeat;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .glass-panel {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    header h1 {
+      color: var(--gold);
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    header p {
+      color: var(--light);
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+    
+    .panel-control {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
+    
+    .search-container {
+      position: relative;
+      flex-grow: 1;
+      min-width: 250px;
+    }
+    
+    .search-container i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold);
+    }
+    
+    #buscador {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      border: none;
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    #buscador:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+    
+    .filters {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    select {
+      padding: 10px 15px;
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      min-width: 150px;
+    }
+    
+    .btn-export {
+      background: var(--gold);
+      color: var(--darker);
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .btn-export:hover {
+      background: #c9a227;
+      transform: translateY(-2px);
+    }
+    
+    /* Resto de tus estilos existentes... */
+    /* Asegúrate de mantener todos los estilos previos para la tabla, modal, etc. */
+    
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    
+    .gold-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+  </style>
   <link rel="stylesheet" href="styles.css">
-  <!-- Cargar Supabase primero -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <div class="gold-glow"></div>
+  
   <div class="container">
     <div class="glass-panel">
       <header>
-        <h1><i class="fas fa-clipboard-list"></i> Panel de Citas</h1>
-        <p>Barbería Elite - Gestión Profesional</p>
+        <h1><i class="fas fa-cut"></i> Panel de Citas</h1>
+        <p>Barbería Elite - Acceso exclusivo para barberos</p>
       </header>
       
       <main>
@@ -70,23 +230,7 @@
     </div>
     
     <footer>
-      <div class="footer-content">
-        <a href="index.html" class="btn-volver">
-          <i class="fas fa-arrow-left"></i> Volver al inicio
-        </a>
-        
-        <div class="update-info">
-          <p id="update-status">
-            <i class="fas fa-sync-alt"></i> 
-            <span id="hora-actual"></span>
-            <span id="connection-status" class="connected">
-              <i class="fas fa-circle"></i> En línea
-            </span>
-          </p>
-        </div>
-        
-        <p class="version">v2.1 Professional</p>
-      </div>
+      <p>© 2025 Barbería Elite - Sistema de gestión de citas</p>
     </footer>
   </div>
 
@@ -99,21 +243,6 @@
     </div>
   </div>
 
-  <!-- Cargar scripts en orden correcto -->
-  <script src="scripts.js"></script>
   <script src="panel.js"></script>
-  
-  <script>
-    // Función para actualizar hora (solo si no existe en panel.js)
-    if (typeof actualizarHora === 'undefined') {
-      function actualizarHora() {
-        const ahora = new Date();
-        document.getElementById('hora-actual').textContent = 
-          ahora.toLocaleTimeString('es-ES');
-      }
-      actualizarHora();
-      setInterval(actualizarHora, 1000);
-    }
-  </script>
 </body>
 </html>
