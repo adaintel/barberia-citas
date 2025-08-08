@@ -214,4 +214,86 @@ button:hover {
     width: 80%;
     text-align: center;
   }
+
+  /* Estilos para botones de acción */
+.btn-accion {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px 10px;
+  margin: 0 3px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.btn-completar {
+  color: #27ae60;
+  border: 1px solid #27ae60;
+}
+
+.btn-completar:hover {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-cancelar {
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+.btn-cancelar:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+}
+
+/* Mensaje de error con botón */
+.mensaje-error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.mensaje-error button {
+  background: #721c24;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  margin-top: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mensaje-error button:hover {
+  background: #5a1a1a;
+}
+
+/* Responsive para tabla */
+.table-responsive {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .tabla-citas {
+    font-size: 14px;
+  }
+  
+  .tabla-citas th, 
+  .tabla-citas td {
+    padding: 8px 5px;
+  }
+  
+  .btn-accion {
+    padding: 3px 6px;
+    font-size: 14px;
+  }
+}
 }
