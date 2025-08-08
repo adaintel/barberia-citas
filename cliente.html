@@ -4,43 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agendar Cita - Barbería Elite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>📅 Agendar Cita</h1>
-      <p>Barbería Elite</p>
-    </header>
-    
-    <main>
-      <form id="citaForm">
-        <input type="text" id="nombre" placeholder="Nombre completo" required>
-        <input type="tel" id="telefono" placeholder="Teléfono" required>
-        <input type="date" id="fecha" required>
-        <input type="time" id="hora" required>
-        <select id="servicio" required>
-          <option value="" disabled selected>Seleccione un servicio</option>
-          <option value="Corte de cabello">Corte de cabello</option>
-          <option value="Arreglo de barba">Arreglo de barba</option>
-          <option value="Corte y barba">Corte + barba</option>
-          <option value="Tinte">Tinte</option>
-        </select>
-        <select id="barbero" required>
-          <option value="" disabled selected>Seleccione su barbero</option>
-          <option value="Juan">Juan</option>
-          <option value="Carlos">Carlos</option>
-          <option value="Pedro">Pedro</option>
-        </select>
-        <button type="submit">Agendar Cita</button>
-      </form>
+    <div class="glass-panel">
+      <header>
+        <h1><i class="fas fa-calendar-check"></i> Agendar Cita</h1>
+        <p>Barbería Elite - Reserva tu experiencia</p>
+      </header>
       
-      <div id="mensaje"></div>
-    </main>
+      <main>
+        <form id="citaForm" class="form-animado">
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="nombre" placeholder="Nombre completo" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-phone"></i>
+            <input type="tel" id="telefono" placeholder="Teléfono" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-calendar-day"></i>
+            <input type="date" id="fecha" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-clock"></i>
+            <input type="time" id="hora" min="08:00" max="18:00" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-cut"></i>
+            <select id="servicio" required>
+              <option value="" disabled selected>Seleccione un servicio</option>
+              <option value="Corte de cabello">Corte de cabello ($20)</option>
+              <option value="Arreglo de barba">Arreglo de barba ($15)</option>
+              <option value="Corte y barba">Corte + barba ($30)</option>
+              <option value="Tinte">Tinte ($25)</option>
+              <option value="Servicio VIP">Servicio VIP ($50)</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <i class="fas fa-user-tie"></i>
+            <select id="barbero" required>
+              <option value="" disabled selected>Seleccione su barbero</option>
+              <option value="Juan">Juan (Especialista en cortes clásicos)</option>
+              <option value="Carlos">Carlos (Experto en barbas)</option>
+              <option value="Pedro">Pedro (Estilista moderno)</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-calendar-plus"></i> Agendar Cita
+          </button>
+        </form>
+        
+        <div id="mensaje"></div>
+        
+        <div class="info-horario">
+          <p><i class="fas fa-info-circle"></i> Horario: Lunes a Sábado - 8:00 AM a 6:00 PM</p>
+        </div>
+      </main>
+    </div>
     
     <footer>
-      <a href="index.html" class="btn-volver">← Volver al inicio</a>
+      <a href="index.html" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+      </a>
+      <p class="version">v2.0 Professional</p>
     </footer>
   </div>
 
