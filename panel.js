@@ -1,20 +1,30 @@
-// Inicialización del cliente Supabase
-const initSupabase = () => {
-  if (!window.supabaseClient) {
-    window.supabaseClient = supabase.createClient(
-      'https://azjlrbmgpczuintqyosm.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
-    );
-  }
-  return window.supabaseClient;
-};
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo = 'info') {
+  const notificacion = document.createElement('div');
+  notificacion.className = `notificacion notificacion-${tipo}`;
+  notificacion.innerHTML = `<p>${mensaje}</p>`;
+  document.body.appendChild(notificacion);
+  
+  setTimeout(() => {
+    notificacion.classList.add('fade-out');
+    setTimeout(() => notificacion.remove(), 500);
+  }, 3000);
+}
 
-// Variables globales para el panel
+// Variables globales
 let todasLasCitas = [];
 let canalCitas;
 
-// Función para cargar citas desde Supabase
-const cargarCitas = async () => {
+// Función para inicializar Supabase (versión específica para panel)
+function initSupabasePanel() {
+  return supabase.createClient(
+    'https://azjlrbmgpczuintqyosm.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
+  );
+}
+
+// Cargar citas desde Supabase
+async function cargarCitas() {
   const contenedor = document.getElementById('citasContainer');
   if (!contenedor) return;
 
@@ -27,7 +37,7 @@ const cargarCitas = async () => {
       </div>
     `;
 
-    const supabase = initSupabase();
+    const supabase = initSupabasePanel();
     const { data: citas, error } = await supabase
       .from('citas')
       .select('*')
@@ -39,6 +49,7 @@ const cargarCitas = async () => {
     todasLasCitas = citas || [];
     mostrarCitas(todasLasCitas);
     actualizarEstadisticas(todasLasCitas);
+    mostrarNotificacion('Citas cargadas correctamente', 'success');
     
   } catch (error) {
     console.error('Error al cargar citas:', error);
@@ -50,11 +61,12 @@ const cargarCitas = async () => {
         </button>
       </div>
     `;
+    mostrarNotificacion('Error al cargar citas', 'error');
   }
-};
+}
 
-// Función para mostrar citas en la tabla
-const mostrarCitas = (citas) => {
+// Mostrar citas en la tabla
+function mostrarCitas(citas) {
   const contenedor = document.getElementById('citasContainer');
   if (!contenedor) return;
 
@@ -116,10 +128,10 @@ const mostrarCitas = (citas) => {
 
   // Agregar eventos a los botones
   agregarEventosBotones();
-};
+}
 
-// Función para agregar eventos a los botones de acción
-const agregarEventosBotones = () => {
+// Agregar eventos a los botones de acción
+function agregarEventosBotones() {
   document.querySelectorAll('.btn-completar').forEach(btn => {
     btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'completado'));
   });
@@ -131,12 +143,12 @@ const agregarEventosBotones = () => {
   document.querySelectorAll('.btn-detalles').forEach(btn => {
     btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
   });
-};
+}
 
-// Función para cambiar estado de una cita
-const cambiarEstadoCita = async (id, nuevoEstado) => {
+// Cambiar estado de una cita
+async function cambiarEstadoCita(id, nuevoEstado) {
   try {
-    const supabase = initSupabase();
+    const supabase = initSupabasePanel();
     const { error } = await supabase
       .from('citas')
       .update({ estado: nuevoEstado })
@@ -144,25 +156,22 @@ const cambiarEstadoCita = async (id, nuevoEstado) => {
     
     if (error) throw error;
     
-    // Mostrar notificación de éxito
     mostrarNotificacion(`Cita marcada como ${nuevoEstado}`, 'success');
-    
-    // Actualizar la lista de citas
     await cargarCitas();
     
   } catch (error) {
     console.error('Error al actualizar cita:', error);
     mostrarNotificacion('Error al actualizar el estado de la cita', 'error');
   }
-};
+}
 
-// Función para mostrar detalles de una cita
-const mostrarDetallesCita = async (id) => {
+// Mostrar detalles de cita en modal
+async function mostrarDetallesCita(id) {
   const modal = document.getElementById('modal-detalles');
   const modalBody = document.getElementById('modal-body');
   
   try {
-    const supabase = initSupabase();
+    const supabase = initSupabasePanel();
     const { data: cita, error } = await supabase
       .from('citas')
       .select('*')
@@ -207,10 +216,6 @@ const mostrarDetallesCita = async (id) => {
         <h3>Estado:</h3>
         <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
       </div>
-      <div class="detalle-item">
-        <h3>Notas:</h3>
-        <textarea id="notas-cita" placeholder="Agregar notas adicionales..."></textarea>
-      </div>
     `;
     
     modal.style.display = 'block';
@@ -221,7 +226,7 @@ const mostrarDetallesCita = async (id) => {
     modal.style.display = 'block';
   }
   
-  // Configurar cierre del modal
+  // Cerrar modal
   document.querySelector('.close-modal').addEventListener('click', () => {
     modal.style.display = 'none';
   });
@@ -231,10 +236,10 @@ const mostrarDetallesCita = async (id) => {
       modal.style.display = 'none';
     }
   });
-};
+}
 
-// Función para filtrar citas
-const filtrarCitas = () => {
+// Filtrar citas
+function filtrarCitas() {
   const textoBusqueda = document.getElementById('buscador')?.value.toLowerCase() || '';
   const filtroEstado = document.getElementById('filtro-estado')?.value || 'todas';
   const filtroBarbero = document.getElementById('filtro-barbero')?.value || 'todos';
@@ -249,43 +254,21 @@ const filtrarCitas = () => {
   });
 
   mostrarCitas(citasFiltradas);
-};
+}
 
-// Función para actualizar estadísticas
-const actualizarEstadisticas = (citas) => {
+// Actualizar estadísticas
+function actualizarEstadisticas(citas) {
   const totalCitas = document.getElementById('total-citas');
   const pendientesCitas = document.getElementById('pendientes-citas');
   const completadasCitas = document.getElementById('completadas-citas');
   
   if (totalCitas) totalCitas.textContent = citas.length;
-  if (pendientesCitas) {
-    pendientesCitas.textContent = citas.filter(c => c.estado === 'pendiente').length;
-  }
-  if (completadasCitas) {
-    completadasCitas.textContent = citas.filter(c => c.estado === 'completado').length;
-  }
-};
+  if (pendientesCitas) pendientesCitas.textContent = citas.filter(c => c.estado === 'pendiente').length;
+  if (completadasCitas) completadasCitas.textContent = citas.filter(c => c.estado === 'completado').length;
+}
 
-// Función para mostrar notificaciones
-const mostrarNotificacion = (mensaje, tipo) => {
-  const notificacion = document.createElement('div');
-  notificacion.className = `notificacion notificacion-${tipo}`;
-  notificacion.innerHTML = `
-    <p>${mensaje}</p>
-  `;
-  
-  document.body.appendChild(notificacion);
-  
-  setTimeout(() => {
-    notificacion.classList.add('fade-out');
-    setTimeout(() => {
-      notificacion.remove();
-    }, 500);
-  }, 3000);
-};
-
-// Función para exportar citas a CSV
-const exportarCitas = () => {
+// Exportar citas a CSV
+function exportarCitas() {
   if (todasLasCitas.length === 0) {
     mostrarNotificacion('No hay citas para exportar', 'warning');
     return;
@@ -307,53 +290,49 @@ const exportarCitas = () => {
   document.body.removeChild(link);
   
   mostrarNotificacion('Exportación completada con éxito', 'success');
-};
+}
+
+// Conectar a websockets para cambios en tiempo real
+function conectarWebsockets() {
+  const supabase = initSupabasePanel();
+  canalCitas = supabase
+    .channel('cambios-citas')
+    .on('postgres_changes', { 
+      event: '*', 
+      schema: 'public', 
+      table: 'citas' 
+    }, () => {
+      mostrarNotificacion('La lista de citas se ha actualizado', 'info');
+      cargarCitas();
+    })
+    .subscribe();
+}
 
 // Inicialización del panel
-const inicializarPanel = () => {
+function inicializarPanel() {
   // Configurar buscador
   const buscador = document.getElementById('buscador');
-  if (buscador) {
-    buscador.addEventListener('input', filtrarCitas);
-  }
+  if (buscador) buscador.addEventListener('input', filtrarCitas);
   
   // Configurar filtros
   const filtroEstado = document.getElementById('filtro-estado');
   const filtroBarbero = document.getElementById('filtro-barbero');
-  
   if (filtroEstado) filtroEstado.addEventListener('change', filtrarCitas);
   if (filtroBarbero) filtroBarbero.addEventListener('change', filtrarCitas);
   
   // Configurar botón de exportar
   const btnExportar = document.getElementById('btn-exportar');
-  if (btnExportar) {
-    btnExportar.addEventListener('click', exportarCitas);
-  }
+  if (btnExportar) btnExportar.addEventListener('click', exportarCitas);
   
   // Cargar citas iniciales
   cargarCitas();
   
-  // Configurar actualización automática cada 30 segundos
+  // Configurar actualización automática
   setInterval(cargarCitas, 30000);
   
-  // Configurar conexión a websockets para cambios en tiempo real
-  const conectarWebsockets = () => {
-    const supabase = initSupabase();
-    canalCitas = supabase
-      .channel('cambios-citas')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'citas' 
-      }, () => {
-        mostrarNotificacion('La lista de citas se ha actualizado', 'info');
-        cargarCitas();
-      })
-      .subscribe();
-  };
-  
+  // Conectar websockets
   conectarWebsockets();
-};
+}
 
 // Inicialización cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
@@ -362,10 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Configurar hora de actualización
   const actualizarHora = () => {
     const ahora = new Date();
-    document.getElementById('hora-actual').textContent = 
-      ahora.toLocaleTimeString('es-ES');
+    document.getElementById('hora-actual').textContent = ahora.toLocaleTimeString('es-ES');
   };
-  
   actualizarHora();
   setInterval(actualizarHora, 1000);
   
@@ -374,13 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusElement = document.getElementById('connection-status');
     if (!statusElement) return;
 
-    if (navigator.onLine) {
-      statusElement.className = 'connected';
-      statusElement.innerHTML = '<i class="fas fa-circle"></i> En línea';
-    } else {
-      statusElement.className = 'disconnected';
-      statusElement.innerHTML = '<i class="fas fa-circle"></i> Sin conexión';
-    }
+    statusElement.className = navigator.onLine ? 'connected' : 'disconnected';
+    statusElement.innerHTML = `<i class="fas fa-circle"></i> ${navigator.onLine ? 'En línea' : 'Sin conexión'}`;
   };
   
   verificarConexion();
