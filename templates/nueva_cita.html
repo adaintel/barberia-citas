@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Cita{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4">Agendar Nueva Cita</h2>
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('cita_routes.nueva_cita') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.servicio.label(class="form-label") }}
+                        {{ form.servicio(class="form-select") }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.barbero.label(class="form-label") }}
+                        {{ form.barbero(class="form-select") }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.fecha.label(class="form-label") }}
+                            {{ form.fecha(class="form-control", type="date", min=date.today().isoformat()) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.hora.label(class="form-label") }}
+                            {{ form.hora(class="form-select") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notas.label(class="form-label") }}
+                        {{ form.notas(class="form-control", rows=3) }}
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fechaInput = document.getElementById('fecha');
+    const barberoSelect = document.getElementById('barbero');
+    const horaSelect = document.getElementById('hora');
+    
+    // Deshabilitar fechas pasadas
+    fechaInput.min = new Date().toISOString().split('T')[0];
+    
+    // Actualizar horas disponibles cuando cambia la fecha o el barbero
+    function actualizarHorasDisponibles() {
+        const fecha = fechaInput.value;
+        const barberoId = barberoSelect.value;
+        
+        if (!fecha || !barberoId) return;
+        
+        fetch(`/api/horas-disponibles?fecha=${fecha}&barbero_id=${barberoId}`)
+            .then(response => response.json())
+            .then(data => {
+                horaSelect.innerHTML = '';
+                data.horas_disponibles.forEach(hora => {
+                    const option = document.createElement('option');
+                    option.value = hora.value;
+                    option.textContent = hora.text;
+                    horaSelect.appendChild(option);
+                });
+            });
+    }
+    
+    fechaInput.addEventListener('change', actualizarHorasDisponibles);
+    barberoSelect.addEventListener('change', actualizarHorasDisponibles);
+});
+</script>
+{% endblock %}
