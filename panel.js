@@ -1,4 +1,4 @@
-// 1. Primero inicializamos Supabase
+// 1. Inicialización de Supabase
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -75,85 +75,6 @@ async function cargarCitas() {
     `;
   }
 }
-
-// Mostrar detalles de cita en modal (corregido para evitar pegado)
-async function mostrarDetallesCita(id) {
-  if (modalAbierto) return;
-  modalAbierto = true;
-  
-  const modal = document.getElementById('modal-detalles');
-  const modalBody = document.getElementById('modal-body');
-  
-  try {
-    const { data: cita, error } = await supabase
-      .from('citas')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    
-    const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    
-    modalBody.innerHTML = `
-      <div class="detalle-item">
-        <h3>Cliente:</h3>
-        <p>${cita.nombre}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Teléfono:</h3>
-        <p>${cita.telefono}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Fecha:</h3>
-        <p>${fechaFormateada}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Hora:</h3>
-        <p>${cita.hora.substring(0, 5)}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Servicio:</h3>
-        <p>${cita.servicio}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Barbero:</h3>
-        <p>${cita.barbero}</p>
-      </div>
-      <div class="detalle-item">
-        <h3>Estado:</h3>
-        <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
-      </div>
-      <button class="btn-cerrar-detalles" style="margin-top: 20px; padding: 10px; background: var(--gold); color: var(--dark); border: none; border-radius: 5px; cursor: pointer;">
-        Cerrar detalles
-      </button>
-    `;
-    
-    modal.style.display = 'flex';
-    
-    // Configurar cierre del modal
-    document.querySelector('.btn-cerrar-detalles').addEventListener('click', cerrarModal);
-    document.querySelector('.close-modal').addEventListener('click', cerrarModal);
-    
-  } catch (error) {
-    console.error('Error al cargar detalles:', error);
-    modalBody.innerHTML = '<p class="mensaje-error">Error al cargar los detalles de la cita</p>';
-    modal.style.display = 'flex';
-  }
-}
-
-function cerrarModal() {
-  const modal = document.getElementById('modal-detalles');
-  modal.style.display = 'none';
-  modalAbierto = false;
-}
-
-// [Resto del código de panel.js permanece igual...]
 
 // Mostrar citas en la tabla
 function mostrarCitas(citas) {
@@ -252,16 +173,13 @@ async function cambiarEstadoCita(id, nuevoEstado) {
   }
 }
 
-// Mostrar detalles de cita en modal (corregido para evitar pegado)
+// Mostrar detalles de cita en modal
 async function mostrarDetallesCita(id) {
+  if (modalAbierto) return;
+  modalAbierto = true;
+  
   const modal = document.getElementById('modal-detalles');
   const modalBody = document.getElementById('modal-body');
-  
-  // Limpiar eventos anteriores para evitar duplicados
-  const oldCloseBtn = document.querySelector('.close-modal');
-  if (oldCloseBtn) {
-    oldCloseBtn.removeEventListener('click', closeModal);
-  }
   
   try {
     const { data: cita, error } = await supabase
@@ -308,34 +226,16 @@ async function mostrarDetallesCita(id) {
         <h3>Estado:</h3>
         <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
       </div>
-      <div class="detalle-item">
-        <button id="btn-calendario" class="btn-accion" title="Agregar al calendario">
-          <i class="fas fa-calendar-plus"></i> Agregar a calendario
-        </button>
-      </div>
+      <button class="btn-cerrar-detalles" style="margin-top: 20px; padding: 10px; background: var(--gold); color: var(--dark); border: none; border-radius: 5px; cursor: pointer;">
+        Cerrar detalles
+      </button>
     `;
     
-    modal.style.display = 'flex'; // Cambiado a flex para mejor centrado
-    
-    // Configurar botón de calendario
-    document.getElementById('btn-calendario')?.addEventListener('click', () => {
-      agregarACalendario(cita);
-    });
+    modal.style.display = 'flex';
     
     // Configurar cierre del modal
-    const closeModal = () => {
-      modal.style.display = 'none';
-      document.removeEventListener('click', outsideClick);
-    };
-    
-    const outsideClick = (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    };
-    
-    document.querySelector('.close-modal').addEventListener('click', closeModal);
-    document.addEventListener('click', outsideClick);
+    document.querySelector('.btn-cerrar-detalles').addEventListener('click', cerrarModal);
+    document.querySelector('.close-modal').addEventListener('click', cerrarModal);
     
   } catch (error) {
     console.error('Error al cargar detalles:', error);
@@ -344,70 +244,10 @@ async function mostrarDetallesCita(id) {
   }
 }
 
-// Función para agregar evento al calendario
-function agregarACalendario(cita) {
-  const startDate = new Date(`${cita.fecha}T${cita.hora}`);
-  const endDate = new Date(startDate);
-  endDate.setHours(endDate.getHours() + 1); // Duración de 1 hora
-  
-  const event = {
-    title: `Cita con ${cita.nombre} - ${cita.servicio}`,
-    description: `Servicio: ${cita.servicio}\nBarbero: ${cita.barbero}\nTeléfono: ${cita.telefono}`,
-    start: startDate.toISOString(),
-    end: endDate.toISOString(),
-    location: 'Barbería Elite'
-  };
-  
-  // Para Google Calendar
-  const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDateForGoogle(startDate)}/${formatDateForGoogle(endDate)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
-  
-  // Para otros calendarios (ICS)
-  const icsContent = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'BEGIN:VEVENT',
-    `SUMMARY:${event.title}`,
-    `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
-    `DTSTART:${formatDateForICS(startDate)}`,
-    `DTEND:${formatDateForICS(endDate)}`,
-    `LOCATION:${event.location}`,
-    'END:VEVENT',
-    'END:VCALENDAR'
-  ].join('\n');
-  
-  const icsBlob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-  const icsUrl = URL.createObjectURL(icsBlob);
-  
-  // Crear menú de opciones
-  const options = `
-    <div class="modal-calendario">
-      <h3>Agregar a calendario</h3>
-      <a href="${googleUrl}" target="_blank" class="btn-calendario-option">
-        <i class="fab fa-google"></i> Google Calendar
-      </a>
-      <a href="${icsUrl}" download="cita-barberia.ics" class="btn-calendario-option">
-        <i class="fas fa-calendar-alt"></i> Descargar (.ics)
-      </a>
-      <button class="btn-cerrar-calendario">Cerrar</button>
-    </div>
-  `;
-  
-  const modalBody = document.getElementById('modal-body');
-  modalBody.insertAdjacentHTML('beforeend', options);
-  
-  // Configurar cierre del menú de calendario
-  document.querySelector('.btn-cerrar-calendario')?.addEventListener('click', () => {
-    document.querySelector('.modal-calendario')?.remove();
-  });
-}
-
-// Funciones de ayuda para formatos de fecha
-function formatDateForGoogle(date) {
-  return date.toISOString().replace(/-|:|\.\d\d\d/g, '');
-}
-
-function formatDateForICS(date) {
-  return date.toISOString().replace(/-|:|\.\d\d\d/g, '');
+function cerrarModal() {
+  const modal = document.getElementById('modal-detalles');
+  modal.style.display = 'none';
+  modalAbierto = false;
 }
 
 // Filtrar citas
@@ -466,7 +306,7 @@ function exportarCitas() {
 
 // Conectar a websockets para cambios en tiempo real
 function conectarWebsockets() {
-  canalCitas = supabase
+  const canalCitas = supabase
     .channel('cambios-citas')
     .on('postgres_changes', { 
       event: '*', 
