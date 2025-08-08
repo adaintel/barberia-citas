@@ -3,13 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Barbero</title>
+  <title>Panel del Barbero - Barbería Elite</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Cargamos primero Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <!-- Nuestro script con defer -->
-  <script src="scripts.js" defer></script>
-  <link rel="icon" href="data:,"> <!-- Elimina error favicon -->
 </head>
 <body>
   <div class="container">
@@ -20,7 +15,7 @@
     
     <main>
       <div id="citasContainer">
-        <p>Cargando citas...</p>
+        <!-- Las citas se cargarán aquí automáticamente -->
       </div>
     </main>
     
@@ -30,14 +25,18 @@
     </footer>
   </div>
 
+  <!-- Scripts al final del body para mejor rendimiento -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="scripts.js"></script>
   <script>
     // Mostrar hora de actualización
     function actualizarHora() {
+      const ahora = new Date();
       document.getElementById('hora-actual').textContent = 
-        new Date().toLocaleTimeString('es-ES');
+        ahora.toLocaleTimeString('es-ES');
     }
-    setInterval(actualizarHora, 1000);
     actualizarHora();
+    setInterval(actualizarHora, 1000);
   </script>
 </body>
 </html>
