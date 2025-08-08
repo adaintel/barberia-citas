@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Barbero</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Cargamos primero Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Nuestro script con defer -->
   <script src="scripts.js" defer></script>
+  <link rel="icon" href="data:,"> <!-- Elimina error favicon -->
 </head>
 <body>
   <div class="container">
@@ -17,7 +20,7 @@
     
     <main>
       <div id="citasContainer">
-        <!-- Las citas se cargarán aquí automáticamente -->
+        <p>Cargando citas...</p>
       </div>
     </main>
     
@@ -33,8 +36,8 @@
       document.getElementById('hora-actual').textContent = 
         new Date().toLocaleTimeString('es-ES');
     }
-    actualizarHora();
     setInterval(actualizarHora, 1000);
+    actualizarHora();
   </script>
 </body>
 </html>
