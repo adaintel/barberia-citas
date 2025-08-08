@@ -648,3 +648,71 @@ textarea {
 .btn-verificar:hover {
   background-color: #c9a227;
 }
+
+/* Selectores de fecha/hora mejorados */
+.input-icon-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon-container input[type="date"],
+.input-icon-container input[type="time"] {
+  padding-left: 40px;
+  width: 100%;
+}
+
+.input-icon-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  pointer-events: none;
+}
+
+/* Estilo para el modal de calendario */
+.modal-calendario {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--gold);
+  margin-top: 1rem;
+}
+
+.modal-calendario h3 {
+  color: var(--gold);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.btn-calendario-option {
+  display: block;
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.btn-calendario-option:hover {
+  background: rgba(212, 175, 55, 0.4);
+}
+
+.btn-cerrar-calendario {
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.btn-cerrar-calendario:hover {
+  background: var(--gold);
+  color: var(--dark);
+}
