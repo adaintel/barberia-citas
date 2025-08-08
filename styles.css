@@ -1,77 +1,26 @@
-/* Estilos generales */
-body {
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  line-height: 1.6;
+/* Añade esto al final de tu CSS */
+.estado-pendiente {
+  color: #e67e22;
+  font-weight: bold;
+}
+.estado-completado {
+  color: #2ecc71;
+  font-weight: bold;
+}
+.estado-cancelado {
+  color: #e74c3c;
+  font-weight: bold;
 }
 
-h1 {
-  color: #333;
+.error {
+  color: #e74c3c;
   text-align: center;
 }
 
-/* Formulario */
-form {
-  background: #f4f4f4;
-  padding: 20px;
-  border-radius: 5px;
-  margin-bottom: 20px;
-}
-
-input, select {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-button {
-  background: #333;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #555;
-}
-
-/* Tabla de citas */
-table {
-  width: 100%;
-  border-collapse: collapse;
+.tabla-citas {
   margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #333;
-  color: white;
-}
-
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* Enlaces */
-a {
-  color: #333;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 20px;
-}
-
-a:hover {
-  text-decoration: underline;
+.tabla-citas th {
+  background-color: #34495e;
 }
