@@ -1,22 +1,3 @@
-// Verificación de acceso solo para barberos
-// En panel.js, reemplaza el confirm por:
-const password = prompt("Ingrese la contraseña de barbero:");
-if (password !== "TuContraseñaSegura123") {
-  alert("Acceso no autorizado");
-  window.location.href = "index.html";
-  return false;
-}
-  }
-  return true;
-}
-
-// Modificar la inicialización del panel
-document.addEventListener('DOMContentLoaded', () => {
-  if (!verificarAcceso()) return;
-  
-  // Resto del código de inicialización...
-});
-
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
   const notificacion = document.createElement('div');
@@ -34,7 +15,23 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
 let todasLasCitas = [];
 let canalCitas;
 
-// Función para inicializar Supabase (versión específica para panel)
+// Verificación de seguridad para barberos
+function verificarAccesoBarbero() {
+  const password = localStorage.getItem('barberoPassword');
+  if (!password) {
+    const inputPassword = prompt('Acceso restringido. Ingrese la contraseña de barbero:');
+    if (inputPassword === 'BarberoElite2025') {
+      localStorage.setItem('barberoPassword', 'BarberoElite2025');
+      return true;
+    } else {
+      window.location.href = 'index.html';
+      return false;
+    }
+  }
+  return true;
+}
+
+// Inicialización de Supabase para el panel
 function initSupabasePanel() {
   return supabase.createClient(
     'https://azjlrbmgpczuintqyosm.supabase.co',
@@ -44,11 +41,12 @@ function initSupabasePanel() {
 
 // Cargar citas desde Supabase
 async function cargarCitas() {
+  if (!verificarAccesoBarbero()) return;
+
   const contenedor = document.getElementById('citasContainer');
   if (!contenedor) return;
 
   try {
-    // Mostrar estado de carga
     contenedor.innerHTML = `
       <div class="loading">
         <i class="fas fa-spinner fa-spin"></i>
@@ -68,7 +66,6 @@ async function cargarCitas() {
     todasLasCitas = citas || [];
     mostrarCitas(todasLasCitas);
     actualizarEstadisticas(todasLasCitas);
-    mostrarNotificacion('Citas cargadas correctamente', 'success');
     
   } catch (error) {
     console.error('Error al cargar citas:', error);
@@ -80,7 +77,6 @@ async function cargarCitas() {
         </button>
       </div>
     `;
-    mostrarNotificacion('Error al cargar citas', 'error');
   }
 }
 
@@ -144,23 +140,27 @@ function mostrarCitas(citas) {
 
   html += `</tbody></table></div>`;
   contenedor.innerHTML = html;
-
-  // Agregar eventos a los botones
   agregarEventosBotones();
 }
 
 // Agregar eventos a los botones de acción
 function agregarEventosBotones() {
   document.querySelectorAll('.btn-completar').forEach(btn => {
-    btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'completado'));
+    btn.addEventListener('click', async () => {
+      await cambiarEstadoCita(btn.dataset.id, 'completado');
+    });
   });
   
   document.querySelectorAll('.btn-cancelar').forEach(btn => {
-    btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'cancelado'));
+    btn.addEventListener('click', async () => {
+      await cambiarEstadoCita(btn.dataset.id, 'cancelado');
+    });
   });
   
   document.querySelectorAll('.btn-detalles').forEach(btn => {
-    btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
+    btn.addEventListener('click', () => {
+      mostrarDetallesCita(btn.dataset.id);
+    });
   });
 }
 
@@ -329,6 +329,8 @@ function conectarWebsockets() {
 
 // Inicialización del panel
 function inicializarPanel() {
+  if (!verificarAccesoBarbero()) return;
+
   // Configurar buscador
   const buscador = document.getElementById('buscador');
   if (buscador) buscador.addEventListener('input', filtrarCitas);
