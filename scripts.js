@@ -17,7 +17,7 @@ function mostrarMensaje(texto, tipo) {
   }, 5000);
 }
 
-// Inicialización del formulario de cita
+// Inicialización del formulario de cita con mejor selector de fecha/hora
 function inicializarFormulario() {
   const citaForm = document.getElementById('citaForm');
   if (!citaForm) return;
@@ -34,6 +34,43 @@ function inicializarFormulario() {
   horaInput.min = "08:00";
   horaInput.max = "21:00";
   
+  // Mejor selector de hora con icono
+  const horaContainer = document.createElement('div');
+  horaContainer.className = 'input-icon-container';
+  horaInput.parentNode.insertBefore(horaContainer, horaInput);
+  horaContainer.appendChild(horaInput);
+  
+  const horaIcon = document.createElement('i');
+  horaIcon.className = 'fas fa-clock';
+  horaContainer.appendChild(horaIcon);
+  
+  horaInput.addEventListener('click', function() {
+    this.showPicker(); // Mostrar el selector nativo de hora
+  });
+  
+  horaIcon.addEventListener('click', function() {
+    horaInput.showPicker(); // Mostrar selector al hacer clic en el icono
+  });
+
+  // Mejor selector de fecha con icono
+  const fechaContainer = document.createElement('div');
+  fechaContainer.className = 'input-icon-container';
+  fechaInput.parentNode.insertBefore(fechaContainer, fechaInput);
+  fechaContainer.appendChild(fechaInput);
+  
+  const fechaIcon = document.createElement('i');
+  fechaIcon.className = 'fas fa-calendar-alt';
+  fechaContainer.appendChild(fechaIcon);
+  
+  fechaInput.addEventListener('click', function() {
+    this.showPicker(); // Mostrar el selector nativo de fecha
+  });
+  
+  fechaIcon.addEventListener('click', function() {
+    fechaInput.showPicker(); // Mostrar selector al hacer clic en el icono
+  });
+
+  // Validación de hora
   horaInput.addEventListener('change', function() {
     const hora = parseInt(this.value.split(':')[0]);
     if (hora < 8 || hora > 21) {
