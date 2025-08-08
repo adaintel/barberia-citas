@@ -3,21 +3,212 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agendar Cita - Barbería Elite</title>
+  <title>Agendar Cita | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f8f8f8;
+      --glass: rgba(255, 255, 255, 0.05);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    body {
+      background-color: var(--darker);
+      color: var(--light);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>');
+      background-size: 200px;
+      background-repeat: repeat;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .glass-panel {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    header h1 {
+      color: var(--gold);
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    header p {
+      color: var(--light);
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+    
+    #citaForm {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold);
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      border: none;
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+    
+    button[type="submit"] {
+      background: var(--gold);
+      color: var(--darker);
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    button[type="submit"]:hover {
+      background: #c9a227;
+      transform: translateY(-2px);
+    }
+    
+    #mensaje {
+      padding: 15px;
+      margin: 1rem 0;
+      border-radius: 8px;
+      display: none;
+      text-align: center;
+    }
+    
+    .mensaje-exito {
+      background: rgba(39, 174, 96, 0.2);
+      color: #27ae60;
+      border: 1px solid rgba(39, 174, 96, 0.3);
+      display: block !important;
+    }
+    
+    .mensaje-error {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      display: block !important;
+    }
+    
+    .info-horario {
+      background: rgba(212, 175, 55, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    
+    .btn-volver {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--gold);
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-volver:hover {
+      background: rgba(212, 175, 55, 0.2);
+      text-decoration: none;
+    }
+    
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    
+    .gold-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+  </style>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <div class="gold-glow"></div>
+  
   <div class="container">
     <div class="glass-panel">
       <header>
-        <h1><i class="fas fa-calendar-check"></i> Agendar Cita</h1>
-        <p>Barbería Elite - Reserva tu experiencia</p>
+        <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
+        <p>Barbería Elite - Reserva tu experiencia premium</p>
       </header>
       
       <main>
-        <form id="citaForm" class="form-animado">
+        <form id="citaForm">
           <div class="input-group">
             <i class="fas fa-user"></i>
             <input type="text" id="nombre" placeholder="Nombre completo" required>
@@ -35,7 +226,7 @@
           
           <div class="input-group">
             <i class="fas fa-clock"></i>
-            <input type="time" id="hora" min="08:00" max="18:00" required>
+            <input type="time" id="hora" min="08:00" max="21:00" required>
           </div>
           
           <div class="input-group">
@@ -60,15 +251,16 @@
             </select>
           </div>
           
-          <button type="submit" class="btn-submit">
-            <i class="fas fa-calendar-plus"></i> Agendar Cita
+          <button type="submit">
+            <i class="fas fa-calendar-check"></i> Confirmar Cita
           </button>
         </form>
         
         <div id="mensaje"></div>
         
         <div class="info-horario">
-          <p><i class="fas fa-info-circle"></i> Horario: Lunes a Sábado - 8:00 AM a 6:00 PM</p>
+          <i class="fas fa-info-circle"></i>
+          <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
         </div>
       </main>
     </div>
@@ -77,7 +269,7 @@
       <a href="index.html" class="btn-volver">
         <i class="fas fa-arrow-left"></i> Volver al inicio
       </a>
-      <p class="version">v2.0 Professional</p>
+      <p>© 2025 Barbería Elite - Todos los derechos reservados</p>
     </footer>
   </div>
 
