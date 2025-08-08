@@ -68,9 +68,9 @@ def create_app():
     def inject_common_data():
         return {
             'now': datetime.now(),
+            'current_year': datetime.now().year,
             'servicios': app.config['SERVICIOS'],
-            'is_authenticated': session.get('admin', False),
-            'current_year': datetime.now().year  # Versión redundante para seguridad
+            'is_authenticated': session.get('admin', False)
         }
 
     # Decorador para requerir autenticación
@@ -138,7 +138,18 @@ def create_app():
             return render_template('index.html')
         except Exception as e:
             logger.error(f"Error en ruta principal: {str(e)}")
-            return render_template('index.html')
+            # Versión de emergencia si falla el template
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head><title>Barbería Master</title></head>
+            <body>
+                <h1>Bienvenido a Barbería Master</h1>
+                <p>Sistema de gestión de citas</p>
+                <a href="/agenda">Ver Agenda</a>
+            </body>
+            </html>
+            """
 
     @app.route('/agenda')
     def agenda():
@@ -173,13 +184,80 @@ def create_app():
     @login_required
     def crear_cita():
         if request.method == 'POST':
-            # ... (mantener el mismo código de creación de citas)
-            pass
+            fecha = request.form.get('fecha')
+            hora = request.form.get('hora')
+            nombre_cliente = request.form.get('nombre_cliente', '').strip()
+            servicio = request.form.get('servicio')
+            telefono = request.form.get('telefono', '').strip()
+            
+            if not all([fecha, hora, nombre_cliente, servicio]):
+                flash("Todos los campos excepto teléfono son requeridos", "danger")
+                return redirect(url_for('crear_cita'))
+            
+            try:
+                hora_obj = datetime.strptime(hora, '%H:%M').time()
+                if hora_obj < time(9, 0) or hora_obj > time(18, 0):
+                    flash("El horario de atención es de 9:00 AM a 6:00 PM", "danger")
+                    return redirect(url_for('crear_cita'))
+                
+                conn = get_db_connection()
+                if not conn:
+                    return redirect(url_for('crear_cita'))
+                
+                try:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            SELECT id FROM citas 
+                            WHERE fecha = %s AND hora = %s AND estado = 'pendiente'
+                        """, (fecha, hora))
+                        if cur.fetchone():
+                            flash("Ya existe una cita programada para esa fecha y hora", "danger")
+                            return redirect(url_for('crear_cita'))
+                        
+                        cur.execute("""
+                            INSERT INTO citas (fecha, hora, nombre_cliente, servicio, telefono)
+                            VALUES (%s, %s, %s, %s, %s)
+                            RETURNING id
+                        """, (fecha, hora, nombre_cliente, servicio, telefono))
+                        cita_id = cur.fetchone()[0]
+                        conn.commit()
+                        
+                        flash(f"Cita #{cita_id} creada exitosamente!", "success")
+                        return redirect(url_for('agenda'))
+                except Exception as e:
+                    conn.rollback()
+                    logger.error(f"Error al crear cita: {str(e)}")
+                    flash("Error técnico al guardar la cita", "danger")
+                    return redirect(url_for('crear_cita'))
+                finally:
+                    conn.close()
+            except ValueError:
+                flash("Formato de hora incorrecto (use HH:MM)", "danger")
+                return redirect(url_for('crear_cita'))
         
         return render_template('crear_cita.html', min_date=datetime.now().strftime('%Y-%m-%d'))
 
-    # Rutas de autenticación (login/logout)
-    # ... (mantener el mismo código de autenticación)
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            username = request.form.get('username', '').strip()
+            password = request.form.get('password', '').strip()
+            
+            if username == app.config['ADMIN_USER'] and password == app.config['ADMIN_PASS']:
+                session['admin'] = True
+                flash("Inicio de sesión exitoso", "success")
+                next_page = request.args.get('next') or url_for('agenda')
+                return redirect(next_page)
+            
+            flash("Credenciales incorrectas", "danger")
+        
+        return render_template('login.html')
+
+    @app.route('/logout')
+    def logout():
+        session.pop('admin', None)
+        flash("Has cerrado sesión", "info")
+        return redirect(url_for('index'))
 
     # Manejador de errores robusto
     @app.errorhandler(404)
@@ -190,7 +268,17 @@ def create_app():
     def internal_error(error):
         logger.error(f"Error 500: {str(error)}")
         try:
-            return render_template('errors/500.html', now=datetime.now()), 500
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head><title>Error 500</title></head>
+            <body>
+                <h1>Error en el servidor</h1>
+                <p>Estamos experimentando problemas técnicos. Por favor intente más tarde.</p>
+                <a href="/">Volver al inicio</a>
+            </body>
+            </html>
+            """, 500
         except:
             return "<h1>Error interno del servidor</h1>", 500
 
