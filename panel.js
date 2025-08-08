@@ -32,12 +32,10 @@ function verificarAccesoBarbero() {
 }
 
 // Inicialización de Supabase para el panel
-function initSupabasePanel() {
-  return supabase.createClient(
-    'https://azjlrbmgpczuintqyosm.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
-  );
-}
+const supabase = supabase.createClient(
+  'https://azjlrbmgpczuintqyosm.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'
+);
 
 // Cargar citas desde Supabase
 async function cargarCitas() {
@@ -49,12 +47,11 @@ async function cargarCitas() {
   try {
     contenedor.innerHTML = `
       <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
+        <i class="fas fa-spinner"></i>
         <p>Cargando citas...</p>
       </div>
     `;
 
-    const supabase = initSupabasePanel();
     const { data: citas, error } = await supabase
       .from('citas')
       .select('*')
@@ -146,28 +143,21 @@ function mostrarCitas(citas) {
 // Agregar eventos a los botones de acción
 function agregarEventosBotones() {
   document.querySelectorAll('.btn-completar').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      await cambiarEstadoCita(btn.dataset.id, 'completado');
-    });
+    btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'completado'));
   });
   
   document.querySelectorAll('.btn-cancelar').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      await cambiarEstadoCita(btn.dataset.id, 'cancelado');
-    });
+    btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'cancelado'));
   });
   
   document.querySelectorAll('.btn-detalles').forEach(btn => {
-    btn.addEventListener('click', () => {
-      mostrarDetallesCita(btn.dataset.id);
-    });
+    btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
   });
 }
 
 // Cambiar estado de una cita
 async function cambiarEstadoCita(id, nuevoEstado) {
   try {
-    const supabase = initSupabasePanel();
     const { error } = await supabase
       .from('citas')
       .update({ estado: nuevoEstado })
@@ -190,7 +180,6 @@ async function mostrarDetallesCita(id) {
   const modalBody = document.getElementById('modal-body');
   
   try {
-    const supabase = initSupabasePanel();
     const { data: cita, error } = await supabase
       .from('citas')
       .select('*')
@@ -313,7 +302,6 @@ function exportarCitas() {
 
 // Conectar a websockets para cambios en tiempo real
 function conectarWebsockets() {
-  const supabase = initSupabasePanel();
   canalCitas = supabase
     .channel('cambios-citas')
     .on('postgres_changes', { 
@@ -366,17 +354,4 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   actualizarHora();
   setInterval(actualizarHora, 1000);
-  
-  // Verificar conexión a internet
-  const verificarConexion = () => {
-    const statusElement = document.getElementById('connection-status');
-    if (!statusElement) return;
-
-    statusElement.className = navigator.onLine ? 'connected' : 'disconnected';
-    statusElement.innerHTML = `<i class="fas fa-circle"></i> ${navigator.onLine ? 'En línea' : 'Sin conexión'}`;
-  };
-  
-  verificarConexion();
-  window.addEventListener('online', verificarConexion);
-  window.addEventListener('offline', verificarConexion);
 });
