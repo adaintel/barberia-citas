@@ -656,12 +656,10 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     // Configuración de Supabase
-    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co'; // Reemplaza con tu URL de Supabase
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M'; // Reemplaza con tu clave de Supabase
+    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     // Variables globales
@@ -674,7 +672,7 @@
     function mostrarNotificacion(mensaje, tipo = 'info') {
       const notificacion = document.createElement('div');
       notificacion.className = `notificacion notificacion-${tipo}`;
-      notificacion.innerHTML = `<p>${mensaje}</p>`;
+      notificacion.innerHTML = `<i class="fas fa-${tipo === 'info' ? 'info-circle' : tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i><p>${mensaje}</p>`;
       document.body.appendChild(notificacion);
       
       setTimeout(() => {
@@ -689,12 +687,13 @@
       const inputPassword = document.getElementById('input-password');
       const btnVerificar = document.getElementById('btn-verificar');
       const mensajeError = document.getElementById('mensaje-error-verificacion');
+      const mainContent = document.getElementById('main-content');
       
       // Verificar si ya está autenticado
       const autenticado = localStorage.getItem('barberoAutenticado') === 'true';
       if (autenticado) {
         modal.style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
+        mainContent.style.display = 'block';
         return true;
       }
       
@@ -706,8 +705,10 @@
         if (inputPassword.value === CONTRASENA_BARBERO) {
           localStorage.setItem('barberoAutenticado', 'true');
           modal.style.display = 'none';
-          document.getElementById('main-content').style.display = 'block';
+          mainContent.style.display = 'block';
           mostrarNotificacion('Acceso concedido', 'success');
+          cargarCitas();
+          conectarWebsockets();
           return true;
         } else {
           mensajeError.style.display = 'block';
@@ -1025,31 +1026,23 @@
     }
 
     // Inicialización del panel
-    async function inicializarPanel() {
-      try {
-        // Configurar eventos
-        document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
-        document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
-        document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
-        document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
-        
-        // Verificar acceso
-        verificarAccesoBarbero();
-        
-        // Si está autenticado, cargar datos
-        if (localStorage.getItem('barberoAutenticado') === 'true') {
-          await cargarCitas();
-          conectarWebsockets();
+    function inicializarPanel() {
+      // Configurar eventos
+      document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
+      document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
+      document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
+      document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
+      
+      // Verificar acceso
+      verificarAccesoBarbero();
+      
+      // Configurar cierre del modal con Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalAbierto) {
+          cerrarModal();
         }
-        
-      } catch (error) {
-        console.error('Error en inicialización:', error);
-        mostrarNotificacion('Error al inicializar el panel', 'error');
-      }
+      });
     }
 
     // Iniciar cuando el DOM esté listo
     document.addEventListener('DOMContentLoaded', inicializarPanel);
-  </script>
-</body>
-</html>
