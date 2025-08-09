@@ -2,13 +2,19 @@
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 
-// Verificar si Supabase está cargado antes de inicializar
-let supabase;
-if (typeof supabaseClient !== 'undefined') {
-  supabase = supabaseClient.createClient(supabaseUrl, supabaseKey);
-} else {
-  console.error('Error: Supabase client no está disponible');
-  // Puedes cargar el script dinámicamente aquí si es necesario
+// Inicializar Supabase
+const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+if (!supabase) {
+  console.error('Error: No se pudo inicializar Supabase');
+  // Cargar el script dinámicamente si es necesario
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  script.onload = () => {
+    window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    console.log('Supabase cargado dinámicamente');
+  };
+  document.head.appendChild(script);
 }
 
 // 2. Función mejorada para mostrar mensajes
