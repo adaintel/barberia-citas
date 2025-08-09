@@ -1,82 +1,30 @@
-// Reemplaza la configuración inicial con esto:
-
-// Configuración de Supabase (asegúrate que sea IDÉNTICA en todos los archivos)
+// 1. Configuración Segura de Supabase (usa .env en producción)
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 
-// Inicialización única de Supabase
-if (!window.supabase) {
-  window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
-}
-const supabase = window.supabase;
+// Inicializar Supabase
+const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
-// Función corregida para guardar citas
-async function guardarCita(citaData) {
-  try {
-    const { data, error } = await supabase
-      .from('citas')
-      .insert([{
-        ...citaData,
-        estado: 'pendiente',
-        creado_en: new Date().toISOString()
-      }])
-      .select();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error al guardar cita:', error);
-    throw new Error('No se pudo agendar la cita. Por favor intente nuevamente.');
-  }
+if (!supabase) {
+  console.error('Error: No se pudo inicializar Supabase');
+  // Cargar el script dinámicamente si es necesario
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+  script.onload = () => {
+    window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    console.log('Supabase cargado dinámicamente');
+  };
+  document.head.appendChild(script);
 }
 
-// Funciones compartidas entre cliente y barbero
-async function cargarCitas() {
-  const contenedor = document.getElementById('citasContainer');
-  if (!contenedor) return;
-
-  try {
-    contenedor.innerHTML = `
-      <div class="loading">
-        <i class="fas fa-spinner"></i>
-        <p>Cargando citas...</p>
-      </div>
-    `;
-
-    const { data: citas, error } = await supabase
-      .from('citas')
-      .select('*')
-      .order('fecha', { ascending: true })
-      .order('hora', { ascending: true });
-
-    if (error) throw error;
-
-    todasLasCitas = citas || [];
-    mostrarCitas(todasLasCitas);
-    actualizarEstadisticas(todasLasCitas);
-    
-  } catch (error) {
-    console.error('Error al cargar citas:', error);
-    contenedor.innerHTML = `
-      <div class="mensaje-error">
-        <p>Error al cargar citas. Por favor intente nuevamente.</p>
-        <button onclick="window.location.reload()" class="btn-reintentar">
-          <i class="fas fa-sync-alt"></i> Reintentar
-        </button>
-      </div>
-    `;
-  }
-}
-
-
-  // 2. Función mejorada para mostrar mensajes
+// 2. Función mejorada para mostrar mensajes
 function mostrarMensaje(texto, tipo = 'info') {
   const mensajeDiv = document.getElementById('mensaje');
   if (!mensajeDiv) {
     console.warn('No se encontró el elemento para mostrar mensajes');
     return;
   }
-
+  
   // Limpiar mensajes anteriores
   mensajeDiv.innerHTML = '';
   
