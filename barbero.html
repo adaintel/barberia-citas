@@ -625,30 +625,54 @@
     // Verificación de seguridad para barberos
     async function verificarAccesoBarbero() {
       const password = localStorage.getItem('barberoPassword');
-      
-      if (password === 'BarberoElite2025') {
+      // Contraseña hardcodeada (en producción usa Supabase Auth)
+      const PASSWORD_CORRECTO = 'BarberoElite2025';
+      if (password === PASSWORD_CORRECTO) {
         return true;
       }
-
+      
       // Mostrar modal de verificación
       const modal = document.getElementById('modal-verificacion');
       modal.style.display = 'flex';
       
+      // Limpiar mensajes de error
+      document.getElementById('mensaje-error-verificacion').style.display = 'none';
+      
       return new Promise((resolve) => {
-        document.getElementById('btn-verificar').onclick = async () => {
-          const inputPassword = document.getElementById('input-password').value;
-          if (inputPassword === 'BarberoElite2025') {
-            localStorage.setItem('barberoPassword', 'BarberoElite2025');
+        const btnVerificar = document.getElementById('btn-verificar');
+        const inputPassword = document.getElementById('input-password');
+        // Función para verificar
+        const verificar = async () => {
+          if (inputPassword.value === PASSWORD_CORRECTO) {
+            localStorage.setItem('barberoPassword', PASSWORD_CORRECTO);
             modal.style.display = 'none';
             resolve(true);
           } else {
             document.getElementById('mensaje-error-verificacion').style.display = 'block';
+            inputPassword.focus();
+          }
+        }; 
+        // Evento click en botón
+        btnVerificar.onclick = verificar;
+        
+        // Evento enter en input
+        inputPassword.onkeyup = (e) => {
+          if (e.key === 'Enter') {
+            verificar();
+          }
+        }; 
+        
+        // Si cierran el modal sin autenticarse, redirigir
+        modal.onclick = (e) => {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+            window.location.href = 'index.html';
             resolve(false);
           }
         };
-     });
-   }
-
+      });
+    } 
+      
     // Cargar citas desde Supabase
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
