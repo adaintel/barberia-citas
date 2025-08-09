@@ -802,3 +802,62 @@ input[type="time"] {
   background: var(--gold);
   color: var(--dark);
 }
+
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn-logout {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: rgba(231, 76, 60, 0.2);
+}
+
+.notificacion {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px;
+  border-radius: 5px;
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+.notificacion-info {
+  background-color: #3498db;
+}
+
+.notificacion-success {
+  background-color: #2ecc71;
+}
+
+.notificacion-error {
+  background-color: #e74c3c;
+}
+
+.notificacion-warning {
+  background-color: #f39c12;
+}
+
+.fade-out {
+  transform: translateX(100%);
+  opacity: 0;
+}
