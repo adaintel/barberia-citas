@@ -3,132 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Barbero | Barbería Elite</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Panel del Barbero</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Preconexión para mejor performance -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="gold-glow"></div>
-  
-  <div class="container">
-    <div class="glass-panel">
-      <header>
-        <h1><i class="fas fa-cut"></i> Panel de Citas <span id="nombre-barbero"></span></h1>
-        <p>Barbería Elite - Gestión Profesional</p>
-      </header>
-      
-      <main>
-        <div class="panel-control">
-          <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="buscador" placeholder="Buscar por nombre o teléfono...">
-          </div>
-          
-          <div class="filters">
-            <select id="filtro-estado">
-              <option value="todas">Todas las citas</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="completado">Completadas</option>
-              <option value="cancelado">Canceladas</option>
-            </select>
-            
-            <select id="filtro-barbero">
-              <option value="todos">Todos los barberos</option>
-              <!-- Se llenará dinámicamente -->
-            </select>
-            
-            <button id="btn-exportar" class="btn-export">
-              <i class="fas fa-file-export"></i> Exportar
-            </button>
-          </div>
-        </div>
-        
-        <div id="citasContainer">
-          <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Cargando citas...</p>
-          </div>
-        </div>
-        
-        <div class="stats-container">
-          <div class="stat-card">
-            <h3>Total Citas</h3>
-            <p id="total-citas">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Pendientes</h3>
-            <p id="pendientes-citas">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Completadas</h3>
-            <p id="completadas-citas">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Sesión activa</h3>
-            <p id="tiempo-sesion">--:--</p>
-          </div>
-        </div>
-      </main>
-    </div>
-    
-    <footer>
-      <div class="footer-actions">
-        <a href="index.html" class="btn-volver">
-          <i class="fas fa-arrow-left"></i> Volver al inicio
-        </a>
-        <button id="btn-logout" class="btn-logout">
-          <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-        </button>
-      </div>
-      <p>© <span id="current-year">2025</span> Barbería Elite - Sistema de gestión de citas</p>
-    </footer>
+  <!-- Contenedor principal -->
+  <div class="container" id="panel-container" style="display:none;">
+    <!-- ... contenido del panel ... -->
   </div>
 
-  <!-- Modal para detalles -->
-  <div id="modal-detalles" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2>Detalles de Cita</h2>
-      <div id="modal-body"></div>
-    </div>
+  <!-- Modal de login (visible inicialmente) -->
+  <div id="login-container">
+    <h2>Acceso Barberos</h2>
+    <input type="email" id="login-email" placeholder="Email profesional">
+    <input type="password" id="login-password" placeholder="Contraseña">
+    <button id="btn-login">Ingresar</button>
+    <p id="login-message"></p>
   </div>
 
-  <!-- Modal de verificación -->
-  <div id="modal-verificacion" class="modal-verificacion">
-    <div class="contenido-verificacion">
-      <h2><i class="fas fa-lock"></i> Acceso Restringido</h2>
-      <p>Ingrese sus credenciales de barbero:</p>
-      <div class="input-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" id="input-email" placeholder="Correo electrónico" required>
-      </div>
-      <div class="input-group">
-        <i class="fas fa-key"></i>
-        <input type="password" id="input-password" placeholder="Contraseña" required>
-      </div>
-      <button id="btn-verificar" class="btn-verificar">
-        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-      </button>
-      <p id="mensaje-error-verificacion" class="mensaje-error-verificacion"></p>
-    </div>
-  </div>
-
-  <!-- Scripts (en orden correcto) -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    // Configuración centralizada de Supabase
-    window.supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
-    window.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
-    window.supabase = supabase.createClient(window.supabaseUrl, window.supabaseKey);
-    
-    // Actualizar año automáticamente
-    document.getElementById('current-year').textContent = new Date().getFullYear();
-  </script>
-  <script src="scripts.js"></script>
   <script src="barbero-auth.js"></script>
+  <script>
+    // Verificación de sesión al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+      const session = JSON.parse(localStorage.getItem('barberSession') || '{}');
+      
+      if (session.token && new Date(session.expires) > new Date()) {
+        document.getElementById('panel-container').style.display = 'block';
+        document.getElementById('login-container').style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>
