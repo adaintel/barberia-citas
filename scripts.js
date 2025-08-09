@@ -1,21 +1,33 @@
-// 1. Configuración Segura de Supabase (usa .env en producción)
-window.supabaseUrl  = 'https://azjlrbmgpczuintqyosm.supabase.co';
-window.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
+// Reemplaza la configuración inicial con esto:
 
-// Inicializar Supabase
+// Configuración de Supabase (asegúrate que sea IDÉNTICA en todos los archivos)
+const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
+
+// Inicialización única de Supabase
 if (!window.supabase) {
-  const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+  window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
 }
-if (!supabase) {
-  console.error('Error: No se pudo inicializar Supabase');
-  // Cargar el script dinámicamente si es necesario
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/@supabase/supabase-js@2';
-  script.onload = () => {
-    window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase cargado dinámicamente');
-  };
-  document.head.appendChild(script);
+const supabase = window.supabase;
+
+// Función corregida para guardar citas
+async function guardarCita(citaData) {
+  try {
+    const { data, error } = await supabase
+      .from('citas')
+      .insert([{
+        ...citaData,
+        estado: 'pendiente',
+        creado_en: new Date().toISOString()
+      }])
+      .select();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error al guardar cita:', error);
+    throw new Error('No se pudo agendar la cita. Por favor intente nuevamente.');
+  }
 }
 
 // Funciones compartidas entre cliente y barbero
