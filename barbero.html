@@ -5,70 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    /* [Todos tus estilos existentes...] */
-    
-    /* Añade estos nuevos estilos para el modal de verificación */
-    .modal-verificacion {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .contenido-verificacion {
-      background-color: var(--darker);
-      padding: 2rem;
-      border-radius: 10px;
-      border: 1px solid var(--gold);
-      max-width: 400px;
-      text-align: center;
-    }
-    
-    .contenido-verificacion h2 {
-      color: var(--gold);
-      margin-bottom: 1rem;
-    }
-    
-    .contenido-verificacion input {
-      width: 100%;
-      padding: 10px;
-      margin: 1rem 0;
-      border-radius: 5px;
-      border: 1px solid var(--gold);
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-    
-    .btn-verificar {
-      background-color: var(--gold);
-      color: var(--dark);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    
-    .btn-verificar:hover {
-      background-color: #c9a227;
-    }
-  </style>
-</head>
-<body>
-  <!-- [Todo el resto de tu HTML existente...] -->
-  
-  <script src="panel.js"></script>
-</body>
-</html>
     :root {
       --gold: #D4AF37;
       --dark: #121212;
@@ -399,9 +336,6 @@
       height: 100%;
       background-color: rgba(0, 0, 0, 0.8);
       z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
     
     .modal-content {
@@ -413,12 +347,16 @@
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       animation: modalFadeIn 0.3s;
     }
     
     @keyframes modalFadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
     }
     
     .close-modal {
@@ -448,6 +386,67 @@
     
     .detalle-item p {
       font-size: 1.1rem;
+    }
+    
+    /* Modal de verificación */
+    .modal-verificacion {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .contenido-verificacion {
+      background-color: var(--darker);
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .contenido-verificacion h2 {
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    
+    .contenido-verificacion input {
+      width: 100%;
+      padding: 10px;
+      margin: 1rem 0;
+      border-radius: 5px;
+      border: 1px solid var(--gold);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .btn-verificar {
+      background-color: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    
+    .btn-verificar:hover {
+      background-color: #c9a227;
+    }
+    
+    .mensaje-error-verificacion {
+      color: #e74c3c;
+      margin-top: 10px;
+      display: none;
     }
     
     /* Footer */
@@ -603,6 +602,14 @@
     </div>
   </div>
 
+  <!-- Scripts en el orden CORRECTO -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Inicialización de Supabase
+    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  </script>
   <script src="panel.js"></script>
 </body>
 </html>
