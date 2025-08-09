@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -28,6 +27,111 @@
       min-height: 100vh;
     }
     
+    /* Estilos para el modal de login */
+    .modal-login {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .contenido-login {
+      background-color: #121212;
+      padding: 2.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--gold);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    }
+    
+    .contenido-login h2 {
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .contenido-login p {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--gold);
+      font-size: 0.9rem;
+    }
+    
+    .select-login, #input-password-login {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 1rem;
+    }
+    
+    .select-login:focus, #input-password-login:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+    
+    .btn-login {
+      background: var(--gold);
+      color: #121212;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      width: 100%;
+      margin-top: 10px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .btn-login:hover {
+      background: #c9a227;
+      transform: translateY(-2px);
+    }
+    
+    .mensaje-error-login {
+      color: #e74c3c;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      min-height: 20px;
+    }
+
+    /* Estilos existentes del panel */
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -507,108 +611,252 @@
       .tabla-citas td {
         padding: 10px 8px;
       }
+
+      /* Ajustes para móvil del login */
+      .contenido-login {
+        padding: 1.5rem;
+      }
+      
+      .contenido-login h2 {
+        font-size: 1.3rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="gold-glow"></div>
-  
-  <div class="container">
-    <div class="glass-panel">
-      <header>
-        <h1><i class="fas fa-cut"></i> Panel de Citas</h1>
-        <p>Barbería Elite - Gestión Profesional</p>
-      </header>
+  <!-- Modal de login (se muestra primero) -->
+  <div id="modal-login" class="modal-login" style="display: flex;">
+    <div class="contenido-login">
+      <h2><i class="fas fa-lock"></i> Acceso Barberos</h2>
+      <p>Ingrese sus credenciales para acceder al panel</p>
       
-      <main>
-        <div class="panel-control">
-          <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="buscador" placeholder="Buscar por nombre...">
+      <div class="form-group">
+        <label for="input-barbero">Barbero:</label>
+        <select id="input-barbero" class="select-login">
+          <option value="">Seleccione su nombre</option>
+          <option value="Juan">Juan</option>
+          <option value="Carlos">Carlos</option>
+          <option value="Pedro">Pedro</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="input-password-login">Contraseña:</label>
+        <input type="password" id="input-password-login" placeholder="Ingrese su contraseña">
+      </div>
+      
+      <button id="btn-login" class="btn-login">
+        <i class="fas fa-sign-in-alt"></i> Ingresar
+      </button>
+      
+      <p id="mensaje-error-login" class="mensaje-error-login"></p>
+    </div>
+  </div>
+
+  <!-- Contenido principal (oculto inicialmente) -->
+  <div id="panel-principal" style="display: none;">
+    <div class="gold-glow"></div>
+    
+    <div class="container">
+      <div class="glass-panel">
+        <header>
+          <h1><i class="fas fa-cut"></i> Panel de Citas</h1>
+          <p>Barbería Elite - Gestión Profesional</p>
+          <p id="barbero-activo" style="margin-top: 10px; color: var(--gold);">
+            <i class="fas fa-user"></i> Barbero: <span id="nombre-barbero"></span>
+            <button id="btn-cerrar-sesion" style="margin-left: 15px; background: rgba(212, 175, 55, 0.1); color: var(--gold); border: 1px solid var(--gold); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 0.8rem;">
+              Cerrar sesión
+            </button>
+          </p>
+        </header>
+        
+        <main>
+          <div class="panel-control">
+            <div class="search-container">
+              <i class="fas fa-search"></i>
+              <input type="text" id="buscador" placeholder="Buscar por nombre...">
+            </div>
+            
+            <div class="filters">
+              <select id="filtro-estado">
+                <option value="todas">Todas las citas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="completado">Completadas</option>
+                <option value="cancelado">Canceladas</option>
+              </select>
+              
+              <select id="filtro-barbero">
+                <option value="todos">Todos los barberos</option>
+                <option value="Juan">Juan</option>
+                <option value="Carlos">Carlos</option>
+                <option value="Pedro">Pedro</option>
+              </select>
+              
+              <button id="btn-exportar" class="btn-export">
+                <i class="fas fa-file-export"></i> Exportar
+              </button>
+            </div>
           </div>
           
-          <div class="filters">
-            <select id="filtro-estado">
-              <option value="todas">Todas las citas</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="completado">Completadas</option>
-              <option value="cancelado">Canceladas</option>
-            </select>
-            
-            <select id="filtro-barbero">
-              <option value="todos">Todos los barberos</option>
-              <option value="Juan">Juan</option>
-              <option value="Carlos">Carlos</option>
-              <option value="Pedro">Pedro</option>
-            </select>
-            
-            <button id="btn-exportar" class="btn-export">
-              <i class="fas fa-file-export"></i> Exportar
-            </button>
+          <div id="citasContainer">
+            <div class="loading">
+              <i class="fas fa-spinner"></i>
+              <p>Cargando citas...</p>
+            </div>
           </div>
-        </div>
-        
-        <div id="citasContainer">
-          <div class="loading">
-            <i class="fas fa-spinner"></i>
-            <p>Cargando citas...</p>
+          
+          <div class="stats-container">
+            <div class="stat-card">
+              <h3>Total Citas</h3>
+              <p id="total-citas">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Pendientes</h3>
+              <p id="pendientes-citas">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Completadas</h3>
+              <p id="completadas-citas">0</p>
+            </div>
           </div>
-        </div>
-        
-        <div class="stats-container">
-          <div class="stat-card">
-            <h3>Total Citas</h3>
-            <p id="total-citas">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Pendientes</h3>
-            <p id="pendientes-citas">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Completadas</h3>
-            <p id="completadas-citas">0</p>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
+      
+      <footer>
+        <a href="index.html" class="btn-volver">
+          <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
+        <p>© 2025 Barbería Elite - Sistema de gestión de citas</p>
+      </footer>
     </div>
-    
-    <footer>
-      <a href="index.html" class="btn-volver">
-        <i class="fas fa-arrow-left"></i> Volver al inicio
-      </a>
-      <p>© 2025 Barbería Elite - Sistema de gestión de citas</p>
-    </footer>
-  </div>
 
-  <!-- Modal para detalles -->
-  <div id="modal-detalles" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2>Detalles de Cita</h2>
-      <div id="modal-body"></div>
+    <!-- Modal para detalles -->
+    <div id="modal-detalles" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Detalles de Cita</h2>
+        <div id="modal-body"></div>
+      </div>
     </div>
   </div>
 
-  <!-- Modal de verificación -->
-  <div id="modal-verificacion" class="modal-verificacion" style="display: none;">
-    <div class="contenido-verificacion">
-      <h2>Acceso Restringido</h2>
-      <p>Ingrese la contraseña de barbero:</p>
-      <input type="password" id="input-password" placeholder="Contraseña">
-      <button id="btn-verificar" class="btn-verificar">Verificar</button>
-      <p id="mensaje-error-verificacion" class="mensaje-error-verificacion">Contraseña incorrecta</p>
-    </div>
-  </div>
-
-  <!-- Scripts en el orden CORRECTO -->
+  <!-- Scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="scripts.js"></script>
+  
   <script>
-      // Variables globales
-      let todasLasCitas = [];
-      let modalAbierto = false;
-      let canalCitas = null;
-
+    // Configuración de Supabase (debes reemplazar con tus credenciales)
+    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Variables globales
+    let todasLasCitas = [];
+    let modalAbierto = false;
+    let canalCitas = null;
+    
+    // =============================================
+    // SISTEMA DE AUTENTICACIÓN
+    // =============================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Contraseñas de los barberos (en producción, usa Supabase Auth o un backend)
+      const barberosPasswords = {
+        'Juan': 'Juan123',
+        'Carlos': 'Carlos5678',
+        'Pedro': 'Pedro9012'
+      };
+      
+      // Elementos del login
+      const modalLogin = document.getElementById('modal-login');
+      const panelPrincipal = document.getElementById('panel-principal');
+      const btnLogin = document.getElementById('btn-login');
+      const selectBarbero = document.getElementById('input-barbero');
+      const inputPassword = document.getElementById('input-password-login');
+      const mensajeError = document.getElementById('mensaje-error-login');
+      const nombreBarberoSpan = document.getElementById('nombre-barbero');
+      const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+      
+      // Verificar si ya está autenticado (sesión persistente)
+      const barberoAutenticado = localStorage.getItem('barberoAutenticado');
+      const barberoNombre = localStorage.getItem('barberoNombre');
+      const ultimoAcceso = localStorage.getItem('ultimoAcceso');
+      
+      // Si ya estaba autenticado y no ha pasado mucho tiempo, dejarlo pasar
+      if (barberoAutenticado && barberoNombre && ultimoAcceso) {
+        const tiempoTranscurrido = (new Date() - new Date(ultimoAcceso)) / (1000 * 60 * 60); // Horas
+        
+        if (tiempoTranscurrido < 8) { // 8 horas de sesión
+          modalLogin.style.display = 'none';
+          panelPrincipal.style.display = 'block';
+          nombreBarberoSpan.textContent = barberoNombre;
+          inicializarPanel();
+          return;
+        } else {
+          // Sesión expirada
+          localStorage.removeItem('barberoAutenticado');
+          localStorage.removeItem('barberoNombre');
+          localStorage.removeItem('ultimoAcceso');
+        }
+      }
+      
+      // Evento para el botón de login
+      btnLogin.addEventListener('click', function() {
+        const barbero = selectBarbero.value;
+        const password = inputPassword.value;
+        
+        // Validaciones
+        if (!barbero) {
+          mostrarError('Seleccione su nombre de barbero');
+          return;
+        }
+        
+        if (!password) {
+          mostrarError('Ingrese su contraseña');
+          return;
+        }
+        
+        // Verificar credenciales
+        if (barberosPasswords[barbero] && password === barberosPasswords[barbero]) {
+          // Credenciales correctas
+          localStorage.setItem('barberoAutenticado', 'true');
+          localStorage.setItem('barberoNombre', barbero);
+          localStorage.setItem('ultimoAcceso', new Date().toISOString());
+          
+          modalLogin.style.display = 'none';
+          panelPrincipal.style.display = 'block';
+          nombreBarberoSpan.textContent = barbero;
+          inicializarPanel();
+        } else {
+          mostrarError('Credenciales incorrectas');
+        }
+      });
+      
+      // También permitir login con Enter
+      inputPassword.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          btnLogin.click();
+        }
+      });
+      
+      // Botón para cerrar sesión
+      btnCerrarSesion.addEventListener('click', function() {
+        localStorage.removeItem('barberoAutenticado');
+        localStorage.removeItem('barberoNombre');
+        localStorage.removeItem('ultimoAcceso');
+        window.location.reload();
+      });
+      
+      function mostrarError(mensaje) {
+        mensajeError.textContent = mensaje;
+        setTimeout(() => mensajeError.textContent = '', 3000);
+      }
+    });
+    
+    // =============================================
+    // FUNCIONALIDAD EXISTENTE DEL PANEL
+    // =============================================
+    
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
       const notificacion = document.createElement('div');
@@ -621,33 +869,6 @@
         setTimeout(() => notificacion.remove(), 500);
       }, 3000);
     }
-
-    // Verificación de seguridad para barberos
-    async function verificarAccesoBarbero() {
-      const password = localStorage.getItem('barberoPassword');
-      
-      if (password === 'BarberoElite2025') {
-        return true;
-      }
-
-      // Mostrar modal de verificación
-      const modal = document.getElementById('modal-verificacion');
-      modal.style.display = 'flex';
-      
-      return new Promise((resolve) => {
-        document.getElementById('btn-verificar').onclick = async () => {
-          const inputPassword = document.getElementById('input-password').value;
-          if (inputPassword === 'BarberoElite2025') {
-            localStorage.setItem('barberoPassword', 'BarberoElite2025');
-            modal.style.display = 'none';
-            resolve(true);
-          } else {
-            document.getElementById('mensaje-error-verificacion').style.display = 'block';
-            resolve(false);
-          }
-        };
-     });
-   }
 
     // Cargar citas desde Supabase
     async function cargarCitas() {
@@ -948,12 +1169,6 @@
     // Inicialización del panel
     async function inicializarPanel() {
       try {
-        const accesoPermitido = await verificarAccesoBarbero();
-        if (!accesoPermitido) {
-          window.location.href = 'index.html';
-          return;
-        }
-
         // Configurar eventos y cargar citas
         document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
@@ -968,9 +1183,6 @@
         mostrarNotificacion('Error al inicializar el panel', 'error');
       }
     }
-
-    // Iniciar cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', inicializarPanel);
   </script>
 </body>
 </html>
