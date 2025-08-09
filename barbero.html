@@ -542,21 +542,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Scripts en el orden CORRECTO -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    // Configuración de Supabase
-    const supabaseUrl = 'https://tu-url-supabase.supabase.co';
-    const supabaseKey = 'tu-clave-supabase';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // Variables globales
-    let todasLasCitas = [];
-    let modalAbierto = false;
-    let canalCitas = null;
-
-    
   <!-- Modal de verificación (ahora aparece primero) -->
   <div id="modal-verificacion" class="modal-verificacion">
     <div class="contenido-verificacion">
@@ -572,7 +557,6 @@
     </div>
   </div>
 
-  
   <!-- Contenido principal (oculto inicialmente) -->
   <div id="contenido-principal" style="display: none;">
     <div class="gold-glow"></div>
@@ -654,7 +638,18 @@
     </div>
   </div>
 
-  
+  <!-- Scripts en el orden CORRECTO -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Primero inicializamos Supabase
+    const supabaseUrl = 'https://tu-url-supabase.supabase.co';
+    const supabaseKey = 'tu-clave-supabase';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Variables globales
+    let todasLasCitas = [];
+    let modalAbierto = false;
+    let canalCitas = null;
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -671,10 +666,10 @@
 
     // Verificación de acceso para barberos
     async function verificarAccesoBarbero() {
-      // Verificar si ya está autenticado
-      const passwordGuardada = localStorage.getItem('barberoPassword');
       const passwordCorrecta = 'BarberoElite2025'; // Cambia esto por una contraseña segura
       
+      // Verificar si ya está autenticado
+      const passwordGuardada = localStorage.getItem('barberoPassword');
       if (passwordGuardada === passwordCorrecta) {
         return true;
       }
@@ -685,36 +680,28 @@
       const btnVerificar = document.getElementById('btn-verificar');
       const mensajeError = document.getElementById('mensaje-error-verificacion');
       
-      // Configurar evento para el botón de verificación
-      btnVerificar.addEventListener('click', verificarContraseña);
-      
-      // También permitir verificar con Enter
-      inputPassword.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          verificarContraseña();
-        }
-      });
-      
-      function verificarContraseña() {
-        if (inputPassword.value === passwordCorrecta) {
-          // Contraseña correcta
-          localStorage.setItem('barberoPassword', passwordCorrecta);
-          modal.style.display = 'none';
-          document.getElementById('contenido-principal').style.display = 'block';
-          return true;
-        } else {
-          // Contraseña incorrecta
-          mensajeError.style.display = 'block';
-          inputPassword.focus();
-          return false;
-        }
-      }
-      
-      // Retornar una promesa que se resolverá cuando se verifique la contraseña
       return new Promise((resolve) => {
-        btnVerificar.onclick = () => {
-          resolve(verificarContraseña());
+        const verificarContraseña = () => {
+          if (inputPassword.value === passwordCorrecta) {
+            // Contraseña correcta
+            localStorage.setItem('barberoPassword', passwordCorrecta);
+            modal.style.display = 'none';
+            document.getElementById('contenido-principal').style.display = 'block';
+            resolve(true);
+          } else {
+            // Contraseña incorrecta
+            mensajeError.style.display = 'block';
+            inputPassword.focus();
+            resolve(false);
+          }
         };
+        
+        btnVerificar.addEventListener('click', verificarContraseña);
+        inputPassword.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            verificarContraseña();
+          }
+        });
       });
     }
 
