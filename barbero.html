@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="ruta/a/tu/favicon.ico" type="image/x-icon">
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
       --gold: #D4AF37;
@@ -744,17 +746,7 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="scripts.js"></script>
   
-  <script>
-    // Configuración de Supabase (debes reemplazar con tus credenciales)
-    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    
-    // Variables globales
-    let todasLasCitas = [];
-    let modalAbierto = false;
-    let canalCitas = null;
-    
+
     // =============================================
     // SISTEMA DE AUTENTICACIÓN
     // =============================================
