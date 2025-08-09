@@ -48,10 +48,13 @@ async function verificarAccesoBarbero() {
 
 // Cargar citas desde Supabase
 async function cargarCitas() {
-  const contenedor = document.getElementById('citasContainer');
-  if (!contenedor) return;
-
-  try {
+  // Verificar que supabase existe
+  if (typeof supabase === 'undefined') {
+    console.error('Supabase no está inicializado');
+    return;
+  }
+  // Resto del código...
+}
     contenedor.innerHTML = `
       <div class="loading">
         <i class="fas fa-spinner"></i>
@@ -312,11 +315,13 @@ function exportarCitas() {
   mostrarNotificacion('Exportación completada con éxito', 'success');
 }
 
-// Conectar a websockets para cambios en tiempo real
 function conectarWebsockets() {
-  if (canalCitas) {
-    supabase.removeChannel(canalCitas);
+  if (typeof supabase === 'undefined') {
+    console.error('Supabase no está inicializado para websockets');
+    return;
   }
+  // Resto del código...
+}
 
   canalCitas = supabase
     .channel('cambios-citas')
@@ -334,16 +339,16 @@ function conectarWebsockets() {
 // Inicialización del panel
 async function inicializarPanel() {
   try {
-    // Verificar acceso primero
-    const password = localStorage.getItem('barberoPassword');
-    
-    if (!password || password !== 'BarberoElite2025') {
-      const accesoPermitido = await verificarAccesoBarbero();
-      if (!accesoPermitido) {
-        window.location.href = 'index.html';
-        return;
-      }
+    // Verificar que supabase está disponible
+    if (typeof supabase === 'undefined') {
+      throw new Error('Supabase no está inicializado');
     }
+    // Resto del código...
+  } catch (error) {
+    console.error('Error en inicialización:', error);
+    mostrarNotificacion('Error al inicializar el panel. Recargue la página.', 'error');
+  }
+}
 
     // Configurar eventos y cargar citas
     document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
