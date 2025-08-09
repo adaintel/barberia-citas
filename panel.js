@@ -18,13 +18,7 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
 
 // Verificación de seguridad para barberos
 async function verificarAccesoBarbero() {
-  const password = localStorage.getItem('barberoPassword');
-  
-  if (password === 'BarberoElite2025') {
-    return true;
-  }
-
-  // Crear modal de verificación
+  // Mostrar modal de contraseña inmediatamente
   const modalVerificacion = document.createElement('div');
   modalVerificacion.className = 'modal-verificacion';
   modalVerificacion.innerHTML = `
@@ -33,7 +27,7 @@ async function verificarAccesoBarbero() {
       <p>Ingrese la contraseña de barbero:</p>
       <input type="password" id="input-password" placeholder="Contraseña">
       <button id="btn-verificar" class="btn-verificar">Verificar</button>
-      <p id="mensaje-error-verificacion" class="mensaje-error-verificacion">Contraseña incorrecta</p>
+      <p id="mensaje-error" style="color:#e74c3c; margin-top:10px; display:none;">Contraseña incorrecta</p>
     </div>
   `;
   document.body.appendChild(modalVerificacion);
@@ -46,7 +40,7 @@ async function verificarAccesoBarbero() {
         modalVerificacion.remove();
         resolve(true);
       } else {
-        document.getElementById('mensaje-error-verificacion').style.display = 'block';
+        document.getElementById('mensaje-error').style.display = 'block';
       }
     });
   });
@@ -340,10 +334,15 @@ function conectarWebsockets() {
 // Inicialización del panel
 async function inicializarPanel() {
   try {
-    const accesoPermitido = await verificarAccesoBarbero();
-    if (!accesoPermitido) {
-      window.location.href = 'index.html';
-      return;
+    // Verificar acceso primero
+    const password = localStorage.getItem('barberoPassword');
+    
+    if (!password || password !== 'BarberoElite2025') {
+      const accesoPermitido = await verificarAccesoBarbero();
+      if (!accesoPermitido) {
+        window.location.href = 'index.html';
+        return;
+      }
     }
 
     // Configurar eventos y cargar citas
