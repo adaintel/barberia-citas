@@ -635,21 +635,23 @@
       }
 
       // Mostrar modal de verificación
-      document.getElementById('modal-verificacion').style.display = 'flex';
+      const modal = document.getElementById('modal-verificacion');
+      modal.style.display = 'flex';
       
       return new Promise((resolve) => {
-        document.getElementById('btn-verificar').addEventListener('click', () => {
+        document.getElementById('btn-verificar').onclick = async () => {
           const inputPassword = document.getElementById('input-password').value;
           if (inputPassword === 'BarberoElite2025') {
             localStorage.setItem('barberoPassword', 'BarberoElite2025');
-            document.getElementById('modal-verificacion').style.display = 'none';
+            modal.style.display = 'none';
             resolve(true);
           } else {
             document.getElementById('mensaje-error-verificacion').style.display = 'block';
+            resolve(false);
           }
-        });
-      });
-    }
+        };
+     });
+   }
 
     // Cargar citas desde Supabase
     async function cargarCitas() {
