@@ -683,16 +683,15 @@
 
     // Verificación de acceso para barberos
     function verificarAccesoBarbero() {
-      console.log("Función verificarAccesoBarbero ejecutada"); // Debug
+      console.log("Iniciando verificación de acceso..."); // Debug
 
       // AÑADE ESTO:
       if (!modal || !inputPassword || !btnVerificar || !mensajeError || !mainContent) {
-        console.error("Elementos del DOM no encontrados:");
-        console.log("Modal:", modal);
-        console.log("Input password:", inputPassword);
-        console.log("Botón verificar:", btnVerificar);
-        console.log("Mensaje error:", mensajeError);
-        console.log("Main content:", mainContent);
+        const modal = document.getElementById('modal-verificacion');
+        const inputPassword = document.getElementById('input-password');
+        const btnVerificar = document.getElementById('btn-verificar');
+        const mensajeError = document.getElementById('mensaje-error-verificacion');
+        const mainContent = document.getElementById('main-content');
         return false;
       }
       // ... el resto de tu función ...
