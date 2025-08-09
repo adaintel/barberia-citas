@@ -978,11 +978,14 @@
           return;
         }
 
-        // Configurar eventos y cargar citas
+        
+        // Configurar eventos y cargar citas solo si está autenticado
         document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
         document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
         document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
+          
+        
         
         await cargarCitas();
         conectarWebsockets();
@@ -990,6 +993,8 @@
       } catch (error) {
         console.error('Error en inicialización:', error);
         mostrarNotificacion('Error al inicializar el panel', 'error');
+        // Redirigir a inicio si hay error grave
+        setTimeout(() => window.location.href = 'index.html', 3000);
       }
     }
 
