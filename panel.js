@@ -65,7 +65,6 @@ async function cargarCitas() {
       </div>
     `;
 
-    // Usar el cliente supabase directamente (ya está disponible globalmente)
     const { data: citas, error } = await supabase
       .from('citas')
       .select('*')
@@ -91,7 +90,7 @@ async function cargarCitas() {
   }
 }
 
-// [Resto de tus funciones (mostrarCitas, cambiarEstadoCita, etc.)...]
+// [Resto de funciones (mostrarCitas, cambiarEstadoCita, etc.)...]
 
 // Conectar a websockets para cambios en tiempo real
 function conectarWebsockets() {
@@ -100,16 +99,27 @@ function conectarWebsockets() {
   }
 
   canalCitas = supabase
-    .channel('cambios-citas')
-    .on('postgres_changes', { 
-      event: '*', 
-      schema: 'public', 
-      table: 'citas' 
-    }, () => {
-      mostrarNotificacion('La lista de citas se ha actualizado', 'info');
-      cargarCitas();
-    })
-    .subscribe();
+    .channel('schema-db-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'citas'
+      },
+      (payload) => {
+        console.log('Cambio recibido:', payload);
+        cargarCitas();
+      }
+    )
+    .subscribe((status, err) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Canal suscrito correctamente');
+      }
+      if (err) {
+        console.error('Error en suscripción:', err);
+      }
+    });
 }
 
 // Inicialización del panel
