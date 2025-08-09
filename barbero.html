@@ -666,7 +666,7 @@
     let todasLasCitas = [];
     let modalAbierto = false;
     let canalCitas = null;
-    const CONTRASENA_BARBERO = "BarberoElite2025"; // Contraseña para acceder al panel
+    const CONTRASENA_BARBERO = "1234"; // Contraseña para acceder al panel
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -683,15 +683,25 @@
 
     // Verificación de acceso para barberos
     function verificarAccesoBarbero() {
-      const modal = document.getElementById('modal-verificacion');
-      const inputPassword = document.getElementById('input-password');
-      const btnVerificar = document.getElementById('btn-verificar');
-      const mensajeError = document.getElementById('mensaje-error-verificacion');
-      const mainContent = document.getElementById('main-content');
+      console.log("Función verificarAccesoBarbero ejecutada"); // Debug
+
+      // AÑADE ESTO:
+      if (!modal || !inputPassword || !btnVerificar || !mensajeError || !mainContent) {
+        console.error("Elementos del DOM no encontrados:");
+        console.log("Modal:", modal);
+        console.log("Input password:", inputPassword);
+        console.log("Botón verificar:", btnVerificar);
+        console.log("Mensaje error:", mensajeError);
+        console.log("Main content:", mainContent);
+        return false;
+      }
+      // ... el resto de tu función ...
+    }
       
       // Verificar si ya está autenticado
       const autenticado = localStorage.getItem('barberoAutenticado') === 'true';
       if (autenticado) {
+        console.log("Ya autenticado, saltando verificación"); // Debug
         modal.style.display = 'none';
         mainContent.style.display = 'block';
         return true;
@@ -699,10 +709,16 @@
       
       // Mostrar modal de verificación
       modal.style.display = 'flex';
+      console.log("Modal de verificación mostrado"); // Debug
       
       // Configurar evento de verificación
       btnVerificar.onclick = () => {
+        console.log("Botón verificar clickeado"); // Debug
+        console.log("Contraseña ingresada:", inputPassword.value); // Debug
+      
+      btnVerificar.addEventListener('click', () => { 
         if (inputPassword.value === CONTRASENA_BARBERO) {
+          console.log("Contraseña correcta"); // Debug
           localStorage.setItem('barberoAutenticado', 'true');
           modal.style.display = 'none';
           mainContent.style.display = 'block';
@@ -711,6 +727,7 @@
           conectarWebsockets();
           return true;
         } else {
+          console.log("Contraseña incorrecta"); // Debug
           mensajeError.style.display = 'block';
           inputPassword.value = '';
           inputPassword.focus();
@@ -721,6 +738,7 @@
       // Permitir verificación con Enter
       inputPassword.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+          console.log("Enter presionado en input de contraseña"); // Debug
           btnVerificar.click();
         }
       });
@@ -1045,4 +1063,7 @@
     }
 
     // Iniciar cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', inicializarPanel);
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("DOM completamente cargado");
+      inicializarPanel();
+    });
