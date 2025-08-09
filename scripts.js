@@ -17,14 +17,53 @@ if (!supabase) {
   document.head.appendChild(script);
 }
 
-// 2. Función mejorada para mostrar mensajes
+// Funciones compartidas entre cliente y barbero
+async function cargarCitas() {
+  const contenedor = document.getElementById('citasContainer');
+  if (!contenedor) return;
+
+  try {
+    contenedor.innerHTML = `
+      <div class="loading">
+        <i class="fas fa-spinner"></i>
+        <p>Cargando citas...</p>
+      </div>
+    `;
+
+    const { data: citas, error } = await supabase
+      .from('citas')
+      .select('*')
+      .order('fecha', { ascending: true })
+      .order('hora', { ascending: true });
+
+    if (error) throw error;
+
+    todasLasCitas = citas || [];
+    mostrarCitas(todasLasCitas);
+    actualizarEstadisticas(todasLasCitas);
+    
+  } catch (error) {
+    console.error('Error al cargar citas:', error);
+    contenedor.innerHTML = `
+      <div class="mensaje-error">
+        <p>Error al cargar citas. Por favor intente nuevamente.</p>
+        <button onclick="window.location.reload()" class="btn-reintentar">
+          <i class="fas fa-sync-alt"></i> Reintentar
+        </button>
+      </div>
+    `;
+  }
+}
+
+
+  // 2. Función mejorada para mostrar mensajes
 function mostrarMensaje(texto, tipo = 'info') {
   const mensajeDiv = document.getElementById('mensaje');
   if (!mensajeDiv) {
     console.warn('No se encontró el elemento para mostrar mensajes');
     return;
   }
-  
+
   // Limpiar mensajes anteriores
   mensajeDiv.innerHTML = '';
   
