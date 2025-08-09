@@ -1,23 +1,75 @@
-// Inicialización de Supabase
+// 1. Configuración Segura de Supabase (usa .env en producción)
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// Función para mostrar mensajes
-function mostrarMensaje(texto, tipo) {
+// Verificar si Supabase está cargado antes de inicializar
+let supabase;
+if (typeof supabaseClient !== 'undefined') {
+  supabase = supabaseClient.createClient(supabaseUrl, supabaseKey);
+} else {
+  console.error('Error: Supabase client no está disponible');
+  // Puedes cargar el script dinámicamente aquí si es necesario
+}
+
+// 2. Función mejorada para mostrar mensajes
+function mostrarMensaje(texto, tipo = 'info') {
   const mensajeDiv = document.getElementById('mensaje');
-  if (!mensajeDiv) return;
+  if (!mensajeDiv) {
+    console.warn('No se encontró el elemento para mostrar mensajes');
+    return;
+  }
   
-  mensajeDiv.textContent = texto;
-  mensajeDiv.className = `mensaje-${tipo}`;
+  // Limpiar mensajes anteriores
+  mensajeDiv.innerHTML = '';
+  
+  // Crear elemento de mensaje
+  const mensajeElement = document.createElement('div');
+  mensajeElement.className = `mensaje ${tipo}`;
+  mensajeElement.textContent = texto;
+  
+  // Agregar botón de cerrar
+  const cerrarBtn = document.createElement('button');
+  cerrarBtn.textContent = '×';
+  cerrarBtn.className = 'cerrar-mensaje';
+  cerrarBtn.onclick = () => mensajeDiv.style.display = 'none';
+  
+  mensajeElement.prepend(cerrarBtn);
+  mensajeDiv.appendChild(mensajeElement);
   mensajeDiv.style.display = 'block';
   
+  // Ocultar automáticamente después de 5 segundos
   setTimeout(() => {
     mensajeDiv.style.display = 'none';
   }, 5000);
 }
 
-// Inicializar selectores de fecha/hora
+// 3. Validación mejorada de formulario
+function validarFormulario({nombre, telefono, fecha, hora}) {
+  if (!nombre || nombre.trim().length < 3) {
+    return {valido: false, error: 'El nombre debe tener al menos 3 caracteres'};
+  }
+  
+  if (!telefono || !/^\d{10,15}$/.test(telefono)) {
+    return {valido: false, error: 'Teléfono debe tener entre 10 y 15 dígitos'};
+  }
+  
+  const fechaCita = new Date(`${fecha}T${hora}`);
+  const ahora = new Date();
+  
+  if (fechaCita < ahora) {
+    return {valido: false, error: 'La cita no puede ser en el pasado'};
+  }
+  
+  // Validar horario laboral (8am-9pm)
+  const horaCita = hora.split(':')[0];
+  if (horaCita < 8 || horaCita > 21) {
+    return {valido: false, error: 'Horario no disponible (8:00 - 21:00)'};
+  }
+  
+  return {valido: true};
+}
+
+// 4. Función para inicializar selectores con validación
 function inicializarSelectores() {
   const fechaInput = document.getElementById('fecha');
   const horaInput = document.getElementById('hora');
@@ -28,61 +80,119 @@ function inicializarSelectores() {
   const hoy = new Date();
   const manana = new Date(hoy);
   manana.setDate(hoy.getDate() + 1);
+  
   fechaInput.min = manana.toISOString().split('T')[0];
   fechaInput.value = manana.toISOString().split('T')[0];
   
-  // Configurar hora por defecto (8:00 AM)
+  // Configurar hora (8:00 AM - 9:00 PM)
   horaInput.min = "08:00";
   horaInput.max = "21:00";
   horaInput.value = "08:00";
+  
+  // Deshabilitar fines de semana
+  fechaInput.addEventListener('change', function() {
+    const fechaSeleccionada = new Date(this.value);
+    const diaSemana = fechaSeleccionada.getDay();
+    
+    if (diaSemana === 0 || diaSemana === 6) { // Domingo (0) o Sábado (6)
+      mostrarMensaje('No trabajamos fines de semana. Por favor seleccione un día hábil.', 'error');
+      this.value = fechaInput.min; // Resetear a fecha mínima
+    }
+  });
 }
 
-// Manejar envío del formulario
+// 5. Función para guardar cita con RLS habilitado
+async function guardarCita(citaData) {
+  if (!supabase) {
+    throw new Error('Error de conexión con el servidor');
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('citas')
+      .insert([{
+        ...citaData,
+        estado: 'pendiente',
+        creado_en: new Date().toISOString()
+      }])
+      .select();
+    
+    if (error) {
+      console.error('Error Supabase:', error);
+      throw new Error(error.message || 'Error al guardar la cita');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error completo:', error);
+    throw error;
+  }
+}
+
+// 6. Inicialización principal cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+  // Verificar si Supabase está inicializado
+  if (!supabase) {
+    mostrarMensaje('Error en la configuración del sistema. Recarga la página.', 'error');
+    return;
+  }
+
+  // Inicializar selectores de fecha/hora
+  inicializarSelectores();
+
+  // Manejar envío del formulario
   const citaForm = document.getElementById('citaForm');
   if (citaForm) {
     citaForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const nombre = document.getElementById('nombre').value.trim();
-      const telefono = document.getElementById('telefono').value.trim();
-      const fecha = document.getElementById('fecha').value;
-      const hora = document.getElementById('hora').value;
-      const servicio = document.getElementById('servicio').value;
-      const barbero = document.getElementById('barbero').value;
+      // Mostrar estado de carga
+      const submitBtn = citaForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Agendando...';
       
-      if (!nombre || !telefono || !fecha || !hora || !servicio || !barbero) {
-        mostrarMensaje('Por favor complete todos los campos', 'error');
-        return;
-      }
-
       try {
-        const { data, error } = await supabase
-          .from('citas')
-          .insert([{
-            nombre: nombre,
-            telefono: telefono,
-            fecha: fecha,
-            hora: hora,
-            servicio: servicio,
-            barbero: barbero,
-            estado: 'pendiente'
-          }])
-          .select();
+        // Obtener valores del formulario
+        const formData = {
+          nombre: document.getElementById('nombre').value.trim(),
+          telefono: document.getElementById('telefono').value.trim(),
+          fecha: document.getElementById('fecha').value,
+          hora: document.getElementById('hora').value,
+          servicio: document.getElementById('servicio').value,
+          barbero: document.getElementById('barbero').value
+        };
+
+        // Validar datos
+        const validacion = validarFormulario(formData);
+        if (!validacion.valido) {
+          throw new Error(validacion.error);
+        }
+
+        // Guardar cita
+        const citaGuardada = await guardarCita(formData);
+        console.log('Cita guardada:', citaGuardada);
         
-        if (error) throw error;
-        
-        mostrarMensaje('✅ Cita agendada correctamente', 'exito');
+        // Mostrar éxito y resetear
+        mostrarMensaje('✅ Cita agendada correctamente. Te esperamos!', 'exito');
         citaForm.reset();
         inicializarSelectores();
         
       } catch (error) {
-        console.error('Error al agendar cita:', error);
-        mostrarMensaje('❌ Error al agendar: ' + error.message, 'error');
+        console.error('Error al procesar cita:', error);
+        mostrarMensaje(`❌ ${error.message}`, 'error');
+      } finally {
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     });
   }
 
-  // Inicializar al cargar
-  inicializarSelectores();
+  // Código adicional para el panel del barbero (si existe)
+  const barberoPanel = document.getElementById('barberoPanel');
+  if (barberoPanel) {
+    // Aquí iría el código específico para el panel del barbero
+    console.log('Panel del barbero detectado');
+  }
 });
