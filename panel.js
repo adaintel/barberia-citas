@@ -18,7 +18,13 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
 
 // Verificación de seguridad para barberos
 async function verificarAccesoBarbero() {
-  // Mostrar modal de contraseña inmediatamente
+  const password = localStorage.getItem('barberoPassword');
+  
+  if (password === 'BarberoElite2025') {
+    return true;
+  }
+
+  // Crear modal de verificación
   const modalVerificacion = document.createElement('div');
   modalVerificacion.className = 'modal-verificacion';
   modalVerificacion.innerHTML = `
@@ -27,7 +33,7 @@ async function verificarAccesoBarbero() {
       <p>Ingrese la contraseña de barbero:</p>
       <input type="password" id="input-password" placeholder="Contraseña">
       <button id="btn-verificar" class="btn-verificar">Verificar</button>
-      <p id="mensaje-error" style="color:#e74c3c; margin-top:10px; display:none;">Contraseña incorrecta</p>
+      <p id="mensaje-error-verificacion" class="mensaje-error-verificacion">Contraseña incorrecta</p>
     </div>
   `;
   document.body.appendChild(modalVerificacion);
@@ -40,7 +46,7 @@ async function verificarAccesoBarbero() {
         modalVerificacion.remove();
         resolve(true);
       } else {
-        document.getElementById('mensaje-error').style.display = 'block';
+        document.getElementById('mensaje-error-verificacion').style.display = 'block';
       }
     });
   });
@@ -48,13 +54,10 @@ async function verificarAccesoBarbero() {
 
 // Cargar citas desde Supabase
 async function cargarCitas() {
-  // Verificar que supabase existe
-  if (typeof supabase === 'undefined') {
-    console.error('Supabase no está inicializado');
-    return;
-  }
-  // Resto del código...
-}
+  const contenedor = document.getElementById('citasContainer');
+  if (!contenedor) return;
+
+  try {
     contenedor.innerHTML = `
       <div class="loading">
         <i class="fas fa-spinner"></i>
@@ -62,7 +65,7 @@ async function cargarCitas() {
       </div>
     `;
 
-    const { data: citas, error } = await supabase
+    const { data: citas, error } = await window.supabase
       .from('citas')
       .select('*')
       .order('fecha', { ascending: true })
@@ -168,7 +171,7 @@ function agregarEventosBotones() {
 // Cambiar estado de una cita
 async function cambiarEstadoCita(id, nuevoEstado) {
   try {
-    const { error } = await supabase
+    const { error } = await window.supabase
       .from('citas')
       .update({ estado: nuevoEstado })
       .eq('id', id);
@@ -193,7 +196,7 @@ async function mostrarDetallesCita(id) {
   const modalBody = document.getElementById('modal-body');
   
   try {
-    const { data: cita, error } = await supabase
+    const { data: cita, error } = await window.supabase
       .from('citas')
       .select('*')
       .eq('id', id)
@@ -315,15 +318,13 @@ function exportarCitas() {
   mostrarNotificacion('Exportación completada con éxito', 'success');
 }
 
+// Conectar a websockets para cambios en tiempo real
 function conectarWebsockets() {
-  if (typeof supabase === 'undefined') {
-    console.error('Supabase no está inicializado para websockets');
-    return;
+  if (canalCitas) {
+    window.supabase.removeChannel(canalCitas);
   }
-  // Resto del código...
-}
 
-  canalCitas = supabase
+  canalCitas = window.supabase
     .channel('cambios-citas')
     .on('postgres_changes', { 
       event: '*', 
@@ -339,16 +340,11 @@ function conectarWebsockets() {
 // Inicialización del panel
 async function inicializarPanel() {
   try {
-    // Verificar que supabase está disponible
-    if (typeof supabase === 'undefined') {
-      throw new Error('Supabase no está inicializado');
+    const accesoPermitido = await verificarAccesoBarbero();
+    if (!accesoPermitido) {
+      window.location.href = 'index.html';
+      return;
     }
-    // Resto del código...
-  } catch (error) {
-    console.error('Error en inicialización:', error);
-    mostrarNotificacion('Error al inicializar el panel. Recargue la página.', 'error');
-  }
-}
 
     // Configurar eventos y cargar citas
     document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
