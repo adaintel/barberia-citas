@@ -258,3 +258,106 @@ function conectarWebsockets() {
   // Implementación debe estar en scripts.js
   console.warn('Función conectarWebsockets() debe ser implementada en scripts.js');
 }
+
+// Agrega estas funciones al final de barbero-auth.js
+
+async function cargarCitas() {
+  try {
+    const { data: citas, error } = await supabase
+      .from('citas')
+      .select('*')
+      .order('fecha', { ascending: true })
+      .order('hora', { ascending: true });
+
+    if (error) throw error;
+
+    todasLasCitas = citas || [];
+    mostrarCitas(todasLasCitas);
+    actualizarEstadisticas(todasLasCitas);
+    
+  } catch (error) {
+    console.error('Error al cargar citas:', error);
+    mostrarNotificacion('Error al cargar las citas', 'error');
+  }
+}
+
+function conectarWebsockets() {
+  if (canalCitas) {
+    supabase.removeChannel(canalCitas);
+  }
+
+  canalCitas = supabase
+    .channel('citas-cambios')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'citas'
+      },
+      () => cargarCitas() // Refrescar cuando haya cambios
+    )
+    .subscribe();
+}
+
+// Función para mostrar citas en la tabla
+function mostrarCitas(citas) {
+  const contenedor = document.getElementById('citasContainer');
+  if (!citas || citas.length === 0) {
+    contenedor.innerHTML = '<p class="no-citas">No hay citas agendadas</p>';
+    return;
+  }
+
+  let html = `
+    <div class="table-responsive">
+      <table class="tabla-citas">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Servicio</th>
+            <th>Barbero</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  citas.forEach(cita => {
+    html += `
+      <tr>
+        <td>${cita.nombre}</td>
+        <td>${cita.telefono}</td>
+        <td>${new Date(cita.fecha).toLocaleDateString()}</td>
+        <td>${cita.hora.substring(0, 5)}</td>
+        <td>${cita.servicio}</td>
+        <td>${cita.barbero}</td>
+        <td class="estado-cita" data-estado="${cita.estado}">
+          ${cita.estado}
+        </td>
+        <td class="acciones">
+          <button class="btn-accion btn-completar" data-id="${cita.id}">
+            <i class="fas fa-check"></i>
+          </button>
+          <button class="btn-accion btn-cancelar" data-id="${cita.id}">
+            <i class="fas fa-times"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table></div>`;
+  contenedor.innerHTML = html;
+}
+
+function actualizarEstadisticas(citas) {
+  document.getElementById('total-citas').textContent = citas.length;
+  document.getElementById('pendientes-citas').textContent = 
+    citas.filter(c => c.estado === 'pendiente').length;
+  document.getElementById('completadas-citas').textContent = 
+    citas.filter(c => c.estado === 'completado').length;
+}
