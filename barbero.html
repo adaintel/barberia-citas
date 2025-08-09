@@ -6,6 +6,10 @@
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
+  <!-- Preconexión para mejor performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="gold-glow"></div>
@@ -21,7 +25,7 @@
         <div class="panel-control">
           <div class="search-container">
             <i class="fas fa-search"></i>
-            <input type="text" id="buscador" placeholder="Buscar por nombre...">
+            <input type="text" id="buscador" placeholder="Buscar por nombre o teléfono...">
           </div>
           
           <div class="filters">
@@ -45,7 +49,7 @@
         
         <div id="citasContainer">
           <div class="loading">
-            <i class="fas fa-spinner"></i>
+            <i class="fas fa-spinner fa-spin"></i>
             <p>Cargando citas...</p>
           </div>
         </div>
@@ -80,7 +84,7 @@
           <i class="fas fa-sign-out-alt"></i> Cerrar sesión
         </button>
       </div>
-      <p>© 2025 Barbería Elite - Sistema de gestión de citas</p>
+      <p>© <span id="current-year">2025</span> Barbería Elite - Sistema de gestión de citas</p>
     </footer>
   </div>
 
@@ -96,10 +100,16 @@
   <!-- Modal de verificación -->
   <div id="modal-verificacion" class="modal-verificacion">
     <div class="contenido-verificacion">
-      <h2>Acceso Restringido</h2>
-      <p>Ingrese sus credenciales:</p>
-      <input type="text" id="input-email" placeholder="Correo electrónico">
-      <input type="password" id="input-password" placeholder="Contraseña">
+      <h2><i class="fas fa-lock"></i> Acceso Restringido</h2>
+      <p>Ingrese sus credenciales de barbero:</p>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="input-email" placeholder="Correo electrónico" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-key"></i>
+        <input type="password" id="input-password" placeholder="Contraseña" required>
+      </div>
       <button id="btn-verificar" class="btn-verificar">
         <i class="fas fa-sign-in-alt"></i> Iniciar sesión
       </button>
@@ -107,8 +117,17 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Scripts (en orden correcto) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Configuración centralizada de Supabase
+    window.supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
+    window.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
+    window.supabase = supabase.createClient(window.supabaseUrl, window.supabaseKey);
+    
+    // Actualizar año automáticamente
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
   <script src="scripts.js"></script>
   <script src="barbero-auth.js"></script>
 </body>
