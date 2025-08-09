@@ -390,6 +390,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      /* Añadir esto: */
+      display: none; /* Se oculta inicialmente */
     }
     
     .contenido-verificacion {
@@ -590,7 +592,7 @@
   </div>
 
   <!-- Modal de verificación -->
-  <div id="modal-verificacion" class="modal-verificacion" style="display: none;">
+  <div id="modal-verificacion" class="modal-verificacion">
     <div class="contenido-verificacion">
       <h2>Acceso Restringido</h2>
       <p>Ingrese la contraseña de barbero:</p>
@@ -972,11 +974,7 @@
     // Inicialización del panel
     async function inicializarPanel() {
       try {
-        const accesoPermitido = await verificarAccesoBarbero();
-        if (!accesoPermitido) {
-          window.location.href = 'index.html';
-          return;
-        }
+        
 
         
         // Configurar eventos y cargar citas solo si está autenticado
@@ -999,7 +997,17 @@
     }
 
     // Iniciar cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', inicializarPanel);
+    // Por esto:
+    document.addEventListener('DOMContentLoaded', function()
+      // Mostrar el modal inmediatamente al cargar
+      document.getElementById('modal-verificacion').style.display = 'flex';
+      // Luego verificar acceso
+      verificarAccesoBarbero().then(acceso => {  
+        if (acceso) {
+          inicializarPanel();
+        }
+      });
+    });
   </script>
 </body>
 </html>
