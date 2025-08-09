@@ -390,8 +390,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /* Añadir esto: */
-      display: none; /* Se oculta inicialmente */
     }
     
     .contenido-verificacion {
@@ -592,7 +590,7 @@
   </div>
 
   <!-- Modal de verificación -->
-  <div id="modal-verificacion" class="modal-verificacion">
+  <div id="modal-verificacion" class="modal-verificacion" style="display: none;">
     <div class="contenido-verificacion">
       <h2>Acceso Restringido</h2>
       <p>Ingrese la contraseña de barbero:</p>
@@ -627,54 +625,30 @@
     // Verificación de seguridad para barberos
     async function verificarAccesoBarbero() {
       const password = localStorage.getItem('barberoPassword');
-      // Contraseña hardcodeada (en producción usa Supabase Auth)
-      const PASSWORD_CORRECTO = 'BarberoElite2025';
-      if (password === PASSWORD_CORRECTO) {
+      
+      if (password === 'BarberoElite2025') {
         return true;
       }
-      
+
       // Mostrar modal de verificación
       const modal = document.getElementById('modal-verificacion');
       modal.style.display = 'flex';
       
-      // Limpiar mensajes de error
-      document.getElementById('mensaje-error-verificacion').style.display = 'none';
-      
       return new Promise((resolve) => {
-        const btnVerificar = document.getElementById('btn-verificar');
-        const inputPassword = document.getElementById('input-password');
-        // Función para verificar
-        const verificar = async () => {
-          if (inputPassword.value === PASSWORD_CORRECTO) {
-            localStorage.setItem('barberoPassword', PASSWORD_CORRECTO);
+        document.getElementById('btn-verificar').onclick = async () => {
+          const inputPassword = document.getElementById('input-password').value;
+          if (inputPassword === 'BarberoElite2025') {
+            localStorage.setItem('barberoPassword', 'BarberoElite2025');
             modal.style.display = 'none';
             resolve(true);
           } else {
             document.getElementById('mensaje-error-verificacion').style.display = 'block';
-            inputPassword.focus();
-          }
-        }; 
-        // Evento click en botón
-        btnVerificar.onclick = verificar;
-        
-        // Evento enter en input
-        inputPassword.onkeyup = (e) => {
-          if (e.key === 'Enter') {
-            verificar();
-          }
-        }; 
-        
-        // Si cierran el modal sin autenticarse, redirigir
-        modal.onclick = (e) => {
-          if (e.target === modal) {
-            modal.style.display = 'none';
-            window.location.href = 'index.html';
             resolve(false);
           }
         };
-      });
-    } 
-      
+     });
+   }
+
     // Cargar citas desde Supabase
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
@@ -974,16 +948,17 @@
     // Inicialización del panel
     async function inicializarPanel() {
       try {
-        
+        const accesoPermitido = await verificarAccesoBarbero();
+        if (!accesoPermitido) {
+          window.location.href = 'index.html';
+          return;
+        }
 
-        
-        // Configurar eventos y cargar citas solo si está autenticado
+        // Configurar eventos y cargar citas
         document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
         document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
         document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
-          
-        
         
         await cargarCitas();
         conectarWebsockets();
@@ -991,23 +966,11 @@
       } catch (error) {
         console.error('Error en inicialización:', error);
         mostrarNotificacion('Error al inicializar el panel', 'error');
-        // Redirigir a inicio si hay error grave
-        setTimeout(() => window.location.href = 'index.html', 3000);
       }
     }
 
     // Iniciar cuando el DOM esté listo
-    // Por esto:
-    document.addEventListener('DOMContentLoaded', function()
-      // Mostrar el modal inmediatamente al cargar
-      document.getElementById('modal-verificacion').style.display = 'flex';
-      // Luego verificar acceso
-      verificarAccesoBarbero().then(acceso => {  
-        if (acceso) {
-          inicializarPanel();
-        }
-      });
-    });
+    document.addEventListener('DOMContentLoaded', inicializarPanel);
   </script>
 </body>
 </html>
