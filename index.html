@@ -3,195 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barbería Elite | Inicio</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Barbería Elite</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Agrega esto para el modal -->
   <style>
-    :root {
-      --gold: #D4AF37;
-      --dark: #121212;
-      --light: #f8f8f8;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Montserrat', sans-serif;
-    }
-    
-    body {
-      background-color: var(--dark);
-      color: var(--light);
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>');
-      background-size: 200px;
-      background-repeat: repeat;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    
-    header {
-      margin-bottom: 3rem;
-      animation: fadeIn 1s ease-out;
-    }
-    
-    .logo {
-      font-size: 5rem;
-      color: var(--gold);
-      margin-bottom: 1rem;
-      text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: var(--gold);
-      letter-spacing: 2px;
-    }
-    
-    .slogan {
-      font-size: 1.2rem;
-      letter-spacing: 1px;
-      opacity: 0.8;
-    }
-    
-    .buttons {
-      display: flex;
-      gap: 1.5rem;
-      margin: 3rem 0;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    
-    .btn {
-      padding: 1rem 2rem;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: bold;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 200px;
-      justify-content: center;
-    }
-    
-    .btn-client {
-      background-color: var(--gold);
-      color: var(--dark);
-      border: 2px solid var(--gold);
-    }
-    
-    .btn-barber {
-      background-color: transparent;
-      color: var(--gold);
-      border: 2px solid var(--gold);
-    }
-    
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-client:hover {
-      background-color: transparent;
-      color: var(--gold);
-    }
-    
-    .btn-barber:hover {
-      background-color: var(--gold);
-      color: var(--dark);
-    }
-    
-    footer {
-      margin-top: auto;
-      padding: 1.5rem;
-      text-align: center;
-      border-top: 1px solid rgba(212, 175, 55, 0.2);
-    }
-    
-    .copyright {
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      opacity: 0.7;
-    }
-    
-    .author {
-      font-size: 0.8rem;
-      opacity: 0.5;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Efecto de brillo dorado */
-    .gold-glow {
+    .modal {
+      display: none;
       position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
-      transform: translate(-50%, -50%);
-      z-index: -1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
     }
-    
-    @media (max-width: 768px) {
-      .logo {
-        font-size: 3.5rem;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      .buttons {
-        flex-direction: column;
-        gap: 1rem;
-      }
+    .modal-content {
+      background: #121212;
+      padding: 2rem;
+      width: 300px;
+      margin: 10% auto;
+      border: 1px solid #D4AF37;
     }
   </style>
 </head>
 <body>
-  <div class="gold-glow"></div>
-  
+  <!-- Contenido principal de tu página -->
   <div class="container">
-    <header>
-      <div class="logo">K</div>
-      <h1>BARBERÍA ELITE</h1>
-      <p class="slogan">Experiencia premium en cuidado masculino</p>
-    </header>
+    <!-- ... resto de tu contenido ... -->
     
-    <main>
-      <div class="buttons">
-        <a href="cliente.html" class="btn btn-client">
-          <i class="fas fa-user"></i> Soy Cliente
-        </a>
-        <a href="barbero.html" class="btn btn-barber">
-          <i class="fas fa-cut"></i> Soy Barbero
-        </a>
-      </div>
-    </main>
-    
-    <footer>
-      <p class="copyright">© 2025 Barbería Elite</p>
-      <p class="author">Aplicación creada por Antonio</p>
-    </footer>
+    <!-- Enlace al panel del barbero (oculto o protegido) -->
+    <a href="barbero.html" id="acceso-barbero" style="display:none;">Acceso Barberos</a>
   </div>
+
+  <!-- Modal de login para barberos -->
+  <div id="modal-login" class="modal">
+    <div class="modal-content">
+      <h3>Acceso Profesional</h3>
+      <input type="email" id="barbero-email" placeholder="Email">
+      <input type="password" id="barbero-password" placeholder="Contraseña">
+      <button id="btn-login-barbero">Ingresar</button>
+      <p id="login-error" style="color:red;"></p>
+    </div>
+  </div>
+
+  <script>
+    // Script para manejar el acceso barbero
+    document.getElementById('acceso-barbero').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('modal-login').style.display = 'block';
+    });
+
+    // Resto de tus scripts...
+  </script>
 </body>
 </html>
