@@ -542,6 +542,21 @@
   </style>
 </head>
 <body>
+
+  <!-- Scripts en el orden CORRECTO -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Configuración de Supabase
+    const supabaseUrl = 'https://tu-url-supabase.supabase.co';
+    const supabaseKey = 'tu-clave-supabase';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Variables globales
+    let todasLasCitas = [];
+    let modalAbierto = false;
+    let canalCitas = null;
+
+    
   <!-- Modal de verificación (ahora aparece primero) -->
   <div id="modal-verificacion" class="modal-verificacion">
     <div class="contenido-verificacion">
@@ -557,6 +572,7 @@
     </div>
   </div>
 
+  
   <!-- Contenido principal (oculto inicialmente) -->
   <div id="contenido-principal" style="display: none;">
     <div class="gold-glow"></div>
@@ -638,18 +654,7 @@
     </div>
   </div>
 
-  <!-- Scripts en el orden CORRECTO -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    // Configuración de Supabase
-    const supabaseUrl = 'https://tu-url-supabase.supabase.co';
-    const supabaseKey = 'tu-clave-supabase';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // Variables globales
-    let todasLasCitas = [];
-    let modalAbierto = false;
-    let canalCitas = null;
+  
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
