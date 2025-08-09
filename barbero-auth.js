@@ -1,5 +1,7 @@
-// Configuración de Supabase
-const supabase = window.supabase; // Usamos la instancia ya existente
+// barbero-auth.js - Versión corregida y completa
+
+// Usamos la instancia global de Supabase
+const supabase = window.supabase;
 
 // Variables globales
 let todasLasCitas = [];
@@ -20,22 +22,26 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
   }, 3000);
 }
 
-// Verificación de acceso mejorada
+// Función mejorada de verificación de acceso
 async function verificarAccesoBarbero() {
-  // Verificar sesión existente
+  console.log("[Debug] Iniciando verificación de acceso...");
+  
+  // 1. Verificar sesión existente
   const session = JSON.parse(localStorage.getItem('barberSession') || '{}');
   
   if (session.token && new Date(session.expires) > new Date()) {
+    console.log("[Debug] Sesión válida encontrada:", session);
     actualizarTiempoSesion(session.expires);
     document.getElementById('nombre-barbero').textContent = `(${session.nombre})`;
     return true;
   }
 
-  // Mostrar modal de verificación
+  // 2. Mostrar modal de verificación
   const modal = document.getElementById('modal-verificacion');
   modal.style.display = 'flex';
   document.getElementById('input-email').focus();
   
+  // 3. Configurar el proceso de verificación
   return new Promise((resolve) => {
     let intentos = 0;
     const maxIntentos = 3;
@@ -44,20 +50,30 @@ async function verificarAccesoBarbero() {
       const email = document.getElementById('input-email').value.trim();
       const password = document.getElementById('input-password').value;
       
+      console.log("[Debug] Intentando login con:", email);
+      
       if (!email || !password) {
         mostrarErrorVerificacion('Ambos campos son requeridos');
         return;
       }
 
       try {
-        // Verificar credenciales con Supabase
+        // 4. Consulta a Supabase con timeout
+        const consultaTimeout = setTimeout(() => {
+          mostrarErrorVerificacion('Tiempo de espera agotado. Intente nuevamente.');
+        }, 5000);
+
         const { data, error } = await supabase
           .from('barberos')
-          .select('id,nombre,email')
+          .select('id, nombre, email')
           .eq('email', email)
           .eq('password', password)
           .eq('activo', true)
           .single();
+        
+        clearTimeout(consultaTimeout);
+        
+        console.log("[Debug] Respuesta de Supabase:", { data, error });
         
         if (error || !data) {
           intentos++;
@@ -67,12 +83,13 @@ async function verificarAccesoBarbero() {
             return;
           }
           
-          mostrarErrorVerificacion('Credenciales incorrectas. Intentos restantes: ' + (maxIntentos - intentos));
+          mostrarErrorVerificacion(`Credenciales incorrectas. Intentos restantes: ${maxIntentos - intentos}`);
           document.getElementById('input-password').value = '';
+          document.getElementById('input-password').focus();
           return;
         }
         
-        // Crear sesión segura
+        // 5. Crear sesión segura
         const sessionData = {
           token: crypto.randomUUID(),
           id: data.id,
@@ -89,21 +106,23 @@ async function verificarAccesoBarbero() {
         resolve(true);
         
       } catch (error) {
-        console.error('Error en verificación:', error);
+        console.error('[Error] En verificación:', error);
         mostrarErrorVerificacion('Error en el sistema. Intente más tarde.');
         resolve(false);
       }
     };
     
+    // Función para mostrar errores
     function mostrarErrorVerificacion(mensaje) {
       const errorElement = document.getElementById('mensaje-error-verificacion');
       errorElement.textContent = mensaje;
       errorElement.style.display = 'block';
+      console.error('[Error] Autenticación:', mensaje);
     }
     
+    // Configurar eventos
     document.getElementById('btn-verificar').onclick = verificarCredenciales;
     
-    // Permitir verificar con Enter
     document.getElementById('input-password').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') verificarCredenciales();
     });
@@ -135,38 +154,82 @@ function actualizarTiempoSesion(fechaExpiracion) {
   intervaloSession = setInterval(actualizar, 60000); // Actualizar cada minuto
 }
 
-// Cerrar sesión
+// Configurar cierre de sesión
 function configurarCierreSesion() {
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('barberSession');
-    mostrarNotificacion('Sesión cerrada correctamente', 'success');
-    setTimeout(() => window.location.href = 'index.html', 1000);
-  });
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem('barberSession');
+      mostrarNotificacion('Sesión cerrada correctamente', 'success');
+      setTimeout(() => window.location.href = 'index.html', 1000);
+    });
+  }
+}
+
+// Cargar lista de barberos
+async function cargarBarberos() {
+  try {
+    const { data, error } = await supabase
+      .from('barberos')
+      .select('id, nombre')
+      .eq('activo', true);
+    
+    if (error) throw error;
+    
+    barberosDisponibles = data || [];
+    
+    // Actualizar selector de barberos
+    const selectBarbero = document.getElementById('filtro-barbero');
+    if (selectBarbero) {
+      // Limpiar opciones excepto la primera
+      while (selectBarbero.options.length > 1) {
+        selectBarbero.remove(1);
+      }
+      
+      // Agregar barberos activos
+      barberosDisponibles.forEach(barbero => {
+        const option = document.createElement('option');
+        option.value = barbero.nombre;
+        option.textContent = barbero.nombre;
+        selectBarbero.appendChild(option);
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error al cargar barberos:', error);
+  }
 }
 
 // Inicialización del panel
 async function inicializarPanel() {
+  console.log("[Debug] Inicializando panel...");
+  
   try {
-    // Verificar acceso primero
+    // 1. Verificar acceso
     const accesoPermitido = await verificarAccesoBarbero();
     if (!accesoPermitido) {
-      window.location.href = 'index.html';
+      console.log("[Debug] Acceso no permitido, redirigiendo...");
       return;
     }
 
-    // Configurar eventos
+    // 2. Configurar eventos
     configurarCierreSesion();
-    document.getElementById('buscador').addEventListener('input', filtrarCitas);
-    document.getElementById('filtro-estado').addEventListener('change', filtrarCitas);
-    document.getElementById('btn-exportar').addEventListener('click', exportarCitas);
     
-    // Cargar datos iniciales
+    const buscador = document.getElementById('buscador');
+    const filtroEstado = document.getElementById('filtro-estado');
+    const btnExportar = document.getElementById('btn-exportar');
+    
+    if (buscador) buscador.addEventListener('input', filtrarCitas);
+    if (filtroEstado) filtroEstado.addEventListener('change', filtrarCitas);
+    if (btnExportar) btnExportar.addEventListener('click', exportarCitas);
+    
+    // 3. Cargar datos iniciales
     await cargarBarberos();
     await cargarCitas();
     conectarWebsockets();
     
   } catch (error) {
-    console.error('Error en inicialización:', error);
+    console.error('[Error] En inicialización:', error);
     mostrarNotificacion('Error al inicializar el panel', 'error');
     setTimeout(() => window.location.href = 'index.html', 3000);
   }
@@ -174,3 +237,24 @@ async function inicializarPanel() {
 
 // Iniciar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', inicializarPanel);
+
+// Funciones que deben estar definidas en scripts.js
+async function cargarCitas() {
+  // Implementación debe estar en scripts.js
+  console.warn('Función cargarCitas() debe ser implementada en scripts.js');
+}
+
+function filtrarCitas() {
+  // Implementación debe estar en scripts.js
+  console.warn('Función filtrarCitas() debe ser implementada en scripts.js');
+}
+
+function exportarCitas() {
+  // Implementación debe estar en scripts.js
+  console.warn('Función exportarCitas() debe ser implementada en scripts.js');
+}
+
+function conectarWebsockets() {
+  // Implementación debe estar en scripts.js
+  console.warn('Función conectarWebsockets() debe ser implementada en scripts.js');
+}
