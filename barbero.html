@@ -976,6 +976,11 @@
           return;
         }
 
+        // Mostrar botón de cerrar sesión si ya está autenticado
+        if (sessionStorage.getItem('barberoAutenticado') === 'true') {
+           mostrarBotonCerrarSesion();
+        }
+
         // Configurar eventos y cargar citas
         document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
