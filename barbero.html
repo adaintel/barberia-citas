@@ -282,16 +282,15 @@
       color: white;
     }
     
-    .btn-detalles {
-      color: var(--gold);
-      border: 1px solid var(--gold);
+    .btn-eliminar { {
+      color: #ff3333 !important;
+      border: 1px solid #ff3333 !important;
     }
-    
-    .btn-detalles:hover {
-      background: var(--gold);
-      color: var(--dark);
+
+    .btn-eliminar:hover {
+      background: #ff3333 !important;
+      color: white !important;
     }
-    
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -931,13 +930,13 @@
             </td>
             <td class="acciones">
               <button class="btn-accion btn-completar" data-id="${cita.id}" title="Completar">
-                <i class="fas fa-check"></i>
+			    <i class="fas fa-check"></i>
               </button>
               <button class="btn-accion btn-cancelar" data-id="${cita.id}" title="Cancelar">
                 <i class="fas fa-times"></i>
               </button>
-              <button class="btn-accion btn-detalles" data-id="${cita.id}" title="Detalles">
-                <i class="fas fa-eye"></i>
+              <button class="btn-accion btn-eliminar" data-id="${cita.id}" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
               </button>
             </td>
           </tr>
@@ -959,10 +958,9 @@
         btn.addEventListener('click', () => cambiarEstadoCita(btn.dataset.id, 'cancelado'));
       });
       
-      document.querySelectorAll('.btn-detalles').forEach(btn => {
-        btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
+      document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', () => eliminarCita(btn.dataset.id));
       });
-    }
 
     // Cambiar estado de una cita
     async function cambiarEstadoCita(id, nuevoEstado) {
@@ -983,6 +981,25 @@
       }
     }
 
+    async function eliminarCita(id) {
+	  if (!confirm("¿Eliminar esta cita permanentemente?")) return;
+		
+	  try {
+        const { error } = await supabase
+          .from('citas')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+    
+        mostrarNotificacion("Cita eliminada con éxito", "success");
+        await cargarCitas();
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        mostrarNotificacion("Error al eliminar la cita", "error");
+     }
+   }
+		
     // Mostrar detalles de cita en modal
     async function mostrarDetallesCita(id) {
       if (modalAbierto) return;
