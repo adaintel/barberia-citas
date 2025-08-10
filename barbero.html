@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- ******************** CSS ******************** -->
   <style>
     :root {
       --gold: #D4AF37;
@@ -40,6 +42,7 @@
       padding: 2rem;
       margin-bottom: 2rem;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      margin-top: 0 !important;
     }
     
     header {
@@ -47,6 +50,7 @@
       margin-bottom: 2rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      margin-top: 0 !important;
     }
 
     header {
@@ -518,15 +522,18 @@
         padding: 10px 8px;
       }
 
-      /* Estilo Premium para el botón de cerrar sesión */
-      .btn-cerrar-sesion {
+      /* Estilo definitivo - Negro/Dorado Premium */
       #btn-cerrar-sesion {
-        position: fixed; /* Cambiado a fixed para mejor posicionamiento */
+        box-sizing: border-box !important;
+        font-family: 'Montserrat', sans-serif !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        position: fixed;
         top: 20px;
         right: 20px;
-        background: rgba(18, 18, 18, 0.9);
-        color: #D4AF37;
-        border: 1px solid #D4AF37;
+        background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
+        color: #D4AF37 !important; /* Dorado */
+        border: 1px solid #D4AF37 !important;
         padding: 8px 15px;
         border-radius: 4px;
         cursor: pointer;
@@ -537,11 +544,12 @@
         align-items: center;
         gap: 5px;
         transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        text-decoration: none !important;
       }
 
-      .btn-cerrar-sesion::before {
+      #btn-cerrar-sesion::before {
         content: '';
         position: absolute;
         top: 0;
@@ -553,11 +561,11 @@
         z-index: -1;
       } 
 
-      .btn-cerrar-sesion:hover {
-        background: #D4AF37;
-        color: #121212;
+      #btn-cerrar-sesion:hover {
+        background: #D4AF37 !important; /* Fondo dorado al hover */
+        color: #0a0a0a !important; /* Texto negro al hover */
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
       }
 
       #btn-cerrar-sesion i {
@@ -602,6 +610,9 @@
 </head>
 <body>
   <div class="gold-glow"></div>
+
+   
+  <!-- ******************** HTML ******************** -->
   
   <div class="container">
     <div class="glass-panel">
@@ -693,6 +704,8 @@
   <!-- Scripts en el orden CORRECTO -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="scripts.js"></script>
+
+   <!-- ******************** JAVASCRIPT ******************** -->
   <script>
       // Variables globales
       let todasLasCitas = [];
@@ -756,17 +769,35 @@
         <i class="fas fa-sign-out-alt"></i>
         <span>Salir del panel</span>
       `;
+
+      // Estilos en línea como garantía
+      botonCerrar.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(10, 10, 10, 0.95);
+        color: #D4AF37;
+        border: 1px solid #D4AF37;
+        padding: 8px 15px;
+        border-radius: 4px;
+        z-index: 1000;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      `;
   
-      // Estilos en línea como respaldo
-      botonCerrar.style.position = 'fixed';
-      botonCerrar.style.top = '20px';
-      botonCerrar.style.right = '20px';
-      botonCerrar.style.background = 'rgba(18, 18, 18, 0.9)';
-      botonCerrar.style.color = '#D4AF37';
-      botonCerrar.style.border = '1px solid #D4AF37';
-      botonCerrar.style.padding = '8px 15px';
-      botonCerrar.style.borderRadius = '4px';
-      botonCerrar.style.zIndex = '1000';
+      botonCerrar.addEventListener('mouseenter', () => {
+        botonCerrar.style.background = '#D4AF37';
+        botonCerrar.style.color = '#0a0a0a';
+      });
+  
+      botonCerrar.addEventListener('mouseleave', () => {
+        botonCerrar.style.background = 'rgba(10, 10, 10, 0.95)';
+        botonCerrar.style.color = '#D4AF37';
+      });
   
       botonCerrar.addEventListener('click', () => {
         sessionStorage.removeItem('barberoAutenticado');
@@ -775,6 +806,7 @@
   
       document.body.appendChild(botonCerrar);
     }
+     
     
     // Cargar citas desde Supabase
     async function cargarCitas() {
