@@ -49,6 +49,17 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid rgba(212, 175, 55, 0.2);
     }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+    }
     
     header h1 {
       color: var(--gold);
@@ -509,79 +520,79 @@
       }
 
       /* Estilo Premium para el botón de cerrar sesión */
-.btn-cerrar-sesion {
-  position: absolute;
-  top: 25px;
-  right: 25px;
-  background: transparent;
-  color: var(--gold);
-  border: 2px solid var(--gold);
-  padding: 8px 20px;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0);
-  overflow: hidden;
-  z-index: 1;
-}
+      .btn-cerrar-sesion {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        background: transparent;
+        color: var(--gold);
+        border: 2px solid var(--gold);
+        padding: 8px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0);
+        overflow: hidden;
+        z-index: 1;
+      }
 
-.btn-cerrar-sesion::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
-  transition: 0.5s;
-  z-index: -1;
-}
+      .btn-cerrar-sesion::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+        transition: 0.5s;
+        z-index: -1;
+      } 
 
-.btn-cerrar-sesion:hover {
-  color: var(--dark);
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-}
+      .btn-cerrar-sesion:hover {
+        color: var(--dark);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+      }
 
-.btn-cerrar-sesion:hover::before {
-  left: 100%;
-}
+      .btn-cerrar-sesion:hover::before {
+        left: 100%;
+      }
 
-.btn-cerrar-sesion:hover::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--gold);
-  z-index: -2;
-  transition: all 0.4s;
-}
+      .btn-cerrar-sesion:hover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--gold);
+        z-index: -2;
+        transition: all 0.4s;
+      }
 
-.btn-cerrar-sesion i {
-  transition: transform 0.3s;
-}
+      .btn-cerrar-sesion i {
+        transition: transform 0.3s;
+      }
 
-.btn-cerrar-sesion:hover i {
-  transform: translateX(3px);
-}
+      .btn-cerrar-sesion:hover i {
+        transform: translateX(3px);
+      }
 
-@media (max-width: 768px) {
-  .btn-cerrar-sesion {
-    position: static;
-    margin: 15px auto 0;
-    display: inline-flex;
-    padding: 8px 15px;
-  }
-}
-    }
+      @media (max-width: 768px) {
+        .btn-cerrar-sesion {
+          position: static;
+          margin: 15px auto 0;
+          display: inline-flex;
+          padding: 8px 15px;
+     }
+   }
+ }
   </style>
 </head>
 <body>
@@ -736,18 +747,25 @@
       const botonExistente = document.getElementById('btn-cerrar-sesion');
       if (botonExistente) botonExistente.remove();
   
-      // Crear nuevo botón con mejor estilo
+      
+      // Crear botón premium
       const botonCerrar = document.createElement('button');
       botonCerrar.id = 'btn-cerrar-sesion';
       botonCerrar.innerHTML = `
+        <span>Salir del panel</span>
         <i class="fas fa-sign-out-alt"></i>
-        <span>Cerrar sesión</span>
-      `;
+     `;
       botonCerrar.className = 'btn-cerrar-sesion';
-      
+  
       botonCerrar.addEventListener('click', () => {
-        sessionStorage.removeItem('barberoAutenticado');
-        window.location.reload();
+        // Agregar animación de salida
+        botonCerrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        botonCerrar.style.pointerEvents = 'none';
+    
+        setTimeout(() => {
+          sessionStorage.removeItem('barberoAutenticado');
+          window.location.reload();
+        }, 800);
       });
   
   header.appendChild(botonCerrar);
