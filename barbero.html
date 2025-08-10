@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
 
   <!-- ******************** CSS ******************** -->
   <style>
@@ -657,7 +659,460 @@
       border-top-color: var(--dark);
       animation: spin 0.8s linear infinite;
     }
-    
+
+    /* Estilo definitivo - Negro/Dorado Premium */
+    #btn-cerrar-sesion {
+      box-sizing: border-box !important;
+      font-family: 'Montserrat', sans-serif !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
+      color: #D4AF37 !important; /* Dorado */
+      border: 1px solid #D4AF37 !important;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      text-decoration: none !important;
+    }
+
+    #btn-cerrar-sesion::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+      transition: 0.5s;
+      z-index: -1;
+    } 
+
+    #btn-cerrar-sesion:hover {
+      background: #D4AF37 !important; /* Fondo dorado al hover */
+      color: #0a0a0a !important; /* Texto negro al hover */
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    #btn-cerrar-sesion i {
+      font-size: 0.9rem;
+    }
+
+    /* Estilos para el tema oscuro/claro */
+    body.light-mode {
+      --dark: #f8f8f8;
+      --darker: #e0e0e0;
+      --light: #121212;
+      background-color: var(--dark);
+      background-image: none;
+    }
+
+    .light-mode .glass-panel {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--gold);
+    }
+
+    .light-mode .tabla-citas {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .light-mode .tabla-citas th {
+      background-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .light-mode .tabla-citas td {
+      color: #333 !important;
+    }
+
+    .light-mode .tabla-citas td:first-child {
+      color: #222 !important;
+    }
+
+    .light-mode .detalle-item p {
+      color: #333 !important;
+    }
+
+    .theme-switcher {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid var(--gold);
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .theme-switcher:hover {
+      background: var(--gold);
+    }
+
+    .theme-switcher i {
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+
+    .light-mode .theme-switcher i {
+      color: var(--dark);
+    }
+
+    .light-mode .theme-switcher {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .light-mode .theme-switcher:hover i {
+      color: var(--dark);
+    }
+
+    /* Estilos para el calendario */
+    #calendar {
+      margin-bottom: 2rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 1rem;
+    }
+
+    .light-mode #calendar {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .fc-toolbar-title {
+      color: var(--gold) !important;
+    }
+
+    .fc-col-header-cell-cushion {
+      color: var(--gold) !important;
+    }
+
+    .fc-daygrid-day-number {
+      color: #ff4d4d !important;
+    }
+
+    .light-mode .fc-daygrid-day-number {
+      color: #333 !important;
+    }
+
+    .fc-event {
+      background-color: rgba(212, 175, 55, 0.3) !important;
+      border-color: var(--gold) !important;
+      color: var(--light) !important;
+    }
+
+    /* Estilos para el sistema de turnos */
+    .turnos-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 2rem;
+    }
+
+    .turno-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      flex: 1;
+      min-width: 200px;
+      transition: all 0.3s;
+    }
+
+    .turno-card.active {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
+
+    .turno-card h3 {
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .turno-card p {
+      color: var(--light);
+      margin-bottom: 0.5rem;
+    }
+
+    .turno-card .badge {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    /* Estilos para perfiles de barberos */
+    .barberos-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 2rem;
+    }
+
+    .barbero-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .barbero-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .barbero-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .barbero-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      margin-right: 1rem;
+    }
+
+    .barbero-info h3 {
+      color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+
+    .barbero-info p {
+      color: var(--light);
+      opacity: 0.8;
+      font-size: 0.9rem;
+    }
+
+    .barbero-horarios {
+      margin-top: 1rem;
+    }
+
+    .barbero-horarios h4 {
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .horario-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+      color: var(--light);
+    }
+
+    .barbero-especialidades {
+      margin-top: 1rem;
+    }
+
+    .especialidad-tag {
+      display: inline-block;
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    /* Estilos para el historial de clientes */
+    .historial-container {
+      margin-bottom: 2rem;
+    }
+
+    .historial-cliente {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .historial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .historial-header h3 {
+      color: var(--gold);
+    }
+
+    .historial-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .historial-item:last-child {
+      border-bottom: none;
+    }
+
+    .historial-servicio {
+      font-weight: bold;
+      color: var(--light);
+    }
+
+    .historial-fecha {
+      color: var(--light);
+      opacity: 0.8;
+    }
+
+    /* Estilos para el sistema de valoraciones */
+    .valoracion-container {
+      margin-bottom: 2rem;
+    }
+
+    .valoracion-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .valoracion-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .valoracion-cliente {
+      color: var(--gold);
+      font-weight: bold;
+    }
+
+    .valoracion-estrellas {
+      color: var(--gold);
+    }
+
+    .valoracion-comentario {
+      color: var(--light);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    /* Estilos para la integración de redes sociales */
+    .redes-container {
+      margin-bottom: 2rem;
+    }
+
+    .instagram-feed {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .instagram-post {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .instagram-post img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .instagram-post:hover img {
+      transform: scale(1.05);
+    }
+
+    .instagram-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .compartir-redes {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .btn-compartir {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--light);
+      padding: 8px 15px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-compartir:hover {
+      background: rgba(212, 175, 55, 0.2);
+    }
+
+    /* Pestañas para organizar las secciones */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--light);
+      opacity: 0.7;
+      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      opacity: 1;
+      color: var(--gold);
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     @media (max-width: 768px) {
       .container {
         padding: 1rem;
@@ -692,96 +1147,43 @@
         padding: 10px 8px;
       }
 
-      /* Estilo definitivo - Negro/Dorado Premium */
-      #btn-cerrar-sesion {
-        box-sizing: border-box !important;
-        font-family: 'Montserrat', sans-serif !important;
-        text-transform: none !important;
-        letter-spacing: normal !important;
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
-        color: #D4AF37 !important; /* Dorado */
-        border: 1px solid #D4AF37 !important;
-        padding: 8px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 500;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(2px);
-        text-decoration: none !important;
-      }
-
-      #btn-cerrar-sesion::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
-        transition: 0.5s;
-        z-index: -1;
-      } 
-
-      #btn-cerrar-sesion:hover {
-        background: #D4AF37 !important; /* Fondo dorado al hover */
-        color: #0a0a0a !important; /* Texto negro al hover */
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-      }
-
-      #btn-cerrar-sesion i {
-        font-size: 0.9rem;
-      } 
       /* Asegurar que no se solape con otros elementos */
       header {
         margin-top: 40px !important;
       }
 
-        
-      .btn-cerrar-sesion:hover::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--gold);
-        z-index: -2;
-        transition: all 0.4s;
+      .barberos-container {
+        grid-template-columns: 1fr;
       }
 
-      .btn-cerrar-sesion i {
-        transition: transform 0.3s;
+      .instagram-feed {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      @media (max-width: 768px) {
-        #btn-cerrar-sesion {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          padding: 6px 12px;
-          font-size: 0.7rem;
+      .tabs {
+        overflow-x: auto;
+        white-space: nowrap;
       }
+
+      .tab {
+        padding: 10px 15px;
+      }
+
       header h1 {
         margin-top: 30px !important;
       }
     }
-  }
+
+    @media (max-width: 480px) {
+      .instagram-feed {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="gold-glow"></div>
 
-   
   <!-- ******************** HTML ******************** -->
   
   <div class="container">
@@ -792,52 +1194,349 @@
       </header>
       
       <main>
-        <div class="panel-control">
-          <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="buscador" placeholder="Buscar por nombre...">
+        <!-- Pestañas para navegar entre secciones -->
+        <div class="tabs">
+          <div class="tab active" data-tab="citas">Citas</div>
+          <div class="tab" data-tab="calendario">Calendario</div>
+          <div class="tab" data-tab="turnos">Turnos</div>
+          <div class="tab" data-tab="barberos">Barberos</div>
+          <div class="tab" data-tab="historial">Historial</div>
+          <div class="tab" data-tab="valoraciones">Valoraciones</div>
+          <div class="tab" data-tab="redes">Redes Sociales</div>
+        </div>
+
+        <!-- Contenido de la pestaña Citas -->
+        <div id="citas-tab" class="tab-content active">
+          <div class="panel-control">
+            <div class="search-container">
+              <i class="fas fa-search"></i>
+              <input type="text" id="buscador" placeholder="Buscar por nombre...">
+            </div>
+            
+            <div class="filters">
+              <select id="filtro-estado">
+                <option value="todas">Todas las citas</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="completado">Completadas</option>
+                <option value="cancelado">Canceladas</option>
+              </select>
+              
+              <select id="filtro-barbero">
+                <option value="todos">Todos los barberos</option>
+                <option value="Juan">Juan</option>
+                <option value="Carlos">Carlos</option>
+                <option value="Pedro">Pedro</option>
+              </select>
+              
+              <button id="btn-exportar" class="btn-export">
+                <i class="fas fa-file-export"></i> Exportar
+              </button>
+            </div>
           </div>
           
-          <div class="filters">
-            <select id="filtro-estado">
-              <option value="todas">Todas las citas</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="completado">Completadas</option>
-              <option value="cancelado">Canceladas</option>
-            </select>
-            
-            <select id="filtro-barbero">
-              <option value="todos">Todos los barberos</option>
-              <option value="Juan">Juan</option>
-              <option value="Carlos">Carlos</option>
-              <option value="Pedro">Pedro</option>
-            </select>
-            
-            <button id="btn-exportar" class="btn-export">
-              <i class="fas fa-file-export"></i> Exportar
-            </button>
+          <div id="citasContainer">
+            <div class="loading">
+              <i class="fas fa-spinner"></i>
+              <p>Cargando citas...</p>
+            </div>
+          </div>
+          
+          <div class="stats-container">
+            <div class="stat-card">
+              <h3>Total Citas</h3>
+              <p id="total-citas">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Pendientes</h3>
+              <p id="pendientes-citas">0</p>
+            </div>
+            <div class="stat-card">
+              <h3>Completadas</h3>
+              <p id="completadas-citas">0</p>
+            </div>
           </div>
         </div>
-        
-        <div id="citasContainer">
-          <div class="loading">
-            <i class="fas fa-spinner"></i>
-            <p>Cargando citas...</p>
+
+        <!-- Contenido de la pestaña Calendario -->
+        <div id="calendario-tab" class="tab-content">
+          <div id="calendar"></div>
+        </div>
+
+        <!-- Contenido de la pestaña Turnos -->
+        <div id="turnos-tab" class="tab-content">
+          <h2><i class="fas fa-clock"></i> Sistema de Turnos</h2>
+          <p>Visualiza y gestiona los turnos de los barberos</p>
+          
+          <div class="turnos-container">
+            <div class="turno-card active">
+              <h3>Turno Actual <span class="badge">En curso</span></h3>
+              <p><strong>Barbero:</strong> Juan Pérez</p>
+              <p><strong>Cliente:</strong> Roberto García</p>
+              <p><strong>Hora:</strong> 10:00 - 10:45</p>
+              <p><strong>Servicio:</strong> Corte y barba</p>
+            </div>
+            
+            <div class="turno-card">
+              <h3>Siguiente Turno</h3>
+              <p><strong>Barbero:</strong> Carlos López</p>
+              <p><strong>Cliente:</strong> Miguel Sánchez</p>
+              <p><strong>Hora:</strong> 10:30 - 11:15</p>
+              <p><strong>Servicio:</strong> Corte clásico</p>
+            </div>
+            
+            <div class="turno-card">
+              <h3>Próximos Turnos</h3>
+              <p><strong>Barbero:</strong> Pedro Gómez</p>
+              <p><strong>Cliente:</strong> Luis Martínez</p>
+              <p><strong>Hora:</strong> 11:00 - 11:45</p>
+              <p><strong>Servicio:</strong> Corte moderno</p>
+            </div>
           </div>
         </div>
-        
-        <div class="stats-container">
-          <div class="stat-card">
-            <h3>Total Citas</h3>
-            <p id="total-citas">0</p>
+
+        <!-- Contenido de la pestaña Barberos -->
+        <div id="barberos-tab" class="tab-content">
+          <h2><i class="fas fa-user-tie"></i> Perfiles de Barberos</h2>
+          <p>Gestiona la información de los barberos</p>
+          
+          <div class="barberos-container">
+            <div class="barbero-card">
+              <div class="barbero-header">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Juan Pérez" class="barbero-avatar">
+                <div class="barbero-info">
+                  <h3>Juan Pérez</h3>
+                  <p>Barbero principal</p>
+                </div>
+              </div>
+              
+              <div class="barbero-horarios">
+                <h4><i class="fas fa-calendar-alt"></i> Horario</h4>
+                <div class="horario-item">
+                  <span>Lunes - Viernes</span>
+                  <span>9:00 - 18:00</span>
+                </div>
+                <div class="horario-item">
+                  <span>Sábado</span>
+                  <span>10:00 - 15:00</span>
+                </div>
+                <div class="horario-item">
+                  <span>Domingo</span>
+                  <span>Cerrado</span>
+                </div>
+              </div>
+              
+              <div class="barbero-especialidades">
+                <h4><i class="fas fa-star"></i> Especialidades</h4>
+                <span class="especialidad-tag">Corte clásico</span>
+                <span class="especialidad-tag">Barba</span>
+                <span class="especialidad-tag">Tinte</span>
+              </div>
+            </div>
+            
+            <div class="barbero-card">
+              <div class="barbero-header">
+                <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Carlos López" class="barbero-avatar">
+                <div class="barbero-info">
+                  <h3>Carlos López</h3>
+                  <p>Especialista en estilos modernos</p>
+                </div>
+              </div>
+              
+              <div class="barbero-horarios">
+                <h4><i class="fas fa-calendar-alt"></i> Horario</h4>
+                <div class="horario-item">
+                  <span>Martes - Sábado</span>
+                  <span>11:00 - 20:00</span>
+                </div>
+                <div class="horario-item">
+                  <span>Domingo - Lunes</span>
+                  <span>Cerrado</span>
+                </div>
+              </div>
+              
+              <div class="barbero-especialidades">
+                <h4><i class="fas fa-star"></i> Especialidades</h4>
+                <span class="especialidad-tag">Corte moderno</span>
+                <span class="especialidad-tag">Diseños</span>
+                <span class="especialidad-tag">Fade</span>
+              </div>
+            </div>
+            
+            <div class="barbero-card">
+              <div class="barbero-header">
+                <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Pedro Gómez" class="barbero-avatar">
+                <div class="barbero-info">
+                  <h3>Pedro Gómez</h3>
+                  <p>Experto en barbas</p>
+                </div>
+              </div>
+              
+              <div class="barbero-horarios">
+                <h4><i class="fas fa-calendar-alt"></i> Horario</h4>
+                <div class="horario-item">
+                  <span>Lunes - Viernes</span>
+                  <span>10:00 - 19:00</span>
+                </div>
+                <div class="horario-item">
+                  <span>Sábado</span>
+                  <span>9:00 - 14:00</span>
+                </div>
+                <div class="horario-item">
+                  <span>Domingo</span>
+                  <span>Cerrado</span>
+                </div>
+              </div>
+              
+              <div class="barbero-especialidades">
+                <h4><i class="fas fa-star"></i> Especialidades</h4>
+                <span class="especialidad-tag">Arreglo de barba</span>
+                <span class="especialidad-tag">Afeitado clásico</span>
+                <span class="especialidad-tag">Tratamientos</span>
+              </div>
+            </div>
           </div>
-          <div class="stat-card">
-            <h3>Pendientes</h3>
-            <p id="pendientes-citas">0</p>
+        </div>
+
+        <!-- Contenido de la pestaña Historial -->
+        <div id="historial-tab" class="tab-content">
+          <h2><i class="fas fa-history"></i> Historial de Clientes</h2>
+          <p>Registro de servicios realizados a cada cliente</p>
+          
+          <div class="historial-container">
+            <div class="historial-cliente">
+              <div class="historial-header">
+                <h3>Roberto García</h3>
+                <p>Cliente desde: 15/03/2023</p>
+              </div>
+              
+              <div class="historial-item">
+                <span class="historial-servicio">Corte clásico + Barba</span>
+                <span class="historial-fecha">10/05/2024</span>
+              </div>
+              
+              <div class="historial-item">
+                <span class="historial-servicio">Corte moderno</span>
+                <span class="historial-fecha">24/04/2024</span>
+              </div>
+              
+              <div class="historial-item">
+                <span class="historial-servicio">Afeitado clásico</span>
+                <span class="historial-fecha">05/04/2024</span>
+              </div>
+            </div>
+            
+            <div class="historial-cliente">
+              <div class="historial-header">
+                <h3>Miguel Sánchez</h3>
+                <p>Cliente desde: 22/01/2024</p>
+              </div>
+              
+              <div class="historial-item">
+                <span class="historial-servicio">Corte fade + Diseño</span>
+                <span class="historial-fecha">12/05/2024</span>
+              </div>
+              
+              <div class="historial-item">
+                <span class="historial-servicio">Tinte de cabello</span>
+                <span class="historial-fecha">28/03/2024</span>
+              </div>
+            </div>
           </div>
-          <div class="stat-card">
-            <h3>Completadas</h3>
-            <p id="completadas-citas">0</p>
+        </div>
+
+        <!-- Contenido de la pestaña Valoraciones -->
+        <div id="valoraciones-tab" class="tab-content">
+          <h2><i class="fas fa-star"></i> Valoraciones de Clientes</h2>
+          <p>Opiniones y calificaciones de los servicios</p>
+          
+          <div class="valoracion-container">
+            <div class="valoracion-card">
+              <div class="valoracion-header">
+                <span class="valoracion-cliente">Roberto García</span>
+                <span class="valoracion-estrellas">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </span>
+              </div>
+              <p class="valoracion-comentario">"Excelente servicio, muy profesional y atención personalizada. Volveré sin duda."</p>
+              <p class="valoracion-fecha">15/05/2024 - Corte clásico</p>
+            </div>
+            
+            <div class="valoracion-card">
+              <div class="valoracion-header">
+                <span class="valoracion-cliente">Miguel Sánchez</span>
+                <span class="valoracion-estrellas">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="far fa-star"></i>
+                </span>
+              </div>
+              <p class="valoracion-comentario">"Muy buen corte, aunque la espera fue un poco larga. Recomendado."</p>
+              <p class="valoracion-fecha">12/05/2024 - Corte fade</p>
+            </div>
+            
+            <div class="valoracion-card">
+              <div class="valoracion-header">
+                <span class="valoracion-cliente">Luis Martínez</span>
+                <span class="valoracion-estrellas">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                </span>
+              </div>
+              <p class="valoracion-comentario">"Carlos es un artista con las tijeras. Me encantó el diseño que me hizo."</p>
+              <p class="valoracion-fecha">08/05/2024 - Corte moderno</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido de la pestaña Redes Sociales -->
+        <div id="redes-tab" class="tab-content">
+          <h2><i class="fas fa-share-alt"></i> Integración con Redes Sociales</h2>
+          <p>Conecta con tus clientes a través de las redes</p>
+          
+          <div class="redes-container">
+            <h3><i class="fab fa-instagram"></i> Instagram Feed</h3>
+            <div class="instagram-feed">
+              <div class="instagram-post">
+                <img src="https://source.unsplash.com/random/300x300/?barber" alt="Publicación Instagram">
+                <div class="instagram-overlay">
+                  <p>Nuevos estilos de verano</p>
+                </div>
+              </div>
+              <div class="instagram-post">
+                <img src="https://source.unsplash.com/random/300x300/?haircut" alt="Publicación Instagram">
+                <div class="instagram-overlay">
+                  <p>Trabajo realizado hoy</p>
+                </div>
+              </div>
+              <div class="instagram-post">
+                <img src="https://source.unsplash.com/random/300x300/?beard" alt="Publicación Instagram">
+                <div class="instagram-overlay">
+                  <p>Tratamientos para barba</p>
+                </div>
+              </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem;"><i class="fas fa-share"></i> Compartir en Redes</h3>
+            <div class="compartir-redes">
+              <button class="btn-compartir">
+                <i class="fab fa-facebook-f"></i> Facebook
+              </button>
+              <button class="btn-compartir">
+                <i class="fab fa-instagram"></i> Instagram
+              </button>
+              <button class="btn-compartir">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -871,16 +1570,26 @@
     </div>
   </div>
 
+  <!-- Botón para cambiar tema oscuro/claro -->
+  <div class="theme-switcher" title="Cambiar tema">
+    <i class="fas fa-moon"></i>
+  </div>
+
   <!-- Scripts en el orden CORRECTO -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
   <script src="scripts.js"></script>
 
-   <!-- ******************** JAVASCRIPT ******************** -->
+  <!-- ******************** JAVASCRIPT ******************** -->
   <script>
-      // Variables globales
-      let todasLasCitas = [];
-      let modalAbierto = false;
-      let canalCitas = null;
+    // Variables globales
+    let todasLasCitas = [];
+    let modalAbierto = false;
+    let canalCitas = null;
+    let calendar = null;
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -1013,7 +1722,6 @@
       document.body.appendChild(botonCerrar);
     }
      
-    
     // Cargar citas desde Supabase
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
@@ -1038,6 +1746,7 @@
         todasLasCitas = citas || [];
         mostrarCitas(todasLasCitas);
         actualizarEstadisticas(todasLasCitas);
+        actualizarCalendario(todasLasCitas);
         
       } catch (error) {
         console.error('Error al cargar citas:', error);
@@ -1254,7 +1963,7 @@
       modalAbierto = false;
     }
 	
-	// Filtrar citas
+	  // Filtrar citas
     function filtrarCitas() {
       const textoBusqueda = document.getElementById('buscador')?.value.toLowerCase() || '';
       const filtroEstado = document.getElementById('filtro-estado')?.value || 'todas';
@@ -1338,6 +2047,206 @@
         });
     }
 
+    // Inicializar calendario
+    function inicializarCalendario() {
+      const calendarEl = document.getElementById('calendar');
+      if (!calendarEl) return;
+
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+          today: 'Hoy',
+          month: 'Mes',
+          week: 'Semana',
+          day: 'Día'
+        },
+        events: [],
+        eventClick: function(info) {
+          mostrarDetallesCita(info.event.id);
+        }
+      });
+
+      calendar.render();
+    }
+
+    // Actualizar calendario con las citas
+    function actualizarCalendario(citas) {
+      if (!calendar) return;
+
+      // Limpiar eventos existentes
+      calendar.getEvents().forEach(event => event.remove());
+
+      // Agregar nuevas citas como eventos
+      citas.forEach(cita => {
+        const fechaHora = new Date(cita.fecha);
+        const [horas, minutos] = cita.hora.split(':');
+        fechaHora.setHours(horas, minutos);
+        
+        const fechaHoraFin = new Date(fechaHora);
+        fechaHoraFin.setMinutes(fechaHoraFin.getMinutes() + 30); // Asumimos 30 minutos por cita
+
+        let colorEvento;
+        switch(cita.estado) {
+          case 'completado':
+            colorEvento = '#27ae60';
+            break;
+          case 'cancelado':
+            colorEvento = '#e74c3c';
+            break;
+          default:
+            colorEvento = '#f39c12';
+        }
+
+        calendar.addEvent({
+          id: cita.id,
+          title: `${cita.nombre} - ${cita.servicio}`,
+          start: fechaHora,
+          end: fechaHoraFin,
+          color: colorEvento,
+          extendedProps: {
+            barbero: cita.barbero,
+            telefono: cita.telefono
+          }
+        });
+      });
+    }
+
+    // Manejar cambio de tema oscuro/claro
+    function configurarTema() {
+      const themeSwitcher = document.querySelector('.theme-switcher');
+      if (!themeSwitcher) return;
+
+      // Verificar preferencia del usuario
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.body.classList.remove('light-mode');
+      } else {
+        document.body.classList.add('light-mode');
+      }
+
+      // Alternar tema al hacer clic
+      themeSwitcher.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        
+        // Cambiar icono
+        const icon = themeSwitcher.querySelector('i');
+        if (document.body.classList.contains('light-mode')) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+      });
+    }
+
+    // Configurar pestañas
+    function configurarPestanas() {
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remover clase active de todas las pestañas y contenidos
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Agregar clase active a la pestaña clickeada
+          tab.classList.add('active');
+          
+          // Mostrar el contenido correspondiente
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+      });
+    }
+
+    // Configurar sistema de turnos
+    function configurarTurnos() {
+      // Simular notificación de turno cada 5 minutos (solo para demostración)
+      setInterval(() => {
+        const turnos = document.querySelectorAll('.turno-card');
+        turnos.forEach((turno, index) => {
+          if (index === 0) return; // Saltar el turno actual
+          
+          if (Math.random() > 0.7) { // 30% de probabilidad de notificación
+            turno.classList.add('active');
+            mostrarNotificacion(`Próximo turno: ${turno.querySelector('h3').textContent}`, 'info');
+            
+            setTimeout(() => {
+              turno.classList.remove('active');
+            }, 5000);
+          }
+        });
+      }, 300000); // 5 minutos
+    }
+
+    // Configurar valoraciones
+    function configurarValoraciones() {
+      // Inicializar plugin de estrellas (solo para demostración)
+      $('.valoracion-estrellas').each(function() {
+        const rating = $(this).find('i.fa-star').length;
+        $(this).rateYo({
+          rating: rating,
+          readOnly: true,
+          starWidth: "20px",
+          normalFill: "#ccc",
+          ratedFill: "#D4AF37"
+        });
+      });
+    }
+
+    // Configurar integración con redes sociales
+    function configurarRedesSociales() {
+      // Simular acción de compartir
+      document.querySelectorAll('.btn-compartir').forEach(btn => {
+        btn.addEventListener('click', () => {
+          let redSocial = '';
+          if (btn.querySelector('.fa-facebook-f')) redSocial = 'Facebook';
+          if (btn.querySelector('.fa-instagram')) redSocial = 'Instagram';
+          if (btn.querySelector('.fa-whatsapp')) redSocial = 'WhatsApp';
+          
+          mostrarNotificacion(`Compartiendo en ${redSocial}...`, 'info');
+        });
+      });
+    }
+
+    // Enviar recordatorios automáticos
+    async function enviarRecordatorios() {
+      try {
+        // Obtener citas para el día siguiente
+        const manana = new Date();
+        manana.setDate(manana.getDate() + 1);
+        const fechaManana = manana.toISOString().split('T')[0];
+        
+        const { data: citas, error } = await supabase
+          .from('citas')
+          .select('*')
+          .eq('fecha', fechaManana)
+          .eq('estado', 'pendiente');
+        
+        if (error) throw error;
+        
+        if (citas && citas.length > 0) {
+          // Simular envío de recordatorios
+          citas.forEach(cita => {
+            console.log(`Enviando recordatorio a ${cita.nombre} (${cita.telefono}) para ${cita.fecha} a las ${cita.hora}`);
+          });
+          
+          mostrarNotificacion(`Recordatorios enviados para ${citas.length} citas`, 'success');
+        }
+      } catch (error) {
+        console.error('Error al enviar recordatorios:', error);
+        mostrarNotificacion('Error al enviar recordatorios', 'error');
+      }
+    }
+
     // Inicialización del panel
     async function inicializarPanel() {
       try {
@@ -1349,7 +2258,7 @@
 
         // Mostrar botón de cerrar sesión si ya está autenticado
         if (sessionStorage.getItem('barberoAutenticado') === 'true') {
-           mostrarBotonCerrarSesion();
+          mostrarBotonCerrarSesion();
         }
 
         // Configurar eventos y cargar citas
@@ -1360,6 +2269,29 @@
         
         await cargarCitas();
         conectarWebsockets();
+        inicializarCalendario();
+        configurarTema();
+        configurarPestanas();
+        configurarTurnos();
+        configurarValoraciones();
+        configurarRedesSociales();
+        
+        // Programar recordatorios diarios a las 8 AM
+        const ahora = new Date();
+        const horaRecordatorio = new Date();
+        horaRecordatorio.setHours(8, 0, 0, 0);
+        
+        if (horaRecordatorio > ahora) {
+          setTimeout(() => {
+            enviarRecordatorios();
+            setInterval(enviarRecordatorios, 24 * 60 * 60 * 1000); // Diario
+          }, horaRecordatorio - ahora);
+        } else {
+          setTimeout(() => {
+            enviarRecordatorios();
+            setInterval(enviarRecordatorios, 24 * 60 * 60 * 1000); // Diario
+          }, (24 * 60 * 60 * 1000) - (ahora - horaRecordatorio));
+        }
         
       } catch (error) {
         console.error('Error en inicialización:', error);
