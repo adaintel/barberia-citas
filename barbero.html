@@ -625,15 +625,6 @@
     // Verificación de seguridad para barberos
     async function verificarAccesoBarbero() {
       const password = localStorage.getItem('barberoPassword');
-
-      if (sessionStorage.getItem('barberoAuthenticated') === 'true') {
-        return true;
-      }
-
-      // Si no está autenticado, redirigir a la página de autenticación
-      window.location.href = 'auth-barbero.html';
-      return false;
-    }
       
       if (password === 'BarberoElite2025') {
         return true;
