@@ -23,15 +23,14 @@
     }
     
     body {
-      background-color: var(--darker);
-      color: var(--light);
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: relative;
     }
     
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
+      position: relative;
+      z-index: 1;
     }
     
     .glass-panel {
@@ -521,25 +520,25 @@
 
       /* Estilo Premium para el botón de cerrar sesión */
       .btn-cerrar-sesion {
-        position: absolute;
-        top: 25px;
-        right: 25px;
-        background: transparent;
-        color: var(--gold);
-        border: 2px solid var(--gold);
-        padding: 8px 20px;
-        border-radius: 50px;
+      #btn-cerrar-sesion {
+        position: fixed; /* Cambiado a fixed para mejor posicionamiento */
+        top: 20px;
+        right: 20px;
+        background: rgba(18, 18, 18, 0.9);
+        color: #D4AF37;
+        border: 1px solid #D4AF37;
+        padding: 8px 15px;
+        border-radius: 4px;
         cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        font-size: 0.85rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        z-index: 1000;
         display: flex;
         align-items: center;
-        gap: 8px;
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0);
-        overflow: hidden;
-        z-index: 1;
+        gap: 5px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);  
       }
 
       .btn-cerrar-sesion::before {
@@ -555,15 +554,21 @@
       } 
 
       .btn-cerrar-sesion:hover {
-        color: var(--dark);
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        background: #D4AF37;
+        color: #121212;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
       }
 
-      .btn-cerrar-sesion:hover::before {
-        left: 100%;
+      #btn-cerrar-sesion i {
+        font-size: 0.9rem;
+      } 
+      /* Asegurar que no se solape con otros elementos */
+      header {
+        margin-top: 40px !important;
       }
 
+        
       .btn-cerrar-sesion:hover::after {
         content: '';
         position: absolute;
@@ -580,19 +585,19 @@
         transition: transform 0.3s;
       }
 
-      .btn-cerrar-sesion:hover i {
-        transform: translateX(3px);
-      }
-
       @media (max-width: 768px) {
-        .btn-cerrar-sesion {
-          position: static;
-          margin: 15px auto 0;
-          display: inline-flex;
-          padding: 8px 15px;
-     }
-   }
- }
+        #btn-cerrar-sesion {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          padding: 6px 12px;
+          font-size: 0.7rem;
+      }
+      header h1 {
+        margin-top: 30px !important;
+      }
+    }
+  }
   </style>
 </head>
 <body>
@@ -740,37 +745,37 @@
 
     // Función para mostrar botón de cerrar sesión
     function mostrarBotonCerrarSesion() {
-      const header = document.querySelector('header');
-      if (!header) return;
-  
-      // Eliminar botón existente si hay uno
+      // Eliminar botón existente si existe
       const botonExistente = document.getElementById('btn-cerrar-sesion');
       if (botonExistente) botonExistente.remove();
   
-      
-      // Crear botón premium
+      // Crear nuevo botón
       const botonCerrar = document.createElement('button');
       botonCerrar.id = 'btn-cerrar-sesion';
       botonCerrar.innerHTML = `
-        <span>Salir del panel</span>
         <i class="fas fa-sign-out-alt"></i>
-     `;
-      botonCerrar.className = 'btn-cerrar-sesion';
+        <span>Salir del panel</span>
+      `;
+  
+      // Estilos en línea como respaldo
+      botonCerrar.style.position = 'fixed';
+      botonCerrar.style.top = '20px';
+      botonCerrar.style.right = '20px';
+      botonCerrar.style.background = 'rgba(18, 18, 18, 0.9)';
+      botonCerrar.style.color = '#D4AF37';
+      botonCerrar.style.border = '1px solid #D4AF37';
+      botonCerrar.style.padding = '8px 15px';
+      botonCerrar.style.borderRadius = '4px';
+      botonCerrar.style.zIndex = '1000';
   
       botonCerrar.addEventListener('click', () => {
-        // Agregar animación de salida
-        botonCerrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        botonCerrar.style.pointerEvents = 'none';
-    
-        setTimeout(() => {
-          sessionStorage.removeItem('barberoAutenticado');
-          window.location.reload();
-        }, 800);
+        sessionStorage.removeItem('barberoAutenticado');
+        window.location.reload();
       });
   
-  header.appendChild(botonCerrar);
-}
-      
+      document.body.appendChild(botonCerrar);
+    }
+    
     // Cargar citas desde Supabase
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
