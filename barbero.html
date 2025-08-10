@@ -291,6 +291,16 @@
       background: var(--gold);
       color: var(--dark);
     }
+
+	.btn-eliminar {
+      color: #ff3333;
+      border: 1px solid #ff3333;
+    }
+
+    .btn-eliminar:hover {
+      background: #ff3333;
+      color: white;
+    }
     
     .stats-container {
       display: grid;
@@ -940,6 +950,20 @@
                 <i class="fas fa-eye"></i>
               </button>
             </td>
+			 <td class="acciones">
+              <button class="btn-accion btn-completar" data-id="${cita.id}" title="Completar">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn-accion btn-cancelar" data-id="${cita.id}" title="Cancelar">
+                <i class="fas fa-times"></i>
+              </button>
+              <button class="btn-accion btn-detalles" data-id="${cita.id}" title="Detalles">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-accion btn-eliminar" data-id="${cita.id}" title="Eliminar">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
           </tr>
         `;
       });
@@ -962,6 +986,11 @@
       document.querySelectorAll('.btn-detalles').forEach(btn => {
         btn.addEventListener('click', () => mostrarDetallesCita(btn.dataset.id));
       });
+
+      document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', () => eliminarCita(btn.dataset.id));
+      });
+		
     }
 
     // Cambiar estado de una cita
@@ -982,6 +1011,31 @@
         mostrarNotificacion('Error al actualizar el estado de la cita', 'error');
       }
     }
+
+
+    // Función para eliminar una cita
+    async function eliminarCita(id) {
+      // Confirmación antes de eliminar
+      const confirmar = confirm('¿Estás seguro de que deseas eliminar esta cita? Esta acción no se puede deshacer.');
+      if (!confirmar) return;
+
+      try {
+        const { error } = await supabase
+          .from('citas')
+          .delete()
+          .eq('id', id);
+    
+        if (error) throw error;
+    
+        mostrarNotificacion('Cita eliminada correctamente', 'success');
+        await cargarCitas();
+     
+      } catch (error) {
+        console.error('Error al eliminar cita:', error);
+        mostrarNotificacion('Error al eliminar la cita', 'error');
+      }
+    }
+	  
 
     // Mostrar detalles de cita en modal
     async function mostrarDetallesCita(id) {
@@ -1010,7 +1064,8 @@
         modalBody.innerHTML = `
           <div class="detalle-item">
             <h3>Cliente:</h3>
-            <p>${cita.nombre}</p>
+            <p style="color: #ff4d4d; font-weight: 600; text-shadow: 0 0 3px rgba(255, 77, 77, 0.3);">
+		${cita.nombre}</p>	
           </div>
           <div class="detalle-item">
             <h3>Teléfono:</h3>
@@ -1036,16 +1091,29 @@
             <h3>Estado:</h3>
             <p class="estado-cita" data-estado="${cita.estado}">${cita.estado}</p>
           </div>
+          <div class="detalle-item">
+            <button class="btn-eliminar" data-id="${cita.id}" style="margin-top: 10px; padding: 8px 15px; background: #ff3333; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        x; background: #ff3333; color: white; border: none; border-radius: 5px; cursor: pointer;">
+              <i class="fas fa-trash"></i> Eliminar cita
+            </button>
+          </div>
           <button class="btn-cerrar-detalles" style="margin-top: 20px; padding: 10px; background: var(--gold); color: var(--dark); border: none; border-radius: 5px; cursor: pointer;">
             Cerrar detalles
           </button>
         `;
+
         
         modal.style.display = 'flex';
         
         // Configurar cierre del modal
         document.querySelector('.btn-cerrar-detalles').addEventListener('click', cerrarModal);
         document.querySelector('.close-modal').addEventListener('click', cerrarModal);
+
+		// Agregar evento al botón de eliminar dentro del modal
+        document.querySelector('.btn-eliminar')?.addEventListener('click', function() {
+          eliminarCita(this.dataset.id);
+          cerrarModal();
+        });
         
       } catch (error) {
         console.error('Error al cargar detalles:', error);
