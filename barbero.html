@@ -56,6 +56,12 @@
       backdrop-filter: blur(5px);
       position: relative;
       overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .glass-panel:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
     }
     
     .glass-panel::before {
@@ -136,6 +142,7 @@
       background-color: rgba(0, 0, 0, 0.3);
       color: white;
       border: 1px solid rgba(212, 175, 55, 0.3);
+      transition: all 0.3s ease;
     }
     
     #buscador:focus {
@@ -158,6 +165,12 @@
       color: white;
       border: 1px solid rgba(212, 175, 55, 0.3);
       min-width: 150px;
+      transition: all 0.3s ease;
+    }
+    
+    select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
     
     .btn-export {
@@ -177,6 +190,7 @@
     .btn-export:hover {
       background: #c9a227;
       transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
     }
     
     .table-responsive {
@@ -190,6 +204,7 @@
       background-color: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
       overflow: hidden;
+      transition: all 0.3s ease;
     }
     
     .tabla-citas th {
@@ -203,9 +218,10 @@
       color: #ff4d4d !important;
       font-weight: 500;
       text-shadow: 0 0 2px rgba(255, 77, 77, 0.2);
+      transition: all 0.2s ease;
     }
 
-	/* Nuevos estilos para nombres de clientes - Agregar después de .tabla-citas td */
+    /* Nuevos estilos para nombres de clientes - Agregar después de .tabla-citas td */
     .tabla-citas td:first-child {
       color: #ff4d4d;
       font-weight: 600;
@@ -216,7 +232,6 @@
       color: #ff3333 !important;
       text-shadow: 0 0 4px rgba(255, 77, 77, 0.4);
     }
-
     
     .tabla-citas tr:last-child td {
       border-bottom: none;
@@ -224,6 +239,10 @@
     
     .tabla-citas tr:hover {
       background-color: rgba(212, 175, 55, 0.05);
+    }
+    
+    .tabla-citas tr:hover td {
+      transform: translateX(5px);
     }
     
     .estado-cita {
@@ -270,6 +289,7 @@
     .btn-completar:hover {
       background: #27ae60;
       color: white;
+      transform: scale(1.1);
     }
     
     .btn-cancelar {
@@ -280,6 +300,7 @@
     .btn-cancelar:hover {
       background: #e74c3c;
       color: white;
+      transform: scale(1.1);
     }
     
     .btn-detalles {
@@ -290,6 +311,7 @@
     .btn-detalles:hover {
       background: var(--gold);
       color: var(--dark);
+      transform: scale(1.1);
     }
     
     .btn-eliminar {
@@ -300,6 +322,7 @@
     .btn-eliminar:hover {
       background: #ff4d4d;
       color: white;
+      transform: scale(1.1);
     }
     
     .stats-container {
@@ -315,12 +338,15 @@
       border-radius: 10px;
       padding: 1.5rem;
       text-align: center;
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
     }
     
     .stat-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) scale(1.02);
       border-color: var(--gold);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.4);
     }
     
     .stat-card h3 {
@@ -421,6 +447,11 @@
       font-size: 1.5rem;
       color: var(--gold);
       cursor: pointer;
+      transition: transform 0.3s;
+    }
+    
+    .close-modal:hover {
+      transform: rotate(90deg);
     }
     
     .modal-content h2 {
@@ -466,6 +497,7 @@
       max-width: 400px;
       width: 90%;
       text-align: center;
+      animation: modalFadeIn 0.3s;
     }
     
     .contenido-verificacion h2 {
@@ -481,6 +513,13 @@
       border: 1px solid var(--gold);
       background-color: rgba(255, 255, 255, 0.1);
       color: white;
+      transition: all 0.3s;
+    }
+    
+    .contenido-verificacion input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
     
     .btn-verificar {
@@ -497,6 +536,11 @@
     
     .btn-verificar:hover {
       background-color: #c9a227;
+      transform: translateY(-2px);
+    }
+    
+    .btn-verificar:active {
+      transform: translateY(0);
     }
     
     .mensaje-error-verificacion {
@@ -527,6 +571,7 @@
     
     .btn-volver:hover {
       background: rgba(212, 175, 55, 0.2);
+      transform: translateY(-2px);
     }
     
     .gold-glow {
@@ -538,6 +583,79 @@
       background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
       transform: translate(-50%, -50%);
       z-index: -1;
+    }
+    
+    /* Notificaciones */
+    .notificacion {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transform: translateX(150%);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    
+    .notificacion.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .notificacion.hide {
+      transform: translateX(150%);
+      opacity: 0;
+    }
+    
+    .notificacion-info {
+      background: rgba(41, 128, 185, 0.9);
+      border-left: 4px solid #2980b9;
+    }
+    
+    .notificacion-success {
+      background: rgba(39, 174, 96, 0.9);
+      border-left: 4px solid #27ae60;
+    }
+    
+    .notificacion-warning {
+      background: rgba(241, 196, 15, 0.9);
+      border-left: 4px solid #f1c40f;
+    }
+    
+    .notificacion-error {
+      background: rgba(231, 76, 60, 0.9);
+      border-left: 4px solid #e74c3c;
+    }
+    
+    .notificacion i {
+      font-size: 1.2rem;
+    }
+    
+    /* Animación de carga para verificación */
+    .verificando {
+      position: relative;
+      pointer-events: none;
+    }
+    
+    .verificando::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin-top: -10px;
+      margin-left: -10px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-top-color: var(--dark);
+      animation: spin 0.8s linear infinite;
     }
     
     @media (max-width: 768px) {
@@ -768,12 +886,27 @@
     function mostrarNotificacion(mensaje, tipo = 'info') {
       const notificacion = document.createElement('div');
       notificacion.className = `notificacion notificacion-${tipo}`;
-      notificacion.innerHTML = `<p>${mensaje}</p>`;
+      notificacion.innerHTML = `
+        <i class="fas fa-${tipo === 'info' ? 'info-circle' : 
+                          tipo === 'success' ? 'check-circle' : 
+                          tipo === 'warning' ? 'exclamation-triangle' : 
+                          'times-circle'}"></i>
+        <p>${mensaje}</p>
+      `;
       document.body.appendChild(notificacion);
       
+      // Mostrar notificación
       setTimeout(() => {
-        notificacion.classList.add('fade-out');
-        setTimeout(() => notificacion.remove(), 500);
+        notificacion.classList.add('show');
+      }, 10);
+      
+      // Ocultar después de 3 segundos
+      setTimeout(() => {
+        notificacion.classList.remove('show');
+        notificacion.classList.add('hide');
+        
+        // Eliminar después de la animación
+        setTimeout(() => notificacion.remove(), 300);
       }, 3000);
     }
 
@@ -787,26 +920,46 @@
         return true;
       }
       
-
       // Mostrar modal de verificación
       const modal = document.getElementById('modal-verificacion');
       modal.style.display = 'flex';
       
       return new Promise((resolve) => {
-        document.getElementById('btn-verificar').onclick = () => {
+        const verificar = () => {
           const inputPassword = document.getElementById('input-password').value;
-          if (inputPassword === CONTRASENA) {
-            sessionStorage.setItem('barberoAutenticado', 'true');
-            modal.style.display = 'none';
-            resolve(true);
-          } else {
-            document.getElementById('mensaje-error-verificacion').style.display = 'block';
-            resolve(false);
-          }
+          if (!inputPassword) return;
+          
+          // Mostrar estado de carga
+          const btnVerificar = document.getElementById('btn-verificar');
+          btnVerificar.classList.add('verificando');
+          btnVerificar.disabled = true;
+          
+          // Simular verificación con retraso (para mejor UX)
+          setTimeout(() => {
+            if (inputPassword === CONTRASENA) {
+              sessionStorage.setItem('barberoAutenticado', 'true');
+              modal.style.display = 'none';
+              mostrarNotificacion('Acceso concedido', 'success');
+              resolve(true);
+            } else {
+              document.getElementById('mensaje-error-verificacion').style.display = 'block';
+              mostrarNotificacion('Contraseña incorrecta', 'error');
+              btnVerificar.classList.remove('verificando');
+              btnVerificar.disabled = false;
+              resolve(false);
+            }
+          }, 800);
         };
-     });
+        
+        // Configurar eventos
+        document.getElementById('btn-verificar').onclick = verificar;
+        document.getElementById('input-password').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            verificar();
+          }
+        });
+      });
     }
-
 
     // Función para mostrar botón de cerrar sesión
     function mostrarBotonCerrarSesion() {
@@ -853,7 +1006,8 @@
   
       botonCerrar.addEventListener('click', () => {
         sessionStorage.removeItem('barberoAutenticado');
-        window.location.reload();
+        mostrarNotificacion('Sesión cerrada correctamente', 'success');
+        setTimeout(() => window.location.reload(), 1000);
       });
   
       document.body.appendChild(botonCerrar);
