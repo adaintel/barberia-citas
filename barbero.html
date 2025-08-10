@@ -624,21 +624,24 @@
 
     // Verificación de seguridad para barberos
     async function verificarAccesoBarbero() {
-      const password = localStorage.getItem('barberoPassword');
-      
-      if (password === 'BarberoElite2025') {
+      // Contraseña simple (puedes cambiarla)
+      const CONTRASENA = "barbero123";
+      // Verificar si ya está autenticado
+      const yaAutenticado = sessionStorage.getItem('barberoAutenticado');
+      if (yaAutenticado === 'true') {
         return true;
       }
+      
 
       // Mostrar modal de verificación
       const modal = document.getElementById('modal-verificacion');
       modal.style.display = 'flex';
       
       return new Promise((resolve) => {
-        document.getElementById('btn-verificar').onclick = async () => {
+        document.getElementById('btn-verificar').onclick = () => {
           const inputPassword = document.getElementById('input-password').value;
-          if (inputPassword === 'BarberoElite2025') {
-            localStorage.setItem('barberoPassword', 'BarberoElite2025');
+          if (inputPassword === CONTRASENA) {
+            sessionStorage.setItem('barberoAutenticado', 'true');
             modal.style.display = 'none';
             resolve(true);
           } else {
@@ -647,7 +650,8 @@
           }
         };
      });
-   }
+    }
+
 
     // Cargar citas desde Supabase
     async function cargarCitas() {
