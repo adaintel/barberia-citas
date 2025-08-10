@@ -658,14 +658,22 @@
       const header = document.querySelector('header');
       if (!header) return;
   
+      // Eliminar botón existente si hay uno
+      const botonExistente = document.getElementById('btn-cerrar-sesion');
+      if (botonExistente) botonExistente.remove();
+  
+      // Crear nuevo botón con mejor estilo
       const botonCerrar = document.createElement('button');
       botonCerrar.id = 'btn-cerrar-sesion';
-      botonCerrar.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar sesión';
+      botonCerrar.innerHTML = `
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Cerrar sesión</span>
+      `;
       botonCerrar.className = 'btn-cerrar-sesion';
-  
+      
       botonCerrar.addEventListener('click', () => {
         sessionStorage.removeItem('barberoAutenticado');
-        window.location.reload(); // Recarga para pedir contraseña nuevamente
+        window.location.reload();
       });
   
   header.appendChild(botonCerrar);
