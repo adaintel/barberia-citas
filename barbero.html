@@ -653,6 +653,24 @@
     }
 
 
+    // Función para mostrar botón de cerrar sesión
+    function mostrarBotonCerrarSesion() {
+      const header = document.querySelector('header');
+      if (!header) return;
+  
+      const botonCerrar = document.createElement('button');
+      botonCerrar.id = 'btn-cerrar-sesion';
+      botonCerrar.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar sesión';
+      botonCerrar.className = 'btn-cerrar-sesion';
+  
+      botonCerrar.addEventListener('click', () => {
+        sessionStorage.removeItem('barberoAutenticado');
+        window.location.reload(); // Recarga para pedir contraseña nuevamente
+      });
+  
+  header.appendChild(botonCerrar);
+}
+      
     // Cargar citas desde Supabase
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
