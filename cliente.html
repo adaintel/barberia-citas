@@ -214,6 +214,58 @@
       z-index: -1;
     }
 
+    /* Estilos para el formulario de confirmación */
+    .confirmacion-container {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .confirmacion-container h2 {
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    
+    .confirmacion-container p {
+      margin-bottom: 1.5rem;
+      color: var(--light);
+    }
+    
+    .confirmacion-botones {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 1.5rem;
+    }
+    
+    .btn-confirmar {
+      background: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-confirmar:hover {
+      background: #219955;
+    }
+    
+    .btn-rechazar {
+      background: #e74c3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-rechazar:hover {
+      background: #c0392b;
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -221,6 +273,10 @@
       
       .container {
         padding: 1rem;
+      }
+      
+      .confirmacion-botones {
+        flex-direction: column;
       }
     }
   </style>
@@ -230,72 +286,97 @@
   
   <div class="container">
     <div class="glass-panel">
-      <header>
-        <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
-        <p>Barbería Elite - Reserva tu experiencia premium</p>
-      </header>
-      
-      <main>
-        <form id="citaForm">
-          <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" id="nombre" placeholder="Nombre completo" required>
-          </div>
-          
-          <div class="input-group">
-            <i class="fas fa-phone"></i>
-            <input type="tel" id="telefono" placeholder="Teléfono" required>
-          </div>
-          
-          <div class="form-row">
-            <!-- Selector de Fecha -->
+      <!-- Formulario principal de cita -->
+      <div id="formularioPrincipal">
+        <header>
+          <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
+          <p>Barbería Elite - Reserva tu experiencia premium</p>
+        </header>
+        
+        <main>
+          <form id="citaForm">
             <div class="input-group">
-              <i class="fas fa-calendar-alt"></i>
-              <input type="date" id="fecha" required>
+              <i class="fas fa-user"></i>
+              <input type="text" id="nombre" placeholder="Nombre completo" required>
             </div>
-
-            <!-- Selector de Hora -->
+            
             <div class="input-group">
-              <i class="fas fa-clock"></i>
-              <input type="time" id="hora" min="08:00" max="21:00" required>
+              <i class="fas fa-phone"></i>
+              <input type="tel" id="telefono" placeholder="Teléfono" required>
             </div>
+            
+            <div class="form-row">
+              <!-- Selector de Fecha -->
+              <div class="input-group">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="fecha" required>
+              </div>
 
-            <!-- Selector de Servicio -->
+              <!-- Selector de Hora -->
+              <div class="input-group">
+                <i class="fas fa-clock"></i>
+                <input type="time" id="hora" min="08:00" max="21:00" required>
+              </div>
+
+              <!-- Selector de Servicio -->
+              <div class="input-group">
+                <i class="fas fa-cut"></i>
+                <select id="servicio" required>
+                  <option value="" disabled selected>Servicio</option>
+                  <option value="Corte de cabello">Corte ($20)</option>
+                  <option value="Arreglo de barba">Barba ($15)</option>
+                  <option value="Corte y barba">Combo ($30)</option>
+                  <option value="Tinte">Tinte ($25)</option>
+                  <option value="Servicio VIP">VIP ($50)</option>
+                </select>
+              </div>
+            </div>
+            
             <div class="input-group">
-              <i class="fas fa-cut"></i>
-              <select id="servicio" required>
-                <option value="" disabled selected>Servicio</option>
-                <option value="Corte de cabello">Corte ($20)</option>
-                <option value="Arreglo de barba">Barba ($15)</option>
-                <option value="Corte y barba">Combo ($30)</option>
-                <option value="Tinte">Tinte ($25)</option>
-                <option value="Servicio VIP">VIP ($50)</option>
+              <i class="fas fa-user-tie"></i>
+              <select id="barbero" required>
+                <option value="" disabled selected>Seleccione su barbero</option>
+                <option value="Juan">Juan (Cortes clásicos)</option>
+                <option value="Carlos">Carlos (Experto en barbas)</option>
+                <option value="Pedro">Pedro (Estilista moderno)</option>
               </select>
             </div>
-          </div>
+            
+            <button type="submit">
+              <i class="fas fa-calendar-check"></i> Confirmar Cita
+            </button>
+          </form>
           
-          <div class="input-group">
-            <i class="fas fa-user-tie"></i>
-            <select id="barbero" required>
-              <option value="" disabled selected>Seleccione su barbero</option>
-              <option value="Juan">Juan (Cortes clásicos)</option>
-              <option value="Carlos">Carlos (Experto en barbas)</option>
-              <option value="Pedro">Pedro (Estilista moderno)</option>
-            </select>
-          </div>
+          <div id="mensaje"></div>
           
-          <button type="submit">
-            <i class="fas fa-calendar-check"></i> Confirmar Cita
-          </button>
-        </form>
+          <div class="info-horario">
+            <i class="fas fa-info-circle"></i>
+            <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
+          </div>
+        </main>
+      </div>
+      
+      <!-- Formulario de confirmación -->
+      <div id="confirmacionContainer" class="confirmacion-container">
+        <header>
+          <h1><i class="fas fa-question-circle"></i> Confirmar Asistencia</h1>
+          <p>Barbería Elite - Confirma tu cita</p>
+        </header>
         
-        <div id="mensaje"></div>
-        
-        <div class="info-horario">
-          <i class="fas fa-info-circle"></i>
-          <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
+        <div id="confirmacionInfo">
+          <h2>¿Confirmas tu asistencia para la cita a las <span id="horaCita"></span>?</h2>
+          <p>Por favor confirma o cancela tu asistencia para que podamos gestionar mejor nuestros horarios.</p>
         </div>
-      </main>
+        
+        <div class="confirmacion-botones">
+          <button id="btnConfirmar" class="btn-confirmar">
+            <i class="fas fa-check"></i> Sí, asistiré
+          </button>
+          <button id="btnRechazar" class="btn-rechazar">
+            <i class="fas fa-times"></i> No podré asistir
+          </button>
+        </div>
+      </div>
     </div>
     
     <footer>
@@ -306,6 +387,169 @@
     </footer>
   </div>
 
-  <script src="scripts.js"></script>
+  <script>
+    // Variables globales
+    let telefonoCliente = null;
+    let horaCita = null;
+    let citaId = null;
+
+    // Función para mostrar mensaje
+    function mostrarMensaje(mensaje, tipo = 'info') {
+      const contenedor = document.getElementById('mensaje');
+      if (!contenedor) return;
+      
+      contenedor.textContent = mensaje;
+      contenedor.className = tipo === 'error' ? 'mensaje-error' : 'mensaje-exito';
+      contenedor.style.display = 'block';
+      
+      // Ocultar después de 5 segundos
+      setTimeout(() => {
+        contenedor.style.display = 'none';
+      }, 5000);
+    }
+
+    // Función para verificar parámetros URL
+    function verificarParametrosURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      telefonoCliente = urlParams.get('telefono');
+      horaCita = urlParams.get('hora');
+      
+      if (telefonoCliente && horaCita) {
+        // Mostrar formulario de confirmación
+        document.getElementById('formularioPrincipal').style.display = 'none';
+        document.getElementById('confirmacionContainer').style.display = 'block';
+        document.getElementById('horaCita').textContent = horaCita;
+        
+        // Buscar la cita correspondiente
+        buscarCitaParaConfirmar(telefonoCliente, horaCita);
+      }
+    }
+
+    // Buscar cita para confirmar
+    async function buscarCitaParaConfirmar(telefono, hora) {
+      try {
+        const { data: citas, error } = await supabase
+          .from('citas')
+          .select('*')
+          .eq('telefono', telefono)
+          .eq('hora', hora + ':00') // Añadimos segundos para coincidir con el formato de la base de datos
+          .eq('estado', 'pendiente')
+          .limit(1);
+        
+        if (error) throw error;
+        
+        if (citas.length > 0) {
+          citaId = citas[0].id;
+        } else {
+          mostrarMensaje('No se encontró la cita especificada', 'error');
+          document.getElementById('confirmacionContainer').innerHTML = `
+            <div class="mensaje-error">
+              <p>No se encontró la cita especificada</p>
+              <a href="cliente.html" class="btn-volver">
+                <i class="fas fa-arrow-left"></i> Volver al formulario
+              </a>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error al buscar cita:', error);
+        mostrarMensaje('Error al buscar la cita', 'error');
+      }
+    }
+
+    // Actualizar estado de la cita
+    async function actualizarEstadoCita(id, estado) {
+      try {
+        const { error } = await supabase
+          .from('citas')
+          .update({ estado: estado })
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        mostrarMensaje(`Cita ${estado === 'completado' ? 'confirmada' : 'cancelada'} correctamente`);
+        
+        // Mostrar mensaje final
+        document.getElementById('confirmacionContainer').innerHTML = `
+          <div class="mensaje-exito">
+            <p>¡Gracias por tu respuesta! Tu cita ha sido ${estado === 'completado' ? 'confirmada' : 'cancelada'}.</p>
+            <a href="cliente.html" class="btn-volver">
+              <i class="fas fa-arrow-left"></i> Volver al inicio
+            </a>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error al actualizar cita:', error);
+        mostrarMensaje('Error al actualizar el estado de la cita', 'error');
+      }
+    }
+
+    // Registrar nueva cita
+    async function registrarCita() {
+      const nombre = document.getElementById('nombre').value;
+      const telefono = document.getElementById('telefono').value;
+      const fecha = document.getElementById('fecha').value;
+      const hora = document.getElementById('hora').value;
+      const servicio = document.getElementById('servicio').value;
+      const barbero = document.getElementById('barbero').value;
+      
+      if (!nombre || !telefono || !fecha || !hora || !servicio || !barbero) {
+        mostrarMensaje('Por favor complete todos los campos', 'error');
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabase
+          .from('citas')
+          .insert([
+            { 
+              nombre: nombre,
+              telefono: telefono,
+              fecha: fecha,
+              hora: hora + ':00',
+              servicio: servicio,
+              barbero: barbero,
+              estado: 'pendiente'
+            }
+          ]);
+        
+        if (error) throw error;
+        
+        mostrarMensaje('¡Cita agendada con éxito! Te esperamos.', 'success');
+        document.getElementById('citaForm').reset();
+      } catch (error) {
+        console.error('Error al registrar cita:', error);
+        mostrarMensaje('Error al agendar la cita', 'error');
+      }
+    }
+
+    // Eventos del formulario
+    document.getElementById('citaForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      registrarCita();
+    });
+
+    // Eventos de confirmación
+    document.getElementById('btnConfirmar')?.addEventListener('click', () => {
+      if (citaId) {
+        actualizarEstadoCita(citaId, 'completado');
+      }
+    });
+
+    document.getElementById('btnRechazar')?.addEventListener('click', () => {
+      if (citaId) {
+        actualizarEstadoCita(citaId, 'cancelado');
+      }
+    });
+
+    // Configurar fecha mínima (hoy)
+    document.addEventListener('DOMContentLoaded', () => {
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('fecha').min = hoy;
+      
+      // Verificar parámetros de URL
+      verificarParametrosURL();
+    });
+  </script>
 </body>
 </html>
