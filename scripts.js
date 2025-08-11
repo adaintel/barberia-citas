@@ -2,10 +2,6 @@
 const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 
-// Configuración del Bot de Telegram
-const TELEGRAM_BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag"; // Reemplaza con tu token de BotFather
-const TELEGRAM_CHAT_ID = "8330674980"; // Reemplaza con el chat_id de Antonio
-
 // Inicializar Supabase
 const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
 
@@ -111,47 +107,7 @@ function inicializarSelectores() {
   });
 }
 
-// 5. Función para enviar notificación por Telegram
-async function enviarNotificacionTelegram(citaData) {
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.warn('Configuración de Telegram incompleta. Notificación no enviada.');
-    return;
-  }
-
-  const mensaje = `📌 *Nueva Cita Agendada*
-  
-🔹 *Cliente:* ${citaData.nombre}
-📞 *Teléfono:* ${citaData.telefono}
-📅 *Fecha:* ${new Date(citaData.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-⏰ *Hora:* ${citaData.hora.substring(0, 5)}
-✂️ *Servicio:* ${citaData.servicio}
-🧔 *Barbero:* ${citaData.barbero}
-
-_¡Por favor confirmar la disponibilidad!_`;
-
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: mensaje,
-        parse_mode: "Markdown"
-      })
-    });
-
-    const data = await response.json();
-    console.log("Notificación enviada a Telegram:", data);
-    return data;
-  } catch (error) {
-    console.error("Error al enviar notificación a Telegram:", error);
-    throw error;
-  }
-}
-
-// 6. Función para guardar cita con RLS habilitado
+// 5. Función para guardar cita con RLS habilitado
 async function guardarCita(citaData) {
   if (!supabase) {
     throw new Error('Error de conexión con el servidor');
@@ -172,13 +128,6 @@ async function guardarCita(citaData) {
       throw new Error(error.message || 'Error al guardar la cita');
     }
     
-    // Enviar notificación a Telegram después de guardar
-    try {
-      await enviarNotificacionTelegram(citaData);
-    } catch (telegramError) {
-      console.warn("La cita se guardó pero falló la notificación:", telegramError);
-    }
-    
     return data;
   } catch (error) {
     console.error('Error completo:', error);
@@ -186,7 +135,7 @@ async function guardarCita(citaData) {
   }
 }
 
-// 7. Inicialización principal cuando el DOM esté listo
+// 6. Inicialización principal cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   // Verificar si Supabase está inicializado
   if (!supabase) {
