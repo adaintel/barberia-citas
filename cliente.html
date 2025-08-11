@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agendar Cita | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="scripts.js"></script>
   <style>
     :root {
       --gold: #D4AF37;
       --dark: #121212;
       --darker: #0a0a0a;
       --light: #f8f8f8;
+      --glass: rgba(255, 255, 255, 0.05);
     }
     
     * {
@@ -23,20 +26,25 @@
     body {
       background-color: var(--darker);
       color: var(--light);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>');
+      background-size: 200px;
+      background-repeat: repeat;
       min-height: 100vh;
-      padding: 2rem;
     }
     
     .container {
       max-width: 600px;
       margin: 0 auto;
+      padding: 2rem;
     }
     
     .glass-panel {
-      background: rgba(0, 0, 0, 0.7);
+      background: var(--glass);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 15px;
-      border: 1px solid var(--gold);
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       padding: 2rem;
       margin-bottom: 2rem;
     }
@@ -89,10 +97,12 @@
       color: white;
       border: 1px solid var(--gold);
       font-size: 1rem;
+      appearance: none;
     }
     
     input:focus, select:focus {
       outline: none;
+      border-color: var(--gold);
       box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
     }
     
@@ -108,6 +118,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 15px;
+      margin-bottom: 15px;
     }
     
     button[type="submit"] {
@@ -144,12 +155,27 @@
       background: rgba(39, 174, 96, 0.2);
       color: #27ae60;
       border: 1px solid rgba(39, 174, 96, 0.3);
+      display: block !important;
     }
     
     .mensaje-error {
       background: rgba(231, 76, 60, 0.2);
       color: #e74c3c;
       border: 1px solid rgba(231, 76, 60, 0.3);
+      display: block !important;
+    }
+    
+    .info-horario {
+      background: rgba(212, 175, 55, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(212, 175, 55, 0.2);
     }
     
     .btn-volver {
@@ -170,6 +196,24 @@
       text-decoration: none;
     }
     
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    
+    .gold-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -182,6 +226,8 @@
   </style>
 </head>
 <body>
+  <div class="gold-glow"></div>
+  
   <div class="container">
     <div class="glass-panel">
       <header>
@@ -202,16 +248,19 @@
           </div>
           
           <div class="form-row">
+            <!-- Selector de Fecha -->
             <div class="input-group">
               <i class="fas fa-calendar-alt"></i>
               <input type="date" id="fecha" required>
             </div>
 
+            <!-- Selector de Hora -->
             <div class="input-group">
               <i class="fas fa-clock"></i>
               <input type="time" id="hora" min="08:00" max="21:00" required>
             </div>
 
+            <!-- Selector de Servicio -->
             <div class="input-group">
               <i class="fas fa-cut"></i>
               <select id="servicio" required>
@@ -227,7 +276,7 @@
           
           <div class="input-group">
             <i class="fas fa-user-tie"></i>
-            <select id="barbero">
+            <select id="barbero" required>
               <option value="" disabled selected>Seleccione su barbero</option>
               <option value="Juan">Juan (Cortes clásicos)</option>
               <option value="Carlos">Carlos (Experto en barbas)</option>
@@ -241,6 +290,11 @@
         </form>
         
         <div id="mensaje"></div>
+        
+        <div class="info-horario">
+          <i class="fas fa-info-circle"></i>
+          <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
+        </div>
       </main>
     </div>
     
@@ -248,148 +302,10 @@
       <a href="index.html" class="btn-volver">
         <i class="fas fa-arrow-left"></i> Volver al inicio
       </a>
+      <p>© 2025 Barbería Elite - Todos los derechos reservados</p>
     </footer>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    // Configuración de Supabase
-    const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // Configuración de Telegram (YA CONFIRMADO QUE FUNCIONA)
-    const TELEGRAM_BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag";
-    const TELEGRAM_CHAT_ID = "8330674980";
-
-    // Función para enviar notificación a Telegram
-    async function enviarNotificacionTelegram(citaData) {
-      const mensaje = `💈 *NUEVA CITA* 💈
-      
-👤 *Cliente:* ${citaData.nombre}
-📞 *Teléfono:* ${citaData.telefono}
-📅 *Fecha:* ${new Date(citaData.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-⏰ *Hora:* ${citaData.hora.substring(0, 5)}
-✂️ *Servicio:* ${citaData.servicio}
-🧔 *Barbero:* ${citaData.barbero || 'Antonio'}`;
-
-      try {
-        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: mensaje,
-            parse_mode: 'Markdown'
-          })
-        });
-
-        const data = await response.json();
-        return data.ok;
-      } catch (error) {
-        console.error('Error al enviar a Telegram:', error);
-        return false;
-      }
-    }
-
-    // Función para guardar la cita
-    async function guardarCita(citaData) {
-      try {
-        // 1. Guardar en Supabase
-        const { data, error } = await supabase
-          .from('citas')
-          .insert([{
-            ...citaData,
-            estado: 'pendiente',
-            creado_en: new Date().toISOString()
-          }])
-          .select();
-
-        if (error) throw error;
-
-        // 2. Enviar notificación a Telegram
-        const telegramEnviado = await enviarNotificacionTelegram(citaData);
-        
-        return {
-          supabaseData: data,
-          telegramEnviado: telegramEnviado
-        };
-      } catch (error) {
-        console.error('Error al guardar cita:', error);
-        throw error;
-      }
-    }
-
-    // Inicializar el formulario
-    function inicializarFormulario() {
-      const fechaInput = document.getElementById('fecha');
-      const hoy = new Date();
-      const manana = new Date(hoy);
-      manana.setDate(hoy.getDate() + 1);
-      
-      fechaInput.min = manana.toISOString().split('T')[0];
-      fechaInput.value = manana.toISOString().split('T')[0];
-    }
-
-    // Mostrar mensajes al usuario
-    function mostrarMensaje(texto, tipo) {
-      const mensajeDiv = document.getElementById('mensaje');
-      mensajeDiv.innerHTML = `<div class="mensaje-${tipo}">${texto}</div>`;
-      mensajeDiv.style.display = 'block';
-      setTimeout(() => mensajeDiv.style.display = 'none', 5000);
-    }
-
-    // Manejar el envío del formulario
-    document.addEventListener('DOMContentLoaded', () => {
-      inicializarFormulario();
-
-      document.getElementById('citaForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        
-        try {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agendando...';
-
-          const formData = {
-            nombre: document.getElementById('nombre').value.trim(),
-            telefono: document.getElementById('telefono').value.trim(),
-            fecha: document.getElementById('fecha').value,
-            hora: document.getElementById('hora').value,
-            servicio: document.getElementById('servicio').value,
-            barbero: document.getElementById('barbero').value || 'Antonio'
-          };
-
-          // Validación básica
-          if (!formData.nombre || !formData.telefono) {
-            throw new Error('Nombre y teléfono son requeridos');
-          }
-
-          const resultado = await guardarCita(formData);
-          
-          let mensaje = '✅ Cita agendada correctamente';
-          if (!resultado.telegramEnviado) {
-            mensaje += ' (pero no se pudo enviar la notificación al barbero)';
-          }
-          
-          mostrarMensaje(mensaje, 'exito');
-          e.target.reset();
-          inicializarFormulario();
-
-        } catch (error) {
-          console.error('Error:', error);
-          mostrarMensaje(`❌ Error: ${error.message}`, 'error');
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-        }
-      });
-    });
-  </script>
+  <script src="scripts.js"></script>
 </body>
 </html>
