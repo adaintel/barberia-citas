@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Barbero | Barber-K</title>
+  <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- ******************** CSS ******************** -->
@@ -831,224 +831,124 @@
       cursor: pointer;
     }
     
-    /* Nuevos estilos para las funcionalidades agregadas */
-    .current-appointment-timer {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--gold);
-      border-radius: 8px;
-      padding: 10px 15px;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--gold);
-    }
-    
-    .timer-display {
-      font-size: 1.2rem;
-      font-weight: bold;
-      font-family: monospace;
-    }
-    
-    .timer-controls {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .timer-btn {
-      background: var(--gold);
-      color: var(--dark);
-      border: none;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .timer-btn:hover {
-      background: #c9a227;
-    }
-    
-    .client-waiting-alert {
-      background: rgba(231, 76, 60, 0.2);
-      border: 1px solid #e74c3c;
-      border-radius: 8px;
-      padding: 10px 15px;
-      margin-bottom: 15px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      color: #e74c3c;
-    }
-    
-    .client-waiting-alert.show {
-      display: flex;
-      animation: pulse 1.5s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-    }
-    
-    .sms-reminder-btn {
-      background: rgba(39, 174, 96, 0.2);
-      border: 1px solid #27ae60;
-      color: #27ae60;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .sms-reminder-btn:hover {
-      background: rgba(39, 174, 96, 0.4);
-    }
-    
-    .barber-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--gold);
-      margin-bottom: 10px;
-    }
-    
-    .color-picker-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid var(--gold);
-      border-radius: 8px;
-      padding: 10px;
-      z-index: 1000;
-    }
-    
-    .color-picker-label {
-      display: block;
-      color: var(--gold);
-      margin-bottom: 5px;
-      font-size: 0.8rem;
-    }
-    
-    .color-picker {
-      width: 100%;
-      height: 30px;
-      border: none;
-      cursor: pointer;
-      background: transparent;
-    }
-    
-    /* Estilo definitivo - Negro/Dorado Premium */
-    #btn-cerrar-sesion {
-      box-sizing: border-box !important;
-      font-family: 'Montserrat', sans-serif !important;
-      text-transform: none !important;
-      letter-spacing: normal !important;
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
-      color: #D4AF37 !important; /* Dorado */
-      border: 1px solid #D4AF37 !important;
-      padding: 8px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 500;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(2px);
-      text-decoration: none !important;
-    }
-
-    #btn-cerrar-sesion::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
-      transition: 0.5s;
-      z-index: -1;
-    } 
-
-    #btn-cerrar-sesion:hover {
-      background: #D4AF37 !important; /* Fondo dorado al hover */
-      color: #0a0a0a !important; /* Texto negro al hover */
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-    }
-
-    #btn-cerrar-sesion i {
-      font-size: 0.9rem;
-    } 
-    /* Asegurar que no se solape con otros elementos */
-    header {
-      margin-top: 40px !important;
-    }
-
-      
-    .btn-cerrar-sesion:hover::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--gold);
-      z-index: -2;
-      transition: all 0.4s;
-    }
-
-    .btn-cerrar-sesion i {
-      transition: transform 0.3s;
-    }
-
     @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .glass-panel {
+        padding: 1.5rem;
+      }
+      
+      .panel-control {
+        flex-direction: column;
+      }
+      
+      .filters {
+        width: 100%;
+      }
+      
+      select {
+        width: 100%;
+      }
+      
+      .btn-export {
+        width: 100%;
+      }
+      
+      .tabla-citas {
+        font-size: 0.9rem;
+      }
+      
+      .tabla-citas th, 
+      .tabla-citas td {
+        padding: 10px 8px;
+      }
+
+      /* Estilo definitivo - Negro/Dorado Premium */
       #btn-cerrar-sesion {
+        box-sizing: border-box !important;
+        font-family: 'Montserrat', sans-serif !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
+        color: #D4AF37 !important; /* Dorado */
+        border: 1px solid #D4AF37 !important;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        text-decoration: none !important;
+      }
+
+      #btn-cerrar-sesion::before {
+        content: '';
         position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 6px 12px;
-        font-size: 0.7rem;
-    }
-    header h1 {
-      margin-top: 30px !important;
-    }
-    
-    /* Optimización para tabletas */
-    .btn-accion {
-      width: 35px;
-      height: 35px;
-      font-size: 1.1rem;
-    }
-    
-    .acciones {
-      gap: 5px;
-    }
-    
-    .timer-display {
-      font-size: 1rem;
-    }
-    
-    .timer-btn, .sms-reminder-btn {
-      padding: 8px 12px;
-    }
-    
-    .color-picker-container {
-      bottom: 10px;
-      right: 10px;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+        transition: 0.5s;
+        z-index: -1;
+      } 
+
+      #btn-cerrar-sesion:hover {
+        background: #D4AF37 !important; /* Fondo dorado al hover */
+        color: #0a0a0a !important; /* Texto negro al hover */
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+      }
+
+      #btn-cerrar-sesion i {
+        font-size: 0.9rem;
+      } 
+      /* Asegurar que no se solape con otros elementos */
+      header {
+        margin-top: 40px !important;
+      }
+
+        
+      .btn-cerrar-sesion:hover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--gold);
+        z-index: -2;
+        transition: all 0.4s;
+      }
+
+      .btn-cerrar-sesion i {
+        transition: transform 0.3s;
+      }
+
+      @media (max-width: 768px) {
+        #btn-cerrar-sesion {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          padding: 6px 12px;
+          font-size: 0.7rem;
+      }
+      header h1 {
+        margin-top: 30px !important;
+      }
     }
   }
-}
   </style>
 </head>
 <body>
@@ -1062,34 +962,10 @@
       <header>
         <img src="barbe-k.jpg" alt="Barber-K Logo" class="logo-panel">
         <h1><i class="fas fa-cut"></i> Panel de Citas</h1>
-        <p>Barber-K - Mejoramos tu estilo!</p>
+        <p>Barbería Elite - Gestión Profesional</p>
       </header>
       
       <main>
-        <!-- Temporizador de cita actual -->
-        <div class="current-appointment-timer">
-          <div>
-            <span>Tiempo de cita actual:</span>
-            <span class="timer-display">00:00:00</span>
-          </div>
-          <div class="timer-controls">
-            <button class="timer-btn" id="start-timer"><i class="fas fa-play"></i></button>
-            <button class="timer-btn" id="stop-timer"><i class="fas fa-stop"></i></button>
-            <button class="timer-btn" id="reset-timer"><i class="fas fa-redo"></i></button>
-          </div>
-        </div>
-        
-        <!-- Alerta de cliente esperando -->
-        <div class="client-waiting-alert">
-          <div>
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>Cliente esperando más de 15 minutos</span>
-          </div>
-          <button class="sms-reminder-btn" id="send-sms-btn">
-            <i class="fas fa-comment-alt"></i> Enviar recordatorio
-          </button>
-        </div>
-        
         <div class="panel-control">
           <div class="search-container">
             <i class="fas fa-search"></i>
@@ -1106,7 +982,7 @@
             
             <select id="filtro-barbero">
               <option value="todos">Todos los barberos</option>
-              <option value="Kelvin Vielma">Kelvin Vielma</option>
+              <option value="Juan">Juan</option>
               <option value="Carlos">Carlos</option>
               <option value="Pedro">Pedro</option>
             </select>
@@ -1137,11 +1013,6 @@
             <h3>Completadas</h3>
             <p id="completadas-citas">0</p>
           </div>
-          <div class="stat-card">
-            <h3>Barbero Actual</h3>
-            <img src="barbe-k.jpg" alt="Kelvin Vielma" class="barber-avatar">
-            <p>Kelvin Vielma</p>
-          </div>
         </div>
 
         <!-- Sección de Historial de Citas -->
@@ -1164,7 +1035,7 @@
       <a href="index.html" class="btn-volver">
         <i class="fas fa-arrow-left"></i> Volver al inicio
       </a>
-      <p>© 2025 Barber-K - Sistema de gestión de citas</p>
+      <p>© 2025 Barbería Elite - Sistema de gestión de citas</p>
     </footer>
   </div>
 
@@ -1188,12 +1059,6 @@
     </div>
   </div>
 
-  <!-- Selector de color dorado -->
-  <div class="color-picker-container">
-    <label for="gold-color-picker" class="color-picker-label">Color principal:</label>
-    <input type="color" id="gold-color-picker" class="color-picker" value="#D4AF37">
-  </div>
-
   <!-- Scripts en el orden CORRECTO -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="scripts.js"></script>
@@ -1204,10 +1069,6 @@
       let todasLasCitas = [];
       let modalAbierto = false;
       let canalCitas = null;
-      let timerInterval = null;
-      let seconds = 0;
-      let waitingAlertShown = false;
-      let audioNotification = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -1367,9 +1228,6 @@
         actualizarEstadisticas(todasLasCitas);
         mostrarHistorialCitas(todasLasCitas);
         
-        // Verificar citas pendientes con retraso
-        verificarCitasConRetraso(todasLasCitas);
-        
       } catch (error) {
         console.error('Error al cargar citas:', error);
         contenedor.innerHTML = `
@@ -1381,56 +1239,6 @@
           </div>
         `;
       }
-    }
-
-    // Verificar citas con retraso para notificaciones
-    function verificarCitasConRetraso(citas) {
-      const ahora = new Date();
-      const citasPendientes = citas.filter(c => c.estado === 'pendiente');
-      
-      citasPendientes.forEach(cita => {
-        const fechaCita = new Date(`${cita.fecha}T${cita.hora}`);
-        const diferenciaMinutos = Math.floor((ahora - fechaCita) / (1000 * 60));
-        
-        // Mostrar alerta si lleva más de 15 minutos esperando
-        if (diferenciaMinutos > 15) {
-          mostrarAlertaEspera(cita);
-        }
-      });
-    }
-    
-    // Mostrar alerta de espera
-    function mostrarAlertaEspera(cita) {
-      const alerta = document.querySelector('.client-waiting-alert');
-      if (!alerta || waitingAlertShown) return;
-      
-      alerta.querySelector('span').textContent = `${cita.nombre} esperando más de 15 minutos`;
-      alerta.classList.add('show');
-      waitingAlertShown = true;
-      
-      // Reproducir sonido de notificación
-      audioNotification.play().catch(e => console.log('No se pudo reproducir el sonido:', e));
-      
-      // Configurar botón de SMS
-      const smsBtn = document.getElementById('send-sms-btn');
-      smsBtn.onclick = () => enviarRecordatorioSMS(cita);
-    }
-    
-    // Enviar recordatorio por SMS/WhatsApp
-    function enviarRecordatorioSMS(cita) {
-      // Simular envío de SMS (en producción se integraría con un servicio real)
-      const mensaje = `Hola ${cita.nombre}, ¿aún vienes a tu cita en Barber-K? Por favor confírmanos. Gracias!`;
-      
-      // Abrir enlace de WhatsApp con el mensaje predefinido
-      const urlWhatsApp = `https://wa.me/${cita.telefono}?text=${encodeURIComponent(mensaje)}`;
-      window.open(urlWhatsApp, '_blank');
-      
-      // Mostrar notificación
-      mostrarNotificacion(`Recordatorio enviado a ${cita.nombre}`, 'success');
-      
-      // Ocultar alerta
-      document.querySelector('.client-waiting-alert').classList.remove('show');
-      waitingAlertShown = false;
     }
 
     // Mostrar citas en la tabla
@@ -1850,64 +1658,6 @@
           }
         });
     }
-    
-    // Funciones para el temporizador de cita
-    function actualizarTemporizador() {
-      seconds++;
-      const horas = Math.floor(seconds / 3600);
-      const minutos = Math.floor((seconds % 3600) / 60);
-      const segundos = seconds % 60;
-      
-      const tiempoFormateado = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-      document.querySelector('.timer-display').textContent = tiempoFormateado;
-      
-      // Mostrar alerta si lleva más de 15 minutos (900 segundos)
-      if (seconds > 900 && !waitingAlertShown) {
-        mostrarAlertaEspera({nombre: 'Cliente actual', telefono: ''});
-      }
-    }
-    
-    function iniciarTemporizador() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(actualizarTemporizador, 1000);
-    }
-    
-    function detenerTemporizador() {
-      if (timerInterval) clearInterval(timerInterval);
-    }
-    
-    function reiniciarTemporizador() {
-      seconds = 0;
-      document.querySelector('.timer-display').textContent = '00:00:00';
-      detenerTemporizador();
-      
-      // Ocultar alerta si está visible
-      if (waitingAlertShown) {
-        document.querySelector('.client-waiting-alert').classList.remove('show');
-        waitingAlertShown = false;
-      }
-    }
-    
-    // Configurar selector de color dorado
-    function configurarSelectorColor() {
-      const colorPicker = document.getElementById('gold-color-picker');
-      if (!colorPicker) return;
-      
-      colorPicker.addEventListener('input', (e) => {
-        const nuevoColor = e.target.value;
-        document.documentElement.style.setProperty('--gold', nuevoColor);
-        
-        // Guardar preferencia en localStorage
-        localStorage.setItem('goldColor', nuevoColor);
-      });
-      
-      // Cargar color guardado si existe
-      const colorGuardado = localStorage.getItem('goldColor');
-      if (colorGuardado) {
-        colorPicker.value = colorGuardado;
-        document.documentElement.style.setProperty('--gold', colorGuardado);
-      }
-    }
 
     // Inicialización del panel
     async function inicializarPanel() {
@@ -1928,14 +1678,6 @@
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
         document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
         document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
-        
-        // Configurar temporizador
-        document.getElementById('start-timer').addEventListener('click', iniciarTemporizador);
-        document.getElementById('stop-timer').addEventListener('click', detenerTemporizador);
-        document.getElementById('reset-timer').addEventListener('click', reiniciarTemporizador);
-        
-        // Configurar selector de color
-        configurarSelectorColor();
         
         await cargarCitas();
         conectarWebsockets();
