@@ -3,8 +3,8 @@ const supabaseUrl = 'https://azjlrbmgpczuintqyosm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6amxyYm1ncGN6dWludHF5b3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NjM2MzgsImV4cCI6MjA3MDIzOTYzOH0.1ThXqiMuqRFhCTqsedG6NDFft_ng-QV2qaD8PpaU92M';
 
 // Configuración del Bot de Telegram
-const TELEGRAM_BOT_TOKEN = "TU_BOT_TOKEN_AQUI"; // Reemplaza con tu token de BotFather
-const TELEGRAM_CHAT_ID = "CHAT_ID_DEL_BARBERO"; // Reemplaza con el chat_id de Antonio
+const TELEGRAM_BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag"; // Reemplaza con tu token de BotFather
+const TELEGRAM_CHAT_ID = "8330674980"; // Reemplaza con el chat_id de Antonio
 
 // Inicializar Supabase
 const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
