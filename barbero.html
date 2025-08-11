@@ -1659,36 +1659,7 @@
         });
     }
 
-    // Función para verificar citas con retraso
-    async function verificarCitasConRetraso() {
-      try {
-        const ahora = new Date();
-        const hace10Minutos = new Date(ahora.getTime() - 10 * 60000).toISOString();
-        
-        // Obtener citas pendientes con más de 10 minutos de retraso
-        const { data: citasRetrasadas, error } = await supabase
-          .from('citas')
-          .select('*')
-          .eq('estado', 'pendiente')
-          .lt('hora', hace10Minutos.split('T')[1].substring(0, 5));
-        
-        if (error) throw error;
-        
-        // Procesar cada cita con retraso
-        citasRetrasadas.forEach(cita => {
-          const horaCita = cita.hora.substring(0, 5);
-          const mensaje = `Hola ${cita.nombre}, vemos que tienes una cita a las ${horaCita} que aún no has confirmado. ¿Podrías confirmar tu asistencia? ${window.location.origin}/cliente.html?telefono=${cita.telefono}&hora=${horaCita}`;
-          
-          // Abrir WhatsApp con mensaje predefinido
-          window.open(`https://wa.me/${cita.telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
-        });
-        
-      } catch (error) {
-        console.error('Error al verificar citas con retraso:', error);
-      }
-    }
-
-    // Inicialización del panel (modificada para incluir el chequeo periódico)
+    // Inicialización del panel
     async function inicializarPanel() {
       try {
         const accesoPermitido = await verificarAccesoBarbero();
@@ -1710,9 +1681,6 @@
         
         await cargarCitas();
         conectarWebsockets();
-        
-        // Verificar citas con retraso cada minuto
-        setInterval(verificarCitasConRetraso, 60000);
         
       } catch (error) {
         console.error('Error en inicialización:', error);
