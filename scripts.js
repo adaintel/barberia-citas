@@ -107,7 +107,41 @@ function inicializarSelectores() {
   });
 }
 
-// 5. Función para guardar cita con RLS habilitado
+// 5. Función para enviar notificación a Telegram
+async function enviarNotificacionTelegram(citaData) {
+  const BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag";
+  const CHAT_ID = "8330674980";
+  
+  try {
+    const mensaje = `📌 *Nueva cita agendada*:\n
+👤 Cliente: *${citaData.nombre}* (${citaData.telefono})\n
+📅 Fecha: *${citaData.fecha}*\n
+⏰ Hora: *${citaData.hora}*\n
+✂️ Servicio: *${citaData.servicio}*\n
+💈 Barbero: *${citaData.barbero}*`;
+
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: mensaje,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al enviar notificación a Telegram');
+    }
+    
+    console.log('Notificación enviada al barbero');
+  } catch (error) {
+    console.error('Error en notificación Telegram:', error);
+    // No mostramos error al usuario para no afectar su experiencia
+  }
+}
+
+// 6. Función para guardar cita con RLS habilitado
 async function guardarCita(citaData) {
   if (!supabase) {
     throw new Error('Error de conexión con el servidor');
@@ -128,6 +162,9 @@ async function guardarCita(citaData) {
       throw new Error(error.message || 'Error al guardar la cita');
     }
     
+    // Enviar notificación a Telegram (no bloqueante)
+    enviarNotificacionTelegram(citaData).catch(e => console.error(e));
+    
     return data;
   } catch (error) {
     console.error('Error completo:', error);
@@ -135,7 +172,7 @@ async function guardarCita(citaData) {
   }
 }
 
-// 6. Inicialización principal cuando el DOM esté listo
+// 7. Inicialización principal cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   // Verificar si Supabase está inicializado
   if (!supabase) {
