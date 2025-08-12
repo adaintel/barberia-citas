@@ -54,32 +54,38 @@
       margin-bottom: 1.5rem;
     }
     
-    .logo-img {
-      width: 180px;
-      height: auto;
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
-    }
-    
-    .logo-text {
-      font-size: 2.5rem;
-      color: var(--gold);
+    .logo-main {
+      font-size: 3.5rem;
+      font-weight: bold;
       letter-spacing: 3px;
       text-transform: uppercase;
-      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
       margin-bottom: 0.5rem;
       background: linear-gradient(90deg, #D4AF37, #F9F295, #D4AF37);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      position: relative;
+    }
+    
+    .logo-main::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      bottom: -10px;
+      left: 0;
     }
     
     .logo-slogan {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       letter-spacing: 2px;
       color: var(--gold);
-      opacity: 0.8;
       font-style: italic;
+      margin-top: 1rem;
+      text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
     }
     
     .slogan {
@@ -174,12 +180,12 @@
     }
     
     @media (max-width: 768px) {
-      .logo-img {
-        width: 140px;
+      .logo-main {
+        font-size: 2.5rem;
       }
       
-      .logo-text {
-        font-size: 2rem;
+      .logo-slogan {
+        font-size: 1.1rem;
       }
       
       .buttons {
@@ -195,9 +201,7 @@
   <div class="container">
     <header>
       <div class="logo-container">
-        <!-- Logo BARBER-K como imagen -->
-        <img src="barbe-k.jpg" alt="BARBER-K Logo" class="logo-img">
-        <div class="logo-text">BARBER-K</div>
+        <div class="logo-main">BARBER-K</div>
         <div class="logo-slogan">¡MEJORAMOS TU ESTILO!</div>
       </div>
       <p class="slogan">Estilo premium para caballeros modernos</p>
