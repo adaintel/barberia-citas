@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>Panel del Barbero | Barbería Elite</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- ******************** CSS ******************** -->
   <style>
@@ -43,6 +44,15 @@
     .container {
       position: relative;
       z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     .glass-panel {
@@ -70,6 +80,12 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       margin-top: 0 !important;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     header {
@@ -105,6 +121,12 @@
       gap: 15px;
       margin-bottom: 25px;
       align-items: center;
+      animation: fadeInUp 0.7s ease-out 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     .search-container {
@@ -183,8 +205,9 @@
     .table-responsive {
       overflow-x: auto;
       margin-top: 1.5rem;
-      max-height: 600px; /* Altura máxima para el scroll */
-      overflow-y: auto; /* Scroll vertical cuando hay muchos clientes */
+      max-height: 600px;
+      overflow-y: auto;
+      animation: fadeIn 0.8s ease-out 0.4s both;
     }
     
     .tabla-citas {
@@ -212,7 +235,7 @@
 
     /* Estilos para nombres de clientes y barberos en rojo */
     .tabla-citas td:first-child,
-    .tabla-citas td:nth-child(6) { /* Columna de barberos */
+    .tabla-citas td:nth-child(6) {
       color: #ff4d4d !important;
       font-weight: 600;
       text-shadow: 0 0 3px rgba(255, 77, 77, 0.3); 
@@ -321,6 +344,7 @@
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
       margin-top: 2rem;
+      animation: fadeIn 0.8s ease-out 0.3s both;
     }
     
     .stat-card {
@@ -545,6 +569,7 @@
       text-align: center;
       color: rgba(255, 255, 255, 0.6);
       font-size: 0.9rem;
+      animation: fadeIn 0.8s ease-out 0.5s both;
     }
     
     .btn-volver {
@@ -574,6 +599,13 @@
       background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%);
       transform: translate(-50%, -50%);
       z-index: -1;
+      animation: pulse 4s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
+      50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+      100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
     }
     
     /* Notificaciones */
@@ -656,6 +688,7 @@
       border-radius: 10px;
       padding: 1.5rem;
       border: 1px solid rgba(212, 175, 55, 0.2);
+      animation: fadeIn 0.8s ease-out 0.6s both;
     }
 
     .historial-header {
@@ -688,6 +721,13 @@
       margin-bottom: 0.8rem;
       border-radius: 0 5px 5px 0;
       transition: all 0.3s ease;
+      animation: slideInRight 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     .historial-item:hover {
@@ -739,8 +779,6 @@
       background: rgba(241, 196, 15, 0.2);
       color: #f1c40f;
     }
-
-
 
     /* Personalización de la barra de desplazamiento */
     .historial-citas::-webkit-scrollbar,
@@ -856,8 +894,8 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background: rgba(10, 10, 10, 0.95); /* Negro sólido con ligera transparencia */
-        color: #D4AF37 !important; /* Dorado */
+        background: rgba(10, 10, 10, 0.95);
+        color: #D4AF37 !important;
         border: 1px solid #D4AF37 !important;
         padding: 8px 15px;
         border-radius: 4px;
@@ -887,8 +925,8 @@
       } 
 
       #btn-cerrar-sesion:hover {
-        background: #D4AF37 !important; /* Fondo dorado al hover */
-        color: #0a0a0a !important; /* Texto negro al hover */
+        background: #D4AF37 !important;
+        color: #0a0a0a !important;
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
       }
@@ -896,54 +934,91 @@
       #btn-cerrar-sesion i {
         font-size: 0.9rem;
       } 
-      /* Asegurar que no se solape con otros elementos */
+
       header {
         margin-top: 40px !important;
       }
+    }
 
-        
-      .btn-cerrar-sesion:hover::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--gold);
-        z-index: -2;
-        transition: all 0.4s;
-      }
+    /* Animación para filas de la tabla */
+    @keyframes fadeInRow {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-      .btn-cerrar-sesion i {
-        transition: transform 0.3s;
-      }
+    .tabla-citas tbody tr {
+      animation: fadeInRow 0.5s ease-out;
+      animation-fill-mode: both;
+    }
 
-      @media (max-width: 768px) {
-        #btn-cerrar-sesion {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          padding: 6px 12px;
-          font-size: 0.7rem;
+    /* Añadir delay escalonado para las filas */
+    .tabla-citas tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .tabla-citas tbody tr:nth-child(2) { animation-delay: 0.2s; }
+    .tabla-citas tbody tr:nth-child(3) { animation-delay: 0.3s; }
+    .tabla-citas tbody tr:nth-child(4) { animation-delay: 0.4s; }
+    .tabla-citas tbody tr:nth-child(5) { animation-delay: 0.5s; }
+    .tabla-citas tbody tr:nth-child(6) { animation-delay: 0.6s; }
+    .tabla-citas tbody tr:nth-child(7) { animation-delay: 0.7s; }
+    .tabla-citas tbody tr:nth-child(8) { animation-delay: 0.8s; }
+    .tabla-citas tbody tr:nth-child(9) { animation-delay: 0.9s; }
+    .tabla-citas tbody tr:nth-child(10) { animation-delay: 1.0s; }
+
+    /* Botón para finalizar el día */
+    .btn-finalizar-dia {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .btn-finalizar-dia:hover {
+      background: rgba(212, 175, 55, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Efecto de confeti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--gold);
+      opacity: 0;
+      z-index: 9999;
+      animation: confettiFall 3s ease-in-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { 
+        transform: translateY(-100px) rotate(0deg); 
+        opacity: 1;
       }
-      header h1 {
-        margin-top: 30px !important;
+      100% { 
+        transform: translateY(100vh) rotate(360deg); 
+        opacity: 0;
       }
     }
-  }
   </style>
 </head>
 <body>
   <div class="gold-glow"></div>
 
-   
   <!-- ******************** HTML ******************** -->
   
   <div class="container">
     <div class="glass-panel">
       <header>
         <h1><i class="fas fa-cut"></i> Panel de Citas</h1>
-        <p> Barber-K - Gestión Profesional</p>
+        <p> Barber-K - Kelvin Vielma</p>
       </header>
       
       <main>
@@ -961,11 +1036,8 @@
               <option value="cancelado">Canceladas</option>
             </select>
             
-            <select id="filtro-barbero">
-              <option value="todos">Todos los barberos</option>
-              <option value="Juan">Juan</option>
-              <option value="Carlos">Carlos</option>
-              <option value="Pedro">Pedro</option>
+            <select id="filtro-barbero" style="display: none;">
+              <option value="Kelvin Vielma" selected>Kelvin Vielma</option>
             </select>
             
             <button id="btn-exportar" class="btn-export">
@@ -999,7 +1071,7 @@
         <!-- Sección de Historial de Citas -->
         <div class="historial-container">
           <div class="historial-header">
-            <h2><i class="fas fa-history"></i> Historial Reciente</h2>
+            <h2><i class="fas fa-history"></i> Historial Completo</h2>
             <span id="contador-historial" style="color: var(--gold); font-weight: 600;">0 citas</span>
           </div>
           <div class="historial-citas" id="historialCitas">
@@ -1009,6 +1081,11 @@
             </div>
           </div>
         </div>
+
+        <!-- Botón para finalizar el día -->
+        <button id="btn-finalizar-dia" class="btn-finalizar-dia">
+          <i class="fas fa-calendar-times"></i> Finalizar día y limpiar panel
+        </button>
       </main>
     </div>
     
@@ -1040,16 +1117,13 @@
     </div>
   </div>
 
-  <!-- Scripts en el orden CORRECTO -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="scripts.js"></script>
-
-   <!-- ******************** JAVASCRIPT ******************** -->
+  <!-- ******************** JAVASCRIPT ******************** -->
   <script>
-      // Variables globales
-      let todasLasCitas = [];
-      let modalAbierto = false;
-      let canalCitas = null;
+    // Variables globales
+    let todasLasCitas = [];
+    let historialCompleto = [];
+    let modalAbierto = false;
+    let canalCitas = null;
 
     // Función para mostrar notificaciones
     function mostrarNotificacion(mensaje, tipo = 'info') {
@@ -1077,6 +1151,30 @@
         // Eliminar después de la animación
         setTimeout(() => notificacion.remove(), 300);
       }, 3000);
+    }
+
+    // Función para crear efecto de confeti
+    function crearConfetti() {
+      const colors = ['#D4AF37', '#FFD700', '#C9B037', '#FFDF00', '#F5D033'];
+      const count = 100;
+      
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        
+        document.body.appendChild(confetti);
+        
+        // Eliminar después de la animación
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
     }
 
     // Verificación de seguridad para barberos
@@ -1109,6 +1207,7 @@
               sessionStorage.setItem('barberoAutenticado', 'true');
               modal.style.display = 'none';
               mostrarNotificacion('Acceso concedido', 'success');
+              mostrarBotonCerrarSesion();
               resolve(true);
             } else {
               document.getElementById('mensaje-error-verificacion').style.display = 'block';
@@ -1182,8 +1281,7 @@
       document.body.appendChild(botonCerrar);
     }
      
-    
-    // Cargar citas desde Supabase
+    // Cargar citas (simuladas ya que no usaremos Supabase)
     async function cargarCitas() {
       const contenedor = document.getElementById('citasContainer');
       if (!contenedor) return;
@@ -1196,18 +1294,53 @@
           </div>
         `;
 
-        const { data: citas, error } = await supabase
-          .from('citas')
-          .select('*')
-          .order('fecha', { ascending: true })
-          .order('hora', { ascending: true });
+        // Simular carga de datos
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Datos de ejemplo (puedes modificarlos)
+        const citasEjemplo = [
+          {
+            id: 1,
+            nombre: "Juan Pérez",
+            telefono: "123456789",
+            fecha: new Date().toISOString().split('T')[0],
+            hora: "10:00:00",
+            servicio: "Corte de cabello",
+            barbero: "Kelvin Vielma",
+            estado: "pendiente"
+          },
+          {
+            id: 2,
+            nombre: "María García",
+            telefono: "987654321",
+            fecha: new Date().toISOString().split('T')[0],
+            hora: "11:30:00",
+            servicio: "Afeitado clásico",
+            barbero: "Kelvin Vielma",
+            estado: "pendiente"
+          },
+          {
+            id: 3,
+            nombre: "Carlos López",
+            telefono: "555555555",
+            fecha: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0],
+            hora: "15:00:00",
+            servicio: "Corte y barba",
+            barbero: "Kelvin Vielma",
+            estado: "completado"
+          }
+        ];
 
-        if (error) throw error;
+        // Cargar desde localStorage si existe
+        const citasGuardadas = localStorage.getItem('citasActuales');
+        const historialGuardado = localStorage.getItem('historialCitas');
+        
+        todasLasCitas = citasGuardadas ? JSON.parse(citasGuardadas) : citasEjemplo;
+        historialCompleto = historialGuardado ? JSON.parse(historialGuardado) : citasEjemplo.filter(c => c.estado !== 'pendiente');
 
-        todasLasCitas = citas || [];
         mostrarCitas(todasLasCitas);
         actualizarEstadisticas(todasLasCitas);
-        mostrarHistorialCitas(todasLasCitas);
+        mostrarHistorialCitas(historialCompleto);
         
       } catch (error) {
         console.error('Error al cargar citas:', error);
@@ -1256,12 +1389,12 @@
             <tbody>
       `;
 
-      citas.forEach(cita => {
+      citas.forEach((cita, index) => {
         const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES');
         const horaFormateada = cita.hora.substring(0, 5);
         
         html += `
-          <tr>
+          <tr style="animation-delay: ${0.1 * index}s">
             <td>
               <input type="checkbox" class="cita-checkbox" data-id="${cita.id}">
               ${cita.nombre}
@@ -1355,12 +1488,9 @@
       const ids = Array.from(checkboxes).map(checkbox => checkbox.dataset.id);
       
       try {
-        const { error } = await supabase
-          .from('citas')
-          .delete()
-          .in('id', ids);
-        
-        if (error) throw error;
+        // Simular eliminación
+        todasLasCitas = todasLasCitas.filter(cita => !ids.includes(cita.id.toString()));
+        localStorage.setItem('citasActuales', JSON.stringify(todasLasCitas));
         
         mostrarNotificacion(`${ids.length} citas eliminadas correctamente`, 'success');
         await cargarCitas();
@@ -1383,10 +1513,7 @@
         return fechaB - fechaA;
       });
 
-      // Limitar a las últimas 20 citas para el historial
-      const ultimasCitas = citasOrdenadas.slice(0, 20);
-
-      if (ultimasCitas.length === 0) {
+      if (citasOrdenadas.length === 0) {
         contenedor.innerHTML = '<p style="color: rgba(255,255,255,0.6); text-align: center;">No hay citas en el historial</p>';
         document.getElementById('contador-historial').textContent = '0 citas';
         return;
@@ -1394,7 +1521,7 @@
 
       let html = '';
       
-      ultimasCitas.forEach(cita => {
+      citasOrdenadas.forEach((cita, index) => {
         const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES', {
           weekday: 'long',
           day: 'numeric',
@@ -1405,7 +1532,7 @@
         const horaFormateada = cita.hora.substring(0, 5);
         
         html += `
-          <div class="historial-item">
+          <div class="historial-item" style="animation-delay: ${0.05 * index}s">
             <div class="historial-item-header">
               <span class="historial-cliente">${cita.nombre}</span>
               <span class="historial-fecha">${fechaFormateada} a las ${horaFormateada}</span>
@@ -1417,7 +1544,7 @@
       });
 
       contenedor.innerHTML = html;
-      document.getElementById('contador-historial').textContent = `${ultimasCitas.length} citas recientes`;
+      document.getElementById('contador-historial').textContent = `${citasOrdenadas.length} citas en historial`;
     }
 
     // Agregar eventos a los botones de acción
@@ -1442,12 +1569,19 @@
     // Cambiar estado de una cita
     async function cambiarEstadoCita(id, nuevoEstado) {
       try {
-        const { error } = await supabase
-          .from('citas')
-          .update({ estado: nuevoEstado })
-          .eq('id', id);
-        
-        if (error) throw error;
+        // Simular actualización
+        const citaIndex = todasLasCitas.findIndex(c => c.id.toString() === id);
+        if (citaIndex !== -1) {
+          todasLasCitas[citaIndex].estado = nuevoEstado;
+          
+          // Mover al historial si no es pendiente
+          if (nuevoEstado !== 'pendiente') {
+            historialCompleto.push({...todasLasCitas[citaIndex]});
+          }
+          
+          localStorage.setItem('citasActuales', JSON.stringify(todasLasCitas));
+          localStorage.setItem('historialCitas', JSON.stringify(historialCompleto));
+        }
         
         mostrarNotificacion(`Cita marcada como ${nuevoEstado}`, 'success');
         await cargarCitas();
@@ -1463,12 +1597,9 @@
       if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) return;
       
       try {
-        const { error } = await supabase
-          .from('citas')
-          .delete()
-          .eq('id', id);
-        
-        if (error) throw error;
+        // Simular eliminación
+        todasLasCitas = todasLasCitas.filter(cita => cita.id.toString() !== id);
+        localStorage.setItem('citasActuales', JSON.stringify(todasLasCitas));
         
         mostrarNotificacion('Cita eliminada correctamente', 'success');
         await cargarCitas();
@@ -1488,13 +1619,12 @@
       const modalBody = document.getElementById('modal-body');
       
       try {
-        const { data: cita, error } = await supabase
-          .from('citas')
-          .select('*')
-          .eq('id', id)
-          .single();
+        // Simular obtención de detalles
+        const cita = todasLasCitas.find(c => c.id.toString() === id);
         
-        if (error) throw error;
+        if (!cita) {
+          throw new Error('Cita no encontrada');
+        }
         
         const fechaFormateada = new Date(cita.fecha).toLocaleDateString('es-ES', {
           weekday: 'long',
@@ -1556,7 +1686,7 @@
       modalAbierto = false;
     }
 	
-	// Filtrar citas
+	  // Filtrar citas
     function filtrarCitas() {
       const textoBusqueda = document.getElementById('buscador')?.value.toLowerCase() || '';
       const filtroEstado = document.getElementById('filtro-estado')?.value || 'todas';
@@ -1610,34 +1740,37 @@
       mostrarNotificacion('Exportación completada con éxito', 'success');
     }
 
-    // Conectar a websockets para cambios en tiempo real
-    function conectarWebsockets() {
-      if (canalCitas) {
-        supabase.removeChannel(canalCitas);
-      }
-
-      canalCitas = supabase
-        .channel('schema-db-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'citas'
-          },
-          (payload) => {
-            console.log('Cambio recibido:', payload);
-            cargarCitas();
-          }
-        )
-        .subscribe((status, err) => {
-          if (status === 'SUBSCRIBED') {
-            console.log('Canal suscrito correctamente');
-          }
-          if (err) {
-            console.error('Error en suscripción:', err);
-          }
+    // Finalizar el día - Limpiar panel
+    function finalizarDia() {
+      if (!confirm('¿Estás seguro de que deseas finalizar el día? Esto moverá todas las citas pendientes al historial y limpiará el panel.')) return;
+      
+      try {
+        // Mover todas las citas pendientes al historial como canceladas
+        const hoy = new Date().toISOString().split('T')[0];
+        const citasPendientes = todasLasCitas.filter(cita => cita.estado === 'pendiente' && cita.fecha <= hoy);
+        
+        citasPendientes.forEach(cita => {
+          cita.estado = 'cancelado';
+          historialCompleto.push({...cita});
         });
+        
+        // Eliminar citas del día actual
+        todasLasCitas = todasLasCitas.filter(cita => cita.fecha !== hoy || cita.estado !== 'pendiente');
+        
+        // Guardar cambios
+        localStorage.setItem('citasActuales', JSON.stringify(todasLasCitas));
+        localStorage.setItem('historialCitas', JSON.stringify(historialCompleto));
+        
+        // Mostrar animación de confeti
+        crearConfetti();
+        
+        mostrarNotificacion('Día finalizado correctamente. Las citas pendientes han sido canceladas.', 'success');
+        cargarCitas();
+        
+      } catch (error) {
+        console.error('Error al finalizar el día:', error);
+        mostrarNotificacion('Error al finalizar el día', 'error');
+      }
     }
 
     // Inicialización del panel
@@ -1649,19 +1782,14 @@
           return;
         }
 
-        // Mostrar botón de cerrar sesión si ya está autenticado
-        if (sessionStorage.getItem('barberoAutenticado') === 'true') {
-           mostrarBotonCerrarSesion();
-        }
-
         // Configurar eventos y cargar citas
         document.getElementById('buscador')?.addEventListener('input', filtrarCitas);
         document.getElementById('filtro-estado')?.addEventListener('change', filtrarCitas);
         document.getElementById('filtro-barbero')?.addEventListener('change', filtrarCitas);
         document.getElementById('btn-exportar')?.addEventListener('click', exportarCitas);
+        document.getElementById('btn-finalizar-dia')?.addEventListener('click', finalizarDia);
         
         await cargarCitas();
-        conectarWebsockets();
         
       } catch (error) {
         console.error('Error en inicialización:', error);
