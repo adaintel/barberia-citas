@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agendar Cita | Barbería Elite</title>
+  <title>Agendar Cita | Barber-K</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="scripts.js"></script>
@@ -203,6 +203,23 @@
       font-size: 0.9rem;
     }
     
+    .redes-sociales {
+      margin: 1.5rem 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    
+    .redes-sociales a {
+      color: var(--gold);
+      font-size: 1.4rem;
+      transition: transform 0.3s;
+    }
+    
+    .redes-sociales a:hover {
+      transform: translateY(-3px);
+    }
+    
     .gold-glow {
       position: fixed;
       top: 50%;
@@ -222,6 +239,10 @@
       .container {
         padding: 1rem;
       }
+      
+      .redes-sociales {
+        gap: 15px;
+      }
     }
   </style>
 </head>
@@ -232,7 +253,7 @@
     <div class="glass-panel">
       <header>
         <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
-        <p>Barbería Elite - Reserva tu experiencia premium</p>
+        <p>Barber-K - Reserva tu experiencia premium</p>
       </header>
       
       <main>
@@ -248,19 +269,16 @@
           </div>
           
           <div class="form-row">
-            <!-- Selector de Fecha -->
             <div class="input-group">
               <i class="fas fa-calendar-alt"></i>
               <input type="date" id="fecha" required>
             </div>
 
-            <!-- Selector de Hora -->
             <div class="input-group">
               <i class="fas fa-clock"></i>
               <input type="time" id="hora" min="08:00" max="21:00" required>
             </div>
 
-            <!-- Selector de Servicio -->
             <div class="input-group">
               <i class="fas fa-cut"></i>
               <select id="servicio" required>
@@ -274,13 +292,11 @@
             </div>
           </div>
           
+          <!-- CAMBIO PRINCIPAL: Selector de barbero (solo Kelvin) -->
           <div class="input-group">
             <i class="fas fa-user-tie"></i>
             <select id="barbero" required>
-              <option value="" disabled selected>Seleccione su barbero</option>
-              <option value="Juan">Juan (Cortes clásicos)</option>
-              <option value="Carlos">Carlos (Experto en barbas)</option>
-              <option value="Pedro">Pedro (Estilista moderno)</option>
+              <option value="Kelvin" selected>Kelvin Vielma (Barbero Principal)</option>
             </select>
           </div>
           
@@ -302,7 +318,18 @@
       <a href="index.html" class="btn-volver">
         <i class="fas fa-arrow-left"></i> Volver al inicio
       </a>
-      <p>© 2025 Barbería Elite - Todos los derechos reservados</p>
+      
+      <!-- NUEVO: Redes sociales -->
+      <div class="redes-sociales">
+        <a href="https://instagram.com/barb3rk" target="_blank" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://tiktok.com/@barb3rk" target="_blank" title="TikTok">
+          <i class="fab fa-tiktok"></i>
+        </a>
+      </div>
+      
+      <p>© 2025 Barber-K - Todos los derechos reservados</p>
     </footer>
   </div>
 
