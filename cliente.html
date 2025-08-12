@@ -104,92 +104,6 @@
     }
     /* ---------------------- */
     
-    /* Panel de Contacto Premium */
-    .contacto-premium {
-      background: rgba(212, 175, 55, 0.15);
-      backdrop-filter: blur(5px);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .contacto-premium::before {
-      content: "K";
-      position: absolute;
-      font-size: 120px;
-      opacity: 0.05;
-      color: var(--gold);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: bold;
-      z-index: 0;
-    }
-    
-    .contacto-titulo {
-      color: var(--gold);
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      position: relative;
-    }
-    
-    .contacto-contenedor {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 1rem;
-      position: relative;
-    }
-    
-    .contacto-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: var(--gold);
-      transition: all 0.3s;
-      z-index: 1;
-    }
-    
-    .contacto-item:hover {
-      transform: translateY(-5px);
-    }
-    
-    .contacto-icono {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-    
-    .contacto-info {
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-align: center;
-    }
-    
-    .whatsapp-btn {
-      background: rgba(37, 211, 102, 0.2);
-      padding: 8px 15px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 5px;
-    }
-    
-    .estrellas-premium {
-      color: var(--gold);
-      letter-spacing: 3px;
-      font-size: 0.9rem;
-    }
-    
     #citaForm {
       display: flex;
       flex-direction: column;
@@ -335,9 +249,9 @@
       z-index: -1;
     }
 
-    /* Nuevos estilos para las redes sociales al final */
+    /* ESTILOS PARA REDES SOCIALES AL FINAL */
     .redes-sociales {
-      margin-top: 1.5rem;
+      margin-top: 2rem;
       text-align: center;
     }
 
@@ -381,6 +295,17 @@
       text-align: center;
     }
 
+    .whatsapp-btn {
+      background: rgba(37, 211, 102, 0.2);
+      padding: 8px 15px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 5px;
+      font-size: 0.8rem;
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -390,14 +315,10 @@
         padding: 1rem;
       }
       
-      .contacto-contenedor {
+      .redes-contenedor {
         grid-template-columns: 1fr;
       }
       
-      .contacto-icono {
-        font-size: 1.8rem;
-      }
-
       .titulo-premium {
         flex-direction: column;
         gap: 5px;
@@ -405,11 +326,6 @@
 
       .diamond {
         transform: rotate(90deg);
-      }
-
-      /* Responsive para redes sociales */
-      .redes-contenedor {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -487,10 +403,10 @@
           <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
         </div>
 
-        <!-- Redes sociales al final -->
+        <!-- REDES SOCIALES AL FINAL -->
         <div class="redes-sociales">
           <div class="redes-titulo">
-            <span class="estrellas-premium">★★★★★</span> Síguenos en redes
+            <span>★★★★★</span> Síguenos en redes
           </div>
           <div class="redes-contenedor">
             <a href="https://wa.me/584142656119" target="_blank" class="redes-item">
