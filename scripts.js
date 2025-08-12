@@ -163,8 +163,8 @@ function inicializarSelectores() {
 }
 
 async function enviarNotificacionTelegram(citaData) {
-  const BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag";
-  const CHAT_ID = "8330674980";
+  const BOT_TOKEN = "8234692500:AAGp3vPMX3i78TRhfpfDteNXX8S4PTGj6t4";
+  const CHAT_ID = "5852644122";
   
   try {
     const mensaje = `📌 *Nueva cita agendada*:\n👤 Cliente: *${citaData.nombre}* (${citaData.telefono})\n📅 Fecha: *${citaData.fecha}*\n⏰ Hora: *${citaData.hora}*\n✂️ Servicio: *${citaData.servicio}*\n💈 Barbero: *${citaData.barbero}*`;
