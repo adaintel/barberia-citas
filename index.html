@@ -72,6 +72,27 @@
       background-clip: text;
       color: transparent;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .logo-main::before,
+    .logo-main::after {
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      content: "\f0c4"; /* Icono de tijeras */
+      font-size: 1.5rem;
+      margin: 0 10px;
+      color: var(--gold);
+    }
+    
+    .logo-main::before {
+      margin-right: 15px;
+    }
+    
+    .logo-main::after {
+      margin-left: 15px;
     }
     
     .logo-main::after {
@@ -149,6 +170,49 @@
       color: var(--dark);
     }
     
+    .location-btn {
+      margin: 2rem 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .location-btn:hover {
+      transform: translateY(-2px);
+      text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+    }
+    
+    .rating-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      border-radius: 10px;
+      background: rgba(212, 175, 55, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .rating-title {
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    
+    .stars {
+      font-size: 1.8rem;
+      color: var(--gold);
+      letter-spacing: 5px;
+      margin-bottom: 1rem;
+    }
+    
+    .rating-text {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
     footer {
       margin-top: auto;
       padding: 1.5rem;
@@ -201,6 +265,12 @@
         font-size: 2.5rem;
       }
       
+      .logo-main::before,
+      .logo-main::after {
+        font-size: 1.2rem;
+        margin: 0 5px;
+      }
+      
       .logo-slogan {
         font-size: 1.1rem;
       }
@@ -212,6 +282,14 @@
       
       .scissors-bg {
         font-size: 200px;
+      }
+      
+      .rating-section {
+        padding: 1rem;
+      }
+      
+      .stars {
+        font-size: 1.5rem;
       }
     }
   </style>
@@ -240,6 +318,24 @@
           <i class="fas fa-cut"></i> Soy Barbero
         </a>
       </div>
+      
+      <!-- Ubicación de la barbería -->
+      <a href="https://www.google.com/maps?q=10.4954872131348,-66.7982482910156" target="_blank" class="location-btn">
+        <i class="fas fa-map-marker-alt"></i> Visítanos en Av. Principal, Caracas
+      </a>
+      
+      <!-- Valoración de la app -->
+      <div class="rating-section">
+        <h3 class="rating-title">¿Cómo valoras nuestra app?</h3>
+        <div class="stars">
+          <i class="fas fa-star" data-rating="1"></i>
+          <i class="fas fa-star" data-rating="2"></i>
+          <i class="fas fa-star" data-rating="3"></i>
+          <i class="fas fa-star" data-rating="4"></i>
+          <i class="fas fa-star" data-rating="5"></i>
+        </div>
+        <p class="rating-text">Tu opinión nos ayuda a mejorar</p>
+      </div>
     </main>
     
     <footer>
@@ -247,5 +343,48 @@
       <p class="author">Sistema desarrollado por Antonio telf:.(2424)1345912</p>
     </footer>
   </div>
+
+  <script>
+    // Sistema de valoración por estrellas
+    document.querySelectorAll('.stars i').forEach(star => {
+      star.addEventListener('click', function() {
+        const rating = this.getAttribute('data-rating');
+        const stars = document.querySelectorAll('.stars i');
+        
+        stars.forEach((s, index) => {
+          if(index < rating) {
+            s.classList.add('fas');
+            s.classList.remove('far');
+          } else {
+            s.classList.add('far');
+            s.classList.remove('fas');
+          }
+        });
+        
+        // Aquí podrías agregar código para enviar la valoración a tu backend
+        console.log(`Valoración enviada: ${rating} estrellas`);
+        alert(`¡Gracias por tu valoración de ${rating} estrellas!`);
+      });
+      
+      star.addEventListener('mouseover', function() {
+        const rating = this.getAttribute('data-rating');
+        const stars = document.querySelectorAll('.stars i');
+        
+        stars.forEach((s, index) => {
+          if(index < rating) {
+            s.style.transform = 'scale(1.2)';
+            s.style.transition = 'all 0.3s';
+          }
+        });
+      });
+      
+      star.addEventListener('mouseout', function() {
+        const stars = document.querySelectorAll('.stars i');
+        stars.forEach(s => {
+          s.style.transform = 'scale(1)';
+        });
+      });
+    });
+  </script>
 </body>
 </html>
