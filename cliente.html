@@ -335,6 +335,52 @@
       z-index: -1;
     }
 
+    /* Nuevos estilos para las redes sociales al final */
+    .redes-sociales {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .redes-titulo {
+      color: var(--gold);
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .redes-contenedor {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .redes-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--gold);
+      transition: all 0.3s;
+    }
+
+    .redes-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .redes-icono {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .redes-info {
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -360,6 +406,11 @@
       .diamond {
         transform: rotate(90deg);
       }
+
+      /* Responsive para redes sociales */
+      .redes-contenedor {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -381,38 +432,6 @@
           <span class="linea-oro"></span>
         </p>
       </header>
-      
-      <!-- Panel de Contacto Premium -->
-      <div class="contacto-premium">
-        <div class="contacto-titulo">
-          <span class="estrellas-premium">★★★★★</span> Contáctanos
-        </div>
-        <div class="contacto-contenedor">
-          <a href="https://wa.me/584142656119" target="_blank" class="contacto-item">
-            <div class="contacto-icono"><i class="fab fa-whatsapp"></i></div>
-            <div class="contacto-info">
-              WhatsApp
-              <div class="whatsapp-btn">+58 414-2656119</div>
-            </div>
-          </a>
-          
-          <a href="https://instagram.com/barb3rk" target="_blank" class="contacto-item">
-            <div class="contacto-icono"><i class="fab fa-instagram"></i></div>
-            <div class="contacto-info">
-              Instagram
-              <div>@barb3rk</div>
-            </div>
-          </a>
-          
-          <a href="https://tiktok.com/@barb3rk" target="_blank" class="contacto-item">
-            <div class="contacto-icono"><i class="fab fa-tiktok"></i></div>
-            <div class="contacto-info">
-              TikTok
-              <div>@barb3rk</div>
-            </div>
-          </a>
-        </div>
-      </div>
       
       <main>
         <form id="citaForm">
@@ -466,6 +485,38 @@
         <div class="info-horario">
           <i class="fas fa-info-circle"></i>
           <p>Horario de atención: Lunes a Sábado de 8:00 AM a 9:00 PM</p>
+        </div>
+
+        <!-- Redes sociales al final -->
+        <div class="redes-sociales">
+          <div class="redes-titulo">
+            <span class="estrellas-premium">★★★★★</span> Síguenos en redes
+          </div>
+          <div class="redes-contenedor">
+            <a href="https://wa.me/584142656119" target="_blank" class="redes-item">
+              <div class="redes-icono"><i class="fab fa-whatsapp"></i></div>
+              <div class="redes-info">
+                WhatsApp
+                <div class="whatsapp-btn">+58 414-2656119</div>
+              </div>
+            </a>
+            
+            <a href="https://instagram.com/barb3rk" target="_blank" class="redes-item">
+              <div class="redes-icono"><i class="fab fa-instagram"></i></div>
+              <div class="redes-info">
+                Instagram
+                <div>@barb3rk</div>
+              </div>
+            </a>
+            
+            <a href="https://tiktok.com/@barb3rk" target="_blank" class="redes-item">
+              <div class="redes-icono"><i class="fab fa-tiktok"></i></div>
+              <div class="redes-info">
+                TikTok
+                <div>@barb3rk</div>
+              </div>
+            </a>
+          </div>
         </div>
       </main>
     </div>
