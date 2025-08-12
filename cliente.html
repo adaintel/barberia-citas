@@ -335,30 +335,17 @@
       z-index: -1;
     }
 
-    /* Estilos para la nueva posición de las redes */
-    .redes-final {
+    /* ESTILOS ORIGINALES DE REDES (MODIFICADOS PARA ELIMINAR EL CUADRO) */
+    .redes-simplificadas {
       margin: 2rem 0;
-      background: rgba(212, 175, 55, 0.15);
-      backdrop-filter: blur(5px);
-      border-radius: 12px;
-      padding: 1.5rem;
-      border: 1px solid rgba(212, 175, 55, 0.3);
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
 
-    .redes-final::before {
-      content: "K";
-      position: absolute;
-      font-size: 120px;
-      opacity: 0.05;
-      color: var(--gold);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: bold;
-      z-index: 0;
+    .redes-contenedor {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 1rem;
     }
 
     @media (max-width: 768px) {
@@ -385,6 +372,12 @@
 
       .diamond {
         transform: rotate(90deg);
+      }
+
+      /* Ajuste para redes en móviles */
+      .redes-contenedor {
+        flex-direction: column;
+        gap: 15px;
       }
     }
   </style>
@@ -464,12 +457,12 @@
       </main>
     </div>
 
-    <!-- REDES SOCIALES MOVIDAS AQUÍ (ANTES DEL FOOTER) -->
-    <div class="redes-final">
+    <!-- REDES SOCIALES SIMPLIFICADAS (SIN CUADRO) -->
+    <div class="redes-simplificadas">
       <div class="contacto-titulo">
         <span class="estrellas-premium">★★★★★</span> Contáctanos
       </div>
-      <div class="contacto-contenedor">
+      <div class="redes-contenedor">
         <a href="https://wa.me/584142656119" target="_blank" class="contacto-item">
           <div class="contacto-icono"><i class="fab fa-whatsapp"></i></div>
           <div class="contacto-info">
