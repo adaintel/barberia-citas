@@ -22,11 +22,9 @@
     body {
       background-color: var(--dark);
       color: var(--light);
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>'),
-                      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="rgba(212, 175, 55, 0.03)" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM128.9 136.3c7.8-7.8 20.5-7.8 28.3 0l259.4 259.4c7.8 7.8 7.8 20.5 0 28.3s-20.5 7.8-28.3 0L128.9 164.6C121.1 156.8 121.1 144.1 128.9 136.3zM383.1 136.3c7.8 7.8 7.8 20.5 0 28.3L164.6 383.1c-7.8 7.8-20.5 7.8-28.3 0s-7.8-20.5 0-28.3l218.5-218.5C362.6 128.5 375.3 128.5 383.1 136.3z"/></svg>');
-      background-size: 200px, 300px;
-      background-repeat: repeat, no-repeat;
-      background-position: center, center;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50" y="50" font-family="Arial" font-size="60" fill="rgba(212, 175, 55, 0.05)" text-anchor="middle" dominant-baseline="middle">K</text></svg>');
+      background-size: 200px;
+      background-repeat: repeat;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -42,8 +40,6 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      position: relative;
-      z-index: 1;
     }
     
     header {
@@ -77,22 +73,40 @@
       justify-content: center;
     }
     
+    /* Animación de tijeras recortando */
     .logo-main::before,
     .logo-main::after {
       font-family: "Font Awesome 6 Free";
       font-weight: 900;
       content: "\f0c4"; /* Icono de tijeras */
-      font-size: 1.5rem;
-      margin: 0 10px;
+      font-size: 1.8rem;
+      margin: 0 15px;
       color: var(--gold);
+      text-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
+    }
+    
+    @keyframes cutting-left {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      50% { transform: rotate(0deg) scale(1); }
+      75% { transform: rotate(15deg) scale(1.1); }
+    }
+    
+    @keyframes cutting-right {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(15deg) scale(1.1); }
+      50% { transform: rotate(0deg) scale(1); }
+      75% { transform: rotate(-15deg) scale(1.1); }
     }
     
     .logo-main::before {
-      margin-right: 15px;
+      animation: cutting-left 2s infinite ease-in-out;
+      margin-right: 20px;
     }
     
     .logo-main::after {
-      margin-left: 15px;
+      animation: cutting-right 2s infinite ease-in-out 0.5s;
+      margin-left: 20px;
     }
     
     .logo-main::after {
@@ -170,49 +184,6 @@
       color: var(--dark);
     }
     
-    .location-btn {
-      margin: 2rem 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--gold);
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-    
-    .location-btn:hover {
-      transform: translateY(-2px);
-      text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-    }
-    
-    .rating-section {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      border-radius: 10px;
-      background: rgba(212, 175, 55, 0.05);
-      border: 1px solid rgba(212, 175, 55, 0.1);
-      max-width: 500px;
-      width: 100%;
-    }
-    
-    .rating-title {
-      color: var(--gold);
-      margin-bottom: 1rem;
-    }
-    
-    .stars {
-      font-size: 1.8rem;
-      color: var(--gold);
-      letter-spacing: 5px;
-      margin-bottom: 1rem;
-    }
-    
-    .rating-text {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-    
     footer {
       margin-top: auto;
       padding: 1.5rem;
@@ -267,8 +238,8 @@
       
       .logo-main::before,
       .logo-main::after {
-        font-size: 1.2rem;
-        margin: 0 5px;
+        font-size: 1.3rem;
+        margin: 0 8px;
       }
       
       .logo-slogan {
@@ -282,14 +253,6 @@
       
       .scissors-bg {
         font-size: 200px;
-      }
-      
-      .rating-section {
-        padding: 1rem;
-      }
-      
-      .stars {
-        font-size: 1.5rem;
       }
     }
   </style>
@@ -318,73 +281,12 @@
           <i class="fas fa-cut"></i> Soy Barbero
         </a>
       </div>
-      
-      <!-- Ubicación de la barbería -->
-      <a href="https://www.google.com/maps?q=10.4954872131348,-66.7982482910156" target="_blank" class="location-btn">
-        <i class="fas fa-map-marker-alt"></i> Visítanos en Av. Principal de la Parrila Petare, Caracas
-      </a>
-      
-      <!-- Valoración de la app -->
-      <div class="rating-section">
-        <h3 class="rating-title">¿Cómo valoras nuestro Servicio de atencion y barberia?</h3>
-        <div class="stars">
-          <i class="fas fa-star" data-rating="1"></i>
-          <i class="fas fa-star" data-rating="2"></i>
-          <i class="fas fa-star" data-rating="3"></i>
-          <i class="fas fa-star" data-rating="4"></i>
-          <i class="fas fa-star" data-rating="5"></i>
-        </div>
-        <p class="rating-text">Tu opinión nos ayuda a mejorar</p>
-      </div>
     </main>
     
     <footer>
       <p class="copyright">© 2025 Barber-K</p>
-      <p class="author">Sistema desarrollado por Antonio Avila telf:.(2424)1345912</p>
+      <p class="author">Sistema desarrollado por Antonio telf:.(2424)1345912</p>
     </footer>
   </div>
-
-  <script>
-    // Sistema de valoración por estrellas
-    document.querySelectorAll('.stars i').forEach(star => {
-      star.addEventListener('click', function() {
-        const rating = this.getAttribute('data-rating');
-        const stars = document.querySelectorAll('.stars i');
-        
-        stars.forEach((s, index) => {
-          if(index < rating) {
-            s.classList.add('fas');
-            s.classList.remove('far');
-          } else {
-            s.classList.add('far');
-            s.classList.remove('fas');
-          }
-        });
-        
-        // Aquí podrías agregar código para enviar la valoración a tu backend
-        console.log(`Valoración enviada: ${rating} estrellas`);
-        alert(`¡Gracias por tu valoración de ${rating} estrellas!`);
-      });
-      
-      star.addEventListener('mouseover', function() {
-        const rating = this.getAttribute('data-rating');
-        const stars = document.querySelectorAll('.stars i');
-        
-        stars.forEach((s, index) => {
-          if(index < rating) {
-            s.style.transform = 'scale(1.2)';
-            s.style.transition = 'all 0.3s';
-          }
-        });
-      });
-      
-      star.addEventListener('mouseout', function() {
-        const stars = document.querySelectorAll('.stars i');
-        stars.forEach(s => {
-          s.style.transform = 'scale(1)';
-        });
-      });
-    });
-  </script>
 </body>
 </html>
