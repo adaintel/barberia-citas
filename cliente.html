@@ -109,8 +109,8 @@
     
     .contacto-contenedor {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
       margin-top: 1rem;
       position: relative;
     }
@@ -148,6 +148,12 @@
       align-items: center;
       gap: 8px;
       margin-top: 5px;
+    }
+    
+    .estrellas-premium {
+      color: var(--gold);
+      letter-spacing: 3px;
+      font-size: 0.9rem;
     }
     
     #citaForm {
@@ -327,7 +333,7 @@
       <!-- Panel de Contacto Premium -->
       <div class="contacto-premium">
         <div class="contacto-titulo">
-          <i class="fas fa-star"></i> Contáctanos
+          <span class="estrellas-premium">★★★★★</span> Contáctanos
         </div>
         <div class="contacto-contenedor">
           <a href="https://wa.me/584142656119" target="_blank" class="contacto-item">
