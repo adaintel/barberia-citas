@@ -208,12 +208,21 @@
       display: flex;
       justify-content: center;
       gap: 20px;
+      background: rgba(212, 175, 55, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
     }
     
     .redes-sociales a {
       color: var(--gold);
       font-size: 1.4rem;
       transition: transform 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 1rem;
     }
     
     .redes-sociales a:hover {
@@ -241,7 +250,9 @@
       }
       
       .redes-sociales {
-        gap: 15px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
       }
     }
   </style>
@@ -255,6 +266,16 @@
         <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
         <p>Barber-K - Reserva tu experiencia premium</p>
       </header>
+      
+      <!-- NUEVO: Redes sociales en posición destacada -->
+      <div class="redes-sociales">
+        <a href="https://instagram.com/barb3rk" target="_blank">
+          <i class="fab fa-instagram"></i> @barb3rk
+        </a>
+        <a href="https://tiktok.com/@barb3rk" target="_blank">
+          <i class="fab fa-tiktok"></i> @barb3rk
+        </a>
+      </div>
       
       <main>
         <form id="citaForm">
@@ -283,16 +304,15 @@
               <i class="fas fa-cut"></i>
               <select id="servicio" required>
                 <option value="" disabled selected>Servicio</option>
-                <option value="Corte de cabello">Corte ($20)</option>
-                <option value="Arreglo de barba">Barba ($15)</option>
-                <option value="Corte y barba">Combo ($30)</option>
-                <option value="Tinte">Tinte ($25)</option>
-                <option value="Servicio VIP">VIP ($50)</option>
+                <option value="Corte con barba">Corte con barba</option>
+                <option value="Corte normal">Corte normal</option>
+                <option value="Retoque de barba">Retoque de barba</option>
+                <option value="Retoque de cejas">Retoque de cejas</option>
               </select>
             </div>
           </div>
           
-          <!-- CAMBIO PRINCIPAL: Selector de barbero (solo Kelvin) -->
+          <!-- Selector de barbero (solo Kelvin) -->
           <div class="input-group">
             <i class="fas fa-user-tie"></i>
             <select id="barbero" required>
@@ -318,17 +338,6 @@
       <a href="index.html" class="btn-volver">
         <i class="fas fa-arrow-left"></i> Volver al inicio
       </a>
-      
-      <!-- NUEVO: Redes sociales -->
-      <div class="redes-sociales">
-        <a href="https://instagram.com/barb3rk" target="_blank" title="Instagram">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://tiktok.com/@barb3rk" target="_blank" title="TikTok">
-          <i class="fab fa-tiktok"></i>
-        </a>
-      </div>
-      
       <p>© 2025 Barber-K - Todos los derechos reservados</p>
     </footer>
   </div>
