@@ -960,3 +960,47 @@ input:valid {
     border-radius: 8px;
   }
 }
+
+/* ===== ESTILOS GENERALES PARA MÓVILES (≤ 768px) ===== */
+@media (max-width: 768px) {
+  /* Ajustes de contenedores */
+  body {
+    font-size: 14px;
+    overflow-x: hidden; /* Evita scroll horizontal */
+  }
+
+  /* Formularios */
+  input, select, textarea, button {
+    font-size: 16px !important; /* Tamaño mínimo para iOS */
+    min-height: 48px !important; /* Área táctil más grande */
+  }
+
+  /* Mensajes de la app */
+  .mensaje {
+    width: 90% !important;
+    left: 5% !important;
+    right: 5% !important;
+    padding: 12px !important;
+  }
+
+  /* Navbar (si tienes) */
+  nav {
+    padding: 10px 5px !important;
+  }
+
+  /* Tablas (para barbero.html) */
+  table {
+    font-size: 12px;
+    display: block;
+    overflow-x: auto; /* Scroll horizontal en tablas */
+  }
+}
+
+/* ===== TABLETS (769px a 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Ajustar contenedores principales */
+  .contenedor-principal {
+    max-width: 90% !important;
+    margin: 0 auto !important;
+  }
+}
