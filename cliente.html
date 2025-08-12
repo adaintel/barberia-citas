@@ -70,6 +70,57 @@
       letter-spacing: 1px;
     }
     
+    /* NUEVO: Estilo para redes sociales */
+    .redes-panel {
+      background: rgba(212, 175, 55, 0.15);
+      backdrop-filter: blur(5px);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      text-align: center;
+    }
+    
+    .redes-titulo {
+      color: var(--gold);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .redes-contenedor {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 1rem;
+    }
+    
+    .red-social {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--gold);
+      transition: all 0.3s;
+    }
+    
+    .red-social:hover {
+      transform: translateY(-5px);
+    }
+    
+    .icono-red {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    
+    .usuario-red {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
     #citaForm {
       display: flex;
       flex-direction: column;
@@ -203,32 +254,6 @@
       font-size: 0.9rem;
     }
     
-    .redes-sociales {
-      margin: 1.5rem 0;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      background: rgba(212, 175, 55, 0.1);
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px solid rgba(212, 175, 55, 0.2);
-    }
-    
-    .redes-sociales a {
-      color: var(--gold);
-      font-size: 1.4rem;
-      transition: transform 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-    
-    .redes-sociales a:hover {
-      transform: translateY(-3px);
-    }
-    
     .gold-glow {
       position: fixed;
       top: 50%;
@@ -249,10 +274,20 @@
         padding: 1rem;
       }
       
-      .redes-sociales {
+      .redes-contenedor {
         flex-direction: column;
+        gap: 15px;
+      }
+      
+      .red-social {
+        flex-direction: row;
+        justify-content: center;
         gap: 10px;
-        align-items: center;
+      }
+      
+      .icono-red {
+        font-size: 1.8rem;
+        margin-bottom: 0;
       }
     }
   </style>
@@ -267,14 +302,21 @@
         <p>Barber-K - Reserva tu experiencia premium</p>
       </header>
       
-      <!-- NUEVO: Redes sociales en posición destacada -->
-      <div class="redes-sociales">
-        <a href="https://instagram.com/barb3rk" target="_blank">
-          <i class="fab fa-instagram"></i> @barb3rk
-        </a>
-        <a href="https://tiktok.com/@barb3rk" target="_blank">
-          <i class="fab fa-tiktok"></i> @barb3rk
-        </a>
+      <!-- NUEVO: Panel de redes sociales destacado -->
+      <div class="redes-panel">
+        <div class="redes-titulo">
+          <i class="fas fa-heart"></i> Síguenos en redes
+        </div>
+        <div class="redes-contenedor">
+          <a href="https://instagram.com/barb3rk" target="_blank" class="red-social">
+            <div class="icono-red"><i class="fab fa-instagram"></i></div>
+            <div class="usuario-red">@barb3rk</div>
+          </a>
+          <a href="https://tiktok.com/@barb3rk" target="_blank" class="red-social">
+            <div class="icono-red"><i class="fab fa-tiktok"></i></div>
+            <div class="usuario-red">@barb3rk</div>
+          </a>
+        </div>
       </div>
       
       <main>
@@ -312,7 +354,6 @@
             </div>
           </div>
           
-          <!-- Selector de barbero (solo Kelvin) -->
           <div class="input-group">
             <i class="fas fa-user-tie"></i>
             <select id="barbero" required>
