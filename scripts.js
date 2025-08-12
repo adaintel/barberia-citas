@@ -17,7 +17,26 @@ if (!supabase) {
   document.head.appendChild(script);
 }
 
-// 2. Función mejorada para mostrar mensajes
+// Configuración de horarios para Venezuela
+const CONFIG_VENEZUELA = {
+  intervaloEntreCitas: 40, // minutos entre citas
+  horarioApertura: '08:00',
+  horarioCierre: '21:00',
+  zonaHoraria: 'America/Caracas',
+  diasTrabajo: [1, 2, 3, 4, 5, 6] // Lunes(1) a Sábado(6)
+};
+
+// 2. Función para obtener hora actual de Venezuela
+function obtenerHoraActualVenezuela() {
+  return new Date().toLocaleTimeString('es-VE', {
+    timeZone: CONFIG_VENEZUELA.zonaHoraria,
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+// 3. Función mejorada para mostrar mensajes
 function mostrarMensaje(texto, tipo = 'info') {
   const mensajeDiv = document.getElementById('mensaje');
   if (!mensajeDiv) {
@@ -27,6 +46,7 @@ function mostrarMensaje(texto, tipo = 'info') {
   
   // Limpiar mensajes anteriores
   mensajeDiv.innerHTML = '';
+  mensajeDiv.className = ''; // Resetear clases
   
   // Crear elemento de mensaje
   const mensajeElement = document.createElement('div');
@@ -49,7 +69,49 @@ function mostrarMensaje(texto, tipo = 'info') {
   }, 5000);
 }
 
-// 3. Validación mejorada de formulario
+// 4. Función para verificar disponibilidad de horario
+async function verificarDisponibilidad(fecha, hora) {
+  try {
+    // Convertir hora seleccionada a minutos
+    const [horaSel, minSel] = hora.split(':').map(Number);
+    const minutosSel = horaSel * 60 + minSel;
+    
+    // Obtener todas las citas para esa fecha
+    const { data: citas, error } = await supabase
+      .from('citas')
+      .select('hora')
+      .eq('fecha', fecha);
+    
+    if (error) throw error;
+    
+    // Verificar cada cita existente
+    for (const cita of citas) {
+      const [horaExistente, minExistente] = cita.hora.split(':').map(Number);
+      const minutosExistente = horaExistente * 60 + minExistente;
+      
+      // Calcular diferencia en minutos
+      const diferencia = Math.abs(minutosSel - minutosExistente);
+      
+      // Si hay menos del intervalo requerido, está ocupado
+      if (diferencia < CONFIG_VENEZUELA.intervaloEntreCitas) {
+        return {
+          disponible: false,
+          mensaje: `El horario ${hora} no está disponible. Por favor elige otro.`
+        };
+      }
+    }
+    
+    return { disponible: true };
+  } catch (error) {
+    console.error('Error verificando disponibilidad:', error);
+    return {
+      disponible: false,
+      mensaje: 'Error al verificar disponibilidad. Intenta nuevamente.'
+    };
+  }
+}
+
+// 5. Validación mejorada de formulario con horario Venezuela
 function validarFormulario({nombre, telefono, fecha, hora}) {
   if (!nombre || nombre.trim().length < 3) {
     return {valido: false, error: 'El nombre debe tener al menos 3 caracteres'};
@@ -66,48 +128,57 @@ function validarFormulario({nombre, telefono, fecha, hora}) {
     return {valido: false, error: 'La cita no puede ser en el pasado'};
   }
   
-  // Validar horario laboral (8am-9pm)
-  const horaCita = hora.split(':')[0];
-  if (horaCita < 8 || horaCita > 21) {
-    return {valido: false, error: 'Horario no disponible (8:00 - 21:00)'};
+  // Validar horario laboral en Venezuela
+  const [horaCita, minCita] = hora.split(':').map(Number);
+  const [horaApertura] = CONFIG_VENEZUELA.horarioApertura.split(':').map(Number);
+  const [horaCierre] = CONFIG_VENEZUELA.horarioCierre.split(':').map(Number);
+  
+  if (horaCita < horaApertura || horaCita >= horaCierre) {
+    return {
+      valido: false, 
+      error: `Horario no disponible (${CONFIG_VENEZUELA.horarioApertura} a ${CONFIG_VENEZUELA.horarioCierre})`
+    };
   }
   
   return {valido: true};
 }
 
-// 4. Función para inicializar selectores con validación
+// 6. Función para inicializar selectores con validación para Venezuela
 function inicializarSelectores() {
   const fechaInput = document.getElementById('fecha');
   const horaInput = document.getElementById('hora');
   
   if (!fechaInput || !horaInput) return;
 
-  // Configurar fecha mínima (mañana)
+  // Configurar fecha mínima (hoy) según hora de Venezuela
   const hoy = new Date();
-  const manana = new Date(hoy);
-  manana.setDate(hoy.getDate() + 1);
+  const hoyVenezuela = hoy.toLocaleString('es-VE', { timeZone: CONFIG_VENEZUELA.zonaHoraria });
+  const fechaMinima = hoyVenezuela.split(',')[0].trim().split('/').reverse().join('-');
   
-  fechaInput.min = manana.toISOString().split('T')[0];
-  fechaInput.value = manana.toISOString().split('T')[0];
+  fechaInput.min = fechaMinima;
+  fechaInput.value = fechaMinima;
   
-  // Configurar hora (8:00 AM - 9:00 PM)
-  horaInput.min = "08:00";
-  horaInput.max = "21:00";
-  horaInput.value = "08:00";
+  // Configurar hora según horario Venezuela
+  horaInput.min = CONFIG_VENEZUELA.horarioApertura;
+  horaInput.max = CONFIG_VENEZUELA.horarioCierre;
   
-  // Deshabilitar fines de semana
+  // Establecer hora actual de Venezuela como sugerencia
+  const horaActual = obtenerHoraActualVenezuela();
+  horaInput.value = horaActual;
+  
+  // Validar días de trabajo (Lunes a Sábado)
   fechaInput.addEventListener('change', function() {
     const fechaSeleccionada = new Date(this.value);
-    const diaSemana = fechaSeleccionada.getDay();
+    const diaSemana = fechaSeleccionada.getDay(); // 0=Domingo, 1=Lunes, etc.
     
-    if (diaSemana === 0 || diaSemana === 6) { // Domingo (0) o Sábado (6)
-      mostrarMensaje('No trabajamos fines de semana. Por favor seleccione un día hábil.', 'error');
+    if (!CONFIG_VENEZUELA.diasTrabajo.includes(diaSemana)) {
+      mostrarMensaje('No trabajamos los domingos. Por favor seleccione un día hábil de Lunes a Sábado.', 'error');
       this.value = fechaInput.min; // Resetear a fecha mínima
     }
   });
 }
 
-// 5. Función para enviar notificación a Telegram
+// 7. Función para enviar notificación a Telegram (sin cambios)
 async function enviarNotificacionTelegram(citaData) {
   const BOT_TOKEN = "8473537897:AAE4DhBRqFSgkerepYMSA-meEBwn0pXjXag";
   const CHAT_ID = "8330674980";
@@ -137,17 +208,23 @@ async function enviarNotificacionTelegram(citaData) {
     console.log('Notificación enviada al barbero');
   } catch (error) {
     console.error('Error en notificación Telegram:', error);
-    // No mostramos error al usuario para no afectar su experiencia
   }
 }
 
-// 6. Función para guardar cita con RLS habilitado
+// 8. Función para guardar cita con validación de horario
 async function guardarCita(citaData) {
   if (!supabase) {
     throw new Error('Error de conexión con el servidor');
   }
 
   try {
+    // Primero verificar disponibilidad
+    const disponibilidad = await verificarDisponibilidad(citaData.fecha, citaData.hora);
+    if (!disponibilidad.disponible) {
+      throw new Error(disponibilidad.mensaje);
+    }
+
+    // Si está disponible, guardar la cita
     const { data, error } = await supabase
       .from('citas')
       .insert([{
@@ -172,7 +249,7 @@ async function guardarCita(citaData) {
   }
 }
 
-// 7. Inicialización principal cuando el DOM esté listo
+// 9. Inicialización principal adaptada para Venezuela
 document.addEventListener('DOMContentLoaded', function() {
   // Verificar si Supabase está inicializado
   if (!supabase) {
@@ -180,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
-  // Inicializar selectores de fecha/hora
+  // Inicializar selectores de fecha/hora para Venezuela
   inicializarSelectores();
 
   // Manejar envío del formulario
@@ -193,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const submitBtn = citaForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Agendando...';
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Agendando...';
       
       try {
         // Obtener valores del formulario
@@ -206,13 +283,13 @@ document.addEventListener('DOMContentLoaded', function() {
           barbero: document.getElementById('barbero').value
         };
 
-        // Validar datos
+        // Validar datos básicos
         const validacion = validarFormulario(formData);
         if (!validacion.valido) {
           throw new Error(validacion.error);
         }
 
-        // Guardar cita
+        // Guardar cita (incluye validación de disponibilidad)
         const citaGuardada = await guardarCita(formData);
         console.log('Cita guardada:', citaGuardada);
         
@@ -227,15 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
       } finally {
         // Restaurar botón
         submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar Cita';
       }
     });
-  }
-
-  // Código adicional para el panel del barbero (si existe)
-  const barberoPanel = document.getElementById('barberoPanel');
-  if (barberoPanel) {
-    // Aquí iría el código específico para el panel del barbero
-    console.log('Panel del barbero detectado');
   }
 });
