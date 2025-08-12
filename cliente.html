@@ -49,26 +49,60 @@
       margin-bottom: 2rem;
     }
     
+    /* ---------------------- */
+    /* ESTILOS PREMIUM (NUEVO) */
+    /* ---------------------- */
     header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
-    
-    header h1 {
-      color: var(--gold);
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
+
+    .titulo-premium {
+      position: relative;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 300;
+      margin-bottom: 0.8rem !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px;
+      gap: 10px;
     }
-    
-    header p {
-      color: var(--light);
-      opacity: 0.8;
-      letter-spacing: 1px;
+
+    .titulo-efecto {
+      background: linear-gradient(90deg, #D4AF37, #F9F295, #D4AF37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding: 0 10px;
+      font-weight: 700;
+      font-size: 2.1rem;
     }
+
+    .diamond {
+      color: var(--gold);
+      font-size: 1.4rem;
+      opacity: 0.7;
+      margin-top: -5px;
+    }
+
+    .subtitulo-lujo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+    }
+
+    .linea-oro {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    /* ---------------------- */
     
     /* Panel de Contacto Premium */
     .contacto-premium {
@@ -317,6 +351,15 @@
       .contacto-icono {
         font-size: 1.8rem;
       }
+
+      .titulo-premium {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .diamond {
+        transform: rotate(90deg);
+      }
     }
   </style>
 </head>
@@ -325,9 +368,18 @@
   
   <div class="container">
     <div class="glass-panel">
+      <!-- HEADER PREMIUM -->
       <header>
-        <h1><i class="fas fa-calendar-plus"></i> Agendar Cita</h1>
-        <p>Barber-K - Experiencia Premium</p>
+        <h1 class="titulo-premium">
+          <span class="diamond">◆</span>
+          <span class="titulo-efecto">AGENDAR CITA</span>
+          <span class="diamond">◆</span>
+        </h1>
+        <p class="subtitulo-lujo">
+          <span class="linea-oro"></span>
+          BARBERÍA DE ALTA GAMA
+          <span class="linea-oro"></span>
+        </p>
       </header>
       
       <!-- Panel de Contacto Premium -->
