@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Barbero - Barbería Makro</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/panels.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="assets/img/logo.png" alt="Barbería Makro">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#citas">Mis Citas</a></li>
+                <li><a href="#horario">Mi Horario</a></li>
+                <li><a href="#" id="logout">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <h1>Panel del Barbero</h1>
+        
+        <section id="citas">
+            <h2>Próximas Citas</h2>
+            <div id="appointments-list"></div>
+        </section>
+        
+        <section id="horario">
+            <h2>Mi Horario</h2>
+            <div id="schedule-container"></div>
+            <button id="save-schedule">Guardar Horario</button>
+        </section>
+        
+        <section id="calendar-section">
+            <h2>Calendario</h2>
+            <div id="calendar"></div>
+        </section>
+    </main>
+
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/auth/login.js"></script>
+    <script src="assets/js/appointments/manage.js"></script>
+    <script src="assets/js/barbers/schedule.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    <script src="assets/js/appointments/calendar.js"></script>
+</body>
+</html>

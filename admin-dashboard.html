@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Barbería Makro</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/panels.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="assets/img/logo.png" alt="Barbería Makro">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#barberos">Barberos</a></li>
+                <li><a href="#clientes">Clientes</a></li>
+                <li><a href="#reportes">Reportes</a></li>
+                <li><a href="#" id="logout">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <h1>Panel de Administración</h1>
+        
+        <section id="barberos">
+            <h2>Gestión de Barberos</h2>
+            <button id="add-barber">Agregar Barbero</button>
+            <div id="barbers-list" class="admin-list"></div>
+        </section>
+        
+        <section id="clientes">
+            <h2>Gestión de Clientes</h2>
+            <div id="clients-list" class="admin-list"></div>
+        </section>
+        
+        <section id="reportes">
+            <h2>Reportes</h2>
+            <div class="reports">
+                <div class="report-card">
+                    <h3>Citas Hoy</h3>
+                    <p id="today-appointments">0</p>
+                </div>
+                <div class="report-card">
+                    <h3>Total Barberos</h3>
+                    <p id="total-barbers">0</p>
+                </div>
+                <div class="report-card">
+                    <h3>Total Clientes</h3>
+                    <p id="total-clients">0</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/auth/login.js"></script>
+    <script src="assets/js/barbers/list.js"></script>
+    <script>
+        // Código específico del admin
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cargar estadísticas
+            const loadStats = async () => {
+                try {
+                    // Obtener conteo de citas hoy
+                    const today = new Date().toISOString().split('T')[0];
+                    const { count: todayCount } = await supabase
+                        .from('appointments')
+                        .select('*', { count: 'exact' })
+                        .eq('date', today);
+                    
+                    document.getElementById('today-appointments').textContent = todayCount;
+                    
+                    // Obtener conteo de barberos
+                    const { count: barbersCount } = await supabase
+                        .from('profiles')
+                        .select('*', { count: 'exact' })
+                        .eq('role', 'barber');
+                    
+                    document.getElementById('total-barbers').textContent = barbersCount;
+                    
+                    // Obtener conteo de clientes
+                    const { count: clientsCount } = await supabase
+                        .from('profiles')
+                        .select('*', { count: 'exact' })
+                        .eq('role', 'client');
+                    
+                    document.getElementById('total-clients').textContent = clientsCount;
+                    
+                } catch (error) {
+                    console.error('Error cargando estadísticas:', error.message);
+                }
+            };
+            
+            loadStats();
+        });
+    </script>
+</body>
+</html>
